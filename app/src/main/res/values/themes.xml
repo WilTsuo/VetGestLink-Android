@@ -1,9 +1,25 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Vetgestlink" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+    <!-- Tema principal que força o modo claro -->
+    <style name="Theme.VetGestLink" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Cores primárias -->
+        <item name="colorPrimary">#15803d</item>
+        <item name="colorPrimaryDark">#14532d</item>
+        <item name="colorAccent">#16a34a</item>
 
+        <!-- Força o tema claro sempre -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <!-- Background sempre branco -->
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+
+        <!-- Cores de texto fixas -->
+        <item name="android:textColorPrimary">#111827</item>
+        <item name="android:textColorSecondary">#4b5563</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#f0fdf4</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
     <style name="Theme.Vetgestlink" parent="Base.Theme.Vetgestlink" />
 </resources>

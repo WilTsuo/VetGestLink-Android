@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Colors - Green Theme -->
+    <color name="primary_green">#15803d</color>
+    <color name="primary_green_dark">#14532d</color>
+    <color name="primary_green_light">#16a34a</color>
+    <color name="primary_green_lighter">#22c55e</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary_green">#1e7a4e</color>
+
+    <!-- Background Colors -->
+    <color name="background_gradient_start">#f0fdf4</color>
+    <color name="background_gradient_end">#ffffff</color>
+    <color name="white">#ffffff</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#4b5563</color>
+    <color name="text_tertiary">#6b7280</color>
+    <color name="text_light">#9ca3af</color>
+
+    <!-- Border Colors -->
+    <color name="border_light">#e5e7eb</color>
+    <color name="border_medium">#d1d5db</color>
+
+    <!-- Icon Colors -->
+    <color name="icon_gray">#9ca3af</color>
 </resources>

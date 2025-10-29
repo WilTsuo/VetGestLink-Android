@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">Vetgestlink</string>
+    <!-- App Name -->
+    <string name="app_name">VetGestLink</string>
+    <string name="app_subtitle">Gestão Veterinária Completa</string>
+    <string name="logo_description">Logo VetGestLink</string>
+
+    <!-- Login Screen -->
+    <string name="email_hint">E-mail</string>
+    <string name="password_hint">Senha</string>
+    <string name="remember_me">Lembrar-me</string>
+    <string name="forgot_password">Esqueci a senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="or">ou</string>
+    <string name="no_account">Não tem uma conta?</string>
+    <string name="request_access">Solicite acesso</string>
+    <string name="copyright">VetGestLink © 2025</string>
+    <string name="all_rights_reserved">Todos os direitos reservados</string>
+
+    <!-- Email Placeholder -->
+    <string name="email_placeholder">seu@email.com</string>
+    <string name="password_placeholder">••••••••</string>
 </resources>
