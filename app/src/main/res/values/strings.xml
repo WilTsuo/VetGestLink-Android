@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
     <string name="app_name">VetGestLink</string>
@@ -5,6 +6,7 @@
     <string name="logo_description">Logo VetGestLink</string>
 
     <!-- Login Screen -->
+    <string name="username_hint">Nome de utilizador</string>
     <string name="email_hint">E-mail</string>
     <string name="password_hint">Senha</string>
     <string name="remember_me">Lembrar-me</string>
@@ -19,4 +21,10 @@
     <!-- Email Placeholder -->
     <string name="email_placeholder">seu@email.com</string>
     <string name="password_placeholder">••••••••</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_appointments">Marcações</string>
+    <string name="nav_billing">Faturação</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_settings">Configurações</string>
 </resources>

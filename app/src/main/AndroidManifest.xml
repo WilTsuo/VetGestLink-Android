@@ -11,22 +11,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Vetgestlink">
+
+        <!-- Login Activity -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".LoginActivity"
+            android:name=".view.activities.LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.Vetgestlink">
+            android:theme="@style/Theme.VetGestLink">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Main Activity -->
+        <activity
+            android:name=".view.activities.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VetGestLink" />
+
+        <!-- Forgot Password -->
+        <activity
+            android:name=".view.activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VetGestLink" />
+
     </application>
 
 </manifest>

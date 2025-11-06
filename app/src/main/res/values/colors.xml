@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
     <!-- Primary Colors - Green Theme -->
     <color name="primary_green">#15803d</color>
     <color name="primary_green_dark">#14532d</color>
@@ -27,4 +26,17 @@
 
     <!-- Icon Colors -->
     <color name="icon_gray">#9ca3af</color>
+
+    <!-- Bottom Navigation Colors -->
+    <color name="bottom_nav_selected">#15803d</color>
+    <color name="bottom_nav_unselected">#6b7280</color>
+
+    <!-- Chip Colors -->
+    <color name="chip_selected">#15803d</color>
+    <color name="chip_unselected">#FFFFFF</color>
+
+    <!-- Status Colors -->
+    <color name="status_success">#16a34a</color>
+    <color name="status_warning">#f59e0b</color>
+    <color name="status_error">#dc2626</color>
 </resources>
