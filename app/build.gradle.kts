@@ -60,6 +60,15 @@ dependencies {
 // Para criar cards programaticamente (sem RecyclerView)
     implementation("androidx.cardview:cardview:1.0.0")
 
+// ===== VOLLEY (HTTP Client) =====
+    implementation("com.android.volley:volley:1.2.1")
+
+// ===== RECYCLERVIEW =====
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+// ===== SWIPE REFRESH =====
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
 // ===== TESTES =====
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissão para acessar a internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,7 +14,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Vetgestlink">
+        android:theme="@style/Theme.Vetgestlink"
+        android:usesCleartextTraffic="true">
 
         <!-- Login Activity -->
         <activity
@@ -23,17 +28,19 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity -->
-        <activity
-            android:name=".view.activities.MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.VetGestLink" />
-
         <!-- Forgot Password -->
         <activity
             android:name=".view.activities.ForgotPasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.VetGestLink" />
+
+        <!-- Main Activity(NOTAS)-->
+        <activity
+            android:name=".view.activities.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VetGestLink" />
+
+
 
     </application>
 

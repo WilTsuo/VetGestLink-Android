@@ -23,8 +23,34 @@
     <string name="password_placeholder">••••••••</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_appointments">Marcações</string>
+    <string name="nav_appointments">Consultas</string>
+    <string name="nav_payments">Pagamentos</string>
+    <string name="nav_notes">Notas</string>
+    <string name="nav_medicines">Medicamentos</string>
     <string name="nav_billing">Faturação</string>
     <string name="nav_profile">Perfil</string>
-    <string name="nav_settings">Configurações</string>
+    <string name="nav_settings">Definições</string>
+
+    <!-- Appointments Fragment -->
+    <string name="appointments_title">Consultas</string>
+    <string name="appointments_subtitle">Histórico e agendamentos</string>
+    <string name="search_appointments_hint">Pesquisar consultas...</string>
+    <string name="add_appointment_description">Adicionar Marcação</string>
+    <string name="appointments_list_description">Lista de consultas</string>
+    <string name="filter_all">Todas</string>
+    <string name="filter_scheduled">Agendadas</string>
+    <string name="filter_today">Hoje</string>
+    <string name="filter_upcoming">Próximas</string>
+    <string name="filter_completed">Concluídas</string>
+
+    <!-- Notas Screen -->
+    <string name="titulo_nota">Título da Nota</string>
+    <string name="descricao_nota">Descrição da nota</string>
+    <string name="data_nota">Data</string>
+    <string name="editar">Editar</string>
+    <string name="excluir">Excluir</string>
+    <string name="data">Data</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
