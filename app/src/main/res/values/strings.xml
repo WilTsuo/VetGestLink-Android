@@ -1,56 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Name -->
     <string name="app_name">VetGestLink</string>
-    <string name="app_subtitle">Gestão Veterinária Completa</string>
-    <string name="logo_description">Logo VetGestLink</string>
 
-    <!-- Login Screen -->
-    <string name="username_hint">Nome de utilizador</string>
-    <string name="email_hint">E-mail</string>
-    <string name="password_hint">Senha</string>
-    <string name="remember_me">Lembrar-me</string>
-    <string name="forgot_password">Esqueci a senha</string>
-    <string name="login_button">Entrar</string>
-    <string name="or">ou</string>
-    <string name="no_account">Não tem uma conta?</string>
-    <string name="request_access">Solicite acesso</string>
-    <string name="copyright">VetGestLink © 2025</string>
-    <string name="all_rights_reserved">Todos os direitos reservados</string>
-
-    <!-- Email Placeholder -->
-    <string name="email_placeholder">seu@email.com</string>
-    <string name="password_placeholder">••••••••</string>
-
-    <!-- Bottom Navigation -->
+    <!-- Navigation -->
     <string name="nav_appointments">Consultas</string>
     <string name="nav_payments">Pagamentos</string>
     <string name="nav_notes">Notas</string>
-    <string name="nav_medicines">Medicamentos</string>
-    <string name="nav_billing">Faturação</string>
     <string name="nav_profile">Perfil</string>
-    <string name="nav_settings">Definições</string>
+    <string name="nav_settings">Configurações</string>
 
-    <!-- Appointments Fragment -->
+    <!-- Login -->
+    <string name="login_title">Bem-vindo</string>
+    <string name="email">Email</string>
+    <string name="password">Senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="register_link">Não tem conta? Registre-se</string>
+    <string name="forgot_password">Esqueceu a senha?</string>
+
+    <!-- Register -->
+    <string name="register_title">Criar Conta</string>
+    <string name="name">Nome</string>
+    <string name="confirm_password">Confirmar Senha</string>
+    <string name="register_button">Registrar</string>
+    <string name="have_account">Já tem conta? Entre</string>
+
+    <!-- Main -->
+    <string name="welcome">Bem-vindo(a)</string>
+    <string name="logout">Sair</string>
+
+    <!-- Appointments -->
     <string name="appointments_title">Consultas</string>
-    <string name="appointments_subtitle">Histórico e agendamentos</string>
-    <string name="search_appointments_hint">Pesquisar consultas...</string>
-    <string name="add_appointment_description">Adicionar Marcação</string>
-    <string name="appointments_list_description">Lista de consultas</string>
-    <string name="filter_all">Todas</string>
-    <string name="filter_scheduled">Agendadas</string>
-    <string name="filter_today">Hoje</string>
-    <string name="filter_upcoming">Próximas</string>
-    <string name="filter_completed">Concluídas</string>
+    <string name="no_appointments">Nenhuma consulta agendada</string>
+    <string name="add_appointment">Nova Consulta</string>
 
-    <!-- Notas Screen -->
-    <string name="titulo_nota">Título da Nota</string>
-    <string name="descricao_nota">Descrição da nota</string>
-    <string name="data_nota">Data</string>
+    <!-- Payments -->
+    <string name="payments_title">Pagamentos</string>
+    <string name="no_payments">Nenhum pagamento registrado</string>
+
+    <!-- Notes -->
+    <string name="notes_title">Notas</string>
+    <string name="no_notes">Nenhuma nota disponível</string>
+    <string name="add_note">Nova Nota</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Perfil</string>
+    <string name="edit_profile">Editar Perfil</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configurações</string>
+    <string name="notifications">Notificações</string>
+    <string name="theme">Tema</string>
+    <string name="language">Idioma</string>
+    <string name="about">Sobre</string>
+
+    <!-- Common -->
+    <string name="save">Salvar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Excluir</string>
+    <string name="edit">Editar</string>
+    <string name="ok">OK</string>
+    <string name="error">Erro</string>
+    <string name="loading">Carregando...</string>
+    <string name="success">Sucesso</string>
+
+    <!-- Error messages -->
+    <string name="error_network">Erro de conexão. Verifique sua internet.</string>
+    <string name="error_login">Email ou senha inválidos</string>
+    <string name="error_required_fields">Por favor, preencha todos os campos</string>
+    <string name="error_email_invalid">Email inválido</string>
+    <string name="error_password_mismatch">As senhas não coincidem</string>
+    <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
+
+    <string name="logo_description">Descrição do logo</string>
+    <string name="app_subtitle">Subtítulo do app</string>
+    <string name="username_hint">Nome de usuário</string>
+    <string name="password_hint">Senha</string>
+    <string name="remember_me">Lembrar-me</string>
+    <string name="or">ou</string>
+    <string name="no_account">Não tem conta?</string>
+    <string name="request_access">Solicitar acesso</string>
+    <string name="copyright">Copyright</string>
+    <string name="all_rights_reserved">Todos os direitos reservados</string>
+    <string name="appointments_subtitle">Subtítulo das marcações</string>
+    <string name="search_appointments_hint">Pesquisar marcações</string>
+    <string name="filter_all">Todos</string>
+    <string name="filter_scheduled">Agendados</string>
+    <string name="filter_completed">Concluídos</string>
+    <string name="appointments_list_description">Lista de marcações</string>
     <string name="editar">Editar</string>
     <string name="excluir">Excluir</string>
     <string name="data">Data</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+
 </resources>
+

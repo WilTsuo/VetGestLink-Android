@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.vetgestlink.api;
 
 import android.content.Context;
+import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
@@ -12,6 +13,8 @@ import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
  * Endpoint: POST /auth/login
  */
 public class AuthApiService {
+
+    private static final String TAG = "AuthApiService";
 
     private Context context;
 
@@ -43,11 +46,14 @@ public class AuthApiService {
             return;
         }
 
+        Log.d(TAG, "Enviando login para: " + url + " payload: " + jsonBody.toString());
+
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.POST,
             url,
             jsonBody,
             response -> {
+                Log.d(TAG, "Resposta do login: " + response.toString());
                 try {
                     boolean success = response.optBoolean("success", false);
 
@@ -68,10 +74,12 @@ public class AuthApiService {
                         callback.onError(message);
                     }
                 } catch (JSONException e) {
+                    Log.e(TAG, "Erro ao parsear resposta de login", e);
                     callback.onError("Erro ao processar resposta do servidor");
                 }
             },
             error -> {
+                Log.e(TAG, "Erro no pedido de login", error);
                 String errorMsg = "Erro ao fazer login";
                 if (error.networkResponse != null) {
                     int statusCode = error.networkResponse.statusCode;
@@ -92,4 +100,3 @@ public class AuthApiService {
         ApiClient.getInstance(context).addToRequestQueue(request);
     }
 }
-

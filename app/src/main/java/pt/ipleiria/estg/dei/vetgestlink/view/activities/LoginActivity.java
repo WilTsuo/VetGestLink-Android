@@ -124,28 +124,32 @@ public class LoginActivity extends AppCompatActivity {
                     clearCredentials();
                 }
 
-                // Mostrar mensagem de sucesso
-                Toast.makeText(LoginActivity.this,
-                    "Bem-vindo, " + userProfile.getNomecompleto() + "!",
-                    Toast.LENGTH_SHORT).show();
+                // Mostrar mensagem de sucesso e navegar para MainActivity na UI thread
+                runOnUiThread(() -> {
+                    Toast.makeText(LoginActivity.this,
+                            "Bem-vindo, " + userProfile.getNomecompleto() + "!",
+                            Toast.LENGTH_SHORT).show();
 
-                // Navegar para a MainActivity
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("user_username", username);
-                startActivity(intent);
+                    // Navegar para a MainActivity
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("user_username", username);
+                    startActivity(intent);
 
-                // Finalizar LoginActivity
-                finish();
+                    // Finalizar LoginActivity
+                    finish();
+                });
             }
 
             @Override
             public void onError(String error) {
-                // Reabilitar botão
-                btnLogin.setEnabled(true);
-                btnLogin.setText("Entrar");
+                // Reabilitar botão na UI thread
+                runOnUiThread(() -> {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText(getString(R.string.login_button));
 
-                // Mostrar erro
-                Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                    // Mostrar erro
+                    Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                });
             }
         });
     }

@@ -1,10 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema principal que força o modo claro -->
-    <style name="Theme.VetGestLink" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!-- Tema principal que força o modo claro e usa MaterialComponents -->
+    <style name="Theme.VetGestLink" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Cores primárias -->
         <item name="colorPrimary">#15803d</item>
-        <item name="colorPrimaryDark">#14532d</item>
-        <item name="colorAccent">#16a34a</item>
+        <item name="colorPrimaryVariant">#14532d</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#16a34a</item>
 
         <!-- Força o tema claro sempre -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
@@ -20,6 +21,12 @@
         <!-- Status bar -->
         <item name="android:statusBarColor">#f0fdf4</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <!-- Surface / material attributes (opcional) -->
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#111827</item>
     </style>
-    <style name="Theme.Vetgestlink" parent="Base.Theme.Vetgestlink" />
+
+    <!-- Base alias para compatibilidade noturna -->
+    <style name="Base.Theme.VetGestLink" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 </resources>

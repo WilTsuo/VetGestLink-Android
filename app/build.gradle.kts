@@ -63,8 +63,6 @@ dependencies {
 // ===== VOLLEY (HTTP Client) =====
     implementation("com.android.volley:volley:1.2.1")
 
-// ===== RECYCLERVIEW =====
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
 // ===== SWIPE REFRESH =====
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
