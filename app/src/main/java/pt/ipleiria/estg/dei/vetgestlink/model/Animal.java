@@ -1,12 +1,11 @@
 package pt.ipleiria.estg.dei.vetgestlink.model;
 
-import java.io.Serializable;
 
 /**
  * Model para Animal
  * Baseado na tabela 'animais' do banco de dados
  */
-public class Animal implements Serializable {
+public class Animal {
 
     private int id;
     private String nome;
