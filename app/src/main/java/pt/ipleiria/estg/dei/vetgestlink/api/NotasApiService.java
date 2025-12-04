@@ -44,7 +44,7 @@ public class NotasApiService {
      * Listar notas dos animais do utilizador
      */
     public void getNotas(String accessToken, Integer animalId) {
-        String url = ApiClient.getInstance(context).buildUrl("nota?access-token=") + accessToken;
+        String url = ApiClient.getInstance(context).getBaseUrl() + "nota?access-token=" + accessToken;
 
         if (animalId != null) {
             url += "&animal_id=" + animalId;
@@ -85,7 +85,7 @@ public class NotasApiService {
      * Criar nova nota
      */
     public void criarNota(String accessToken, int animalId, String nota, NotaOperationCallback callback) {
-        String url = ApiClient.getInstance(context).buildUrl("nota?access-token=") + accessToken;
+        String url = ApiClient.getInstance(context).getBaseUrl() + "nota?access-token=" + accessToken;
 
         JSONObject jsonBody = new JSONObject();
         try {
@@ -130,7 +130,7 @@ public class NotasApiService {
      * Atualizar nota existente
      */
     public void atualizarNota(String accessToken, int notaId, String nota, NotaOperationCallback callback) {
-        String url = ApiClient.getInstance(context).buildUrl("nota/" + notaId +"access-token=" + accessToken);
+        String url = ApiClient.getInstance(context).getBaseUrl() + "nota/" + notaId +"access-token=" + accessToken;
 
         JSONObject jsonBody = new JSONObject();
         try {
@@ -174,7 +174,7 @@ public class NotasApiService {
      * Deletar nota (soft delete)
      */
     public void deletarNota(String accessToken, int notaId, NotaOperationCallback callback) {
-        String url = ApiClient.getInstance(context).buildUrl("nota/" + notaId + "?access-token=" + accessToken);
+        String url = ApiClient.getInstance(context).getBaseUrl() + "nota/" + notaId + "?access-token=" + accessToken;
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.DELETE,

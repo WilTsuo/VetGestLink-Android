@@ -35,7 +35,7 @@ public class AuthApiService {
      * Autentica o utilizador na API
      */
     public void login(String username, String password, LoginCallback callback) {
-        String url = ApiClient.getInstance(context).buildUrl("auth/login"); //agora  usar sempre este metodo para conneções a API
+        String url = ApiClient.getInstance(context).getBaseUrl() + "auth/login"; //agora  usar sempre este metodo para conneções a API
 
         JSONObject jsonBody = new JSONObject();
         try {

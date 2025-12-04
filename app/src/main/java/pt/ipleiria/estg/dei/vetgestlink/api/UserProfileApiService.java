@@ -36,7 +36,7 @@ public class UserProfileApiService {
      * Ver perfil completo (inclui moradas e animais)
      */
     public void getUserProfile(String accessToken, UserProfileCallback callback) {
-        String url = ApiClient.getInstance(context).buildUrl("userprofile?access-token=" + accessToken);
+        String url = ApiClient.getInstance(context).getBaseUrl()+"userprofile?access-token=" + accessToken;
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.GET,

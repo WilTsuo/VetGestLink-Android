@@ -114,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
             builder.setView(dialogView)
                     .setTitle("Configurar URL")
                     .setPositiveButton("Guardar", (dialog, which) -> {
-                        String url = etMainUrl.getText().toString().trim();
+                        String url = ApiClient.getInstance(context).getBaseUrl(); //geturl
                         if (!url.isEmpty()) {
                             Singleton.getInstance().setMainUrl(getApplicationContext(), url);
                             Toast.makeText(LoginActivity.this, "URL guardada", Toast.LENGTH_SHORT).show();
