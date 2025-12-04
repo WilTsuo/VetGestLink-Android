@@ -1,12 +1,11 @@
 package pt.ipleiria.estg.dei.vetgestlink.model;
 
-import java.io.Serializable;
 
 /**
  * Model para Perfil do Usuário
  * Baseado na tabela 'userprofiles' do banco de dados
  */
-public class UserProfile implements Serializable {
+public class UserProfile {
     
     private int id;
     private String nomecompleto;
