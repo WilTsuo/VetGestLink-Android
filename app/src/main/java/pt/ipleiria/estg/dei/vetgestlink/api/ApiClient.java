@@ -4,21 +4,13 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
-/**
- * Cliente HTTP centralizado usando Volley
- */
 public class ApiClient {
 
     private static ApiClient instance;
     private RequestQueue requestQueue;
-    private static Context context;
-
-    // URL base da API - WAMP Server
-    // IMPORTANTE:
-    // - Para EMULADOR Android: use 10.0.2.2 (representa o localhost da sua máquina)
-    // - Para DISPOSITIVO FÍSICO: substitua por seu IP local (ex: 192.168.1.100)
-    public static final String BASE_URL = "http://10.0.2.2/2_ano_1_semestre/Projeto/vetgestlink/backend/web/api/";
+    public static Context context;
 
     private ApiClient(Context ctx) {
         context = ctx.getApplicationContext();
@@ -42,5 +34,20 @@ public class ApiClient {
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
-}
 
+    // Helper to get current base URL from Singleton
+    public String getBaseUrl() {
+        return Singleton.getInstance().getMainUrl();
+    }
+
+    // Optional: build a full endpoint URL
+    public String buildUrl(String endpoint) {
+        // endpoint example: "/login" or "login"
+        String base = getBaseUrl();
+        if (endpoint.startsWith("/")) {
+            return base + endpoint;
+        } else {
+            return base + "/" + endpoint;
+        }
+    }
+}

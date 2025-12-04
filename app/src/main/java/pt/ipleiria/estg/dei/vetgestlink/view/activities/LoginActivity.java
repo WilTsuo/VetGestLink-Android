@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.activities;
 
+import static pt.ipleiria.estg.dei.vetgestlink.api.ApiClient.context;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,8 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import pt.ipleiria.estg.dei.vetgestlink.R;
+import pt.ipleiria.estg.dei.vetgestlink.api.ApiClient;
 import pt.ipleiria.estg.dei.vetgestlink.api.AuthApiService;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 /**
  * View - Activity de Login
@@ -34,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword;
     private MaterialButton btnLogin;
     private TextView tvSignUp;
+    private MaterialButton btnChangeUrl;
 
     // API Service
     private AuthApiService authApiService;
@@ -43,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Singleton.getInstance().init(getApplicationContext());
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -64,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
      * Inicializa todas as views da tela
      */
     private void initializeViews() {
+        btnChangeUrl = findViewById(R.id.btnChangeUrl);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         cbRememberMe = findViewById(R.id.cbRememberMe);
@@ -87,10 +94,37 @@ public class LoginActivity extends AppCompatActivity {
 
         // Link "Solicite acesso"
         tvSignUp.setOnClickListener(v -> {
-            String url = "https://www.exemplo.com/solicitar-acesso";
+            String url = ApiClient.getInstance(context).getBaseUrl(); //geturl
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         });
+
+        btnChangeUrl.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder =
+                    new android.app.AlertDialog.Builder(LoginActivity.this);
+
+            // Inflate custom view
+            android.view.LayoutInflater inflater = getLayoutInflater();
+            android.view.View dialogView = inflater.inflate(R.layout.dialog_change_url, null);
+            android.widget.EditText etMainUrl = dialogView.findViewById(R.id.etMainUrl);
+
+            // Pre-fill current value
+            etMainUrl.setText(Singleton.getInstance().getMainUrl());
+
+            builder.setView(dialogView)
+                    .setTitle("Configurar URL")
+                    .setPositiveButton("Guardar", (dialog, which) -> {
+                        String url = etMainUrl.getText().toString().trim();
+                        if (!url.isEmpty()) {
+                            Singleton.getInstance().setMainUrl(getApplicationContext(), url);
+                            Toast.makeText(LoginActivity.this, "URL guardada", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
+        });
+
     }
 
     /**
