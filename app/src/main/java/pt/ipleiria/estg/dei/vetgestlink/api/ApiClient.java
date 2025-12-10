@@ -37,7 +37,7 @@ public class ApiClient {
 
     // Helper to get current base URL from Singleton
     public String getBaseUrl() {
-        return Singleton.getInstance().getMainUrl();
+        return Singleton.getInstance(context).getMainUrl();
     }
 
     // Optional: build a full endpoint URL

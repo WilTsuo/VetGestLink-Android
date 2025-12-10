@@ -32,25 +32,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Configurar Toolbar (uso local)
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         // Remover content insets que podem deslocar o conteúdo (garante logo à esquerda)
-        toolbar.setContentInsetsRelative(0, 0);
+        //toolbar.setContentInsetsRelative(0, 0);
         // Garantir que não exista navigation icon a empurrar o logo
-        toolbar.setNavigationIcon(null);
+        //toolbar.setNavigationIcon(null);
 
         // Programmatically ensure logo and title behavior so the logo is visible
-        toolbar.setLogo(R.drawable.logo_vetgestlink);
-        toolbar.setTitle("");
+        //toolbar.setLogo(R.drawable.logo_vetgestlink);
+        //toolbar.setTitle("");
 
         // Ensure toolbar logo is shown
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayUseLogoEnabled(true);
+        //if (getSupportActionBar() != null) {
+            //getSupportActionBar().setDisplayShowHomeEnabled(true);
+            //getSupportActionBar().setDisplayUseLogoEnabled(true);
             // Hide default title so the custom TextView inside the Toolbar is used
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+            //     getSupportActionBar().setDisplayShowTitleEnabled(false);
+       // }
 
 
         // SharedPreferences (uso local)
