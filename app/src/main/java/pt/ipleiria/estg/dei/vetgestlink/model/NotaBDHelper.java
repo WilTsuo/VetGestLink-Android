@@ -48,10 +48,7 @@ public class NotaBDHelper extends SQLiteOpenHelper {
         this.onCreate(sqLiteDatabase);
     }
 
-    // -------------------------------
-    // CRUD operations
-    // -------------------------------
-
+    //region - CRUD operation
     public Nota adicionarNotaBD(Nota nota) {
         ContentValues values = new ContentValues();
         values.put(NOTA, nota.getNota());
@@ -83,10 +80,6 @@ public class NotaBDHelper extends SQLiteOpenHelper {
         return numLinhas > 0;
     }
 
-    public void removerAllNotasBD() {
-        this.bd.delete(TABELA_NOME, null, null);
-    }
-
     public ArrayList<Nota> getAllNotasBD() {
         ArrayList<Nota> notas = new ArrayList<>();
         Cursor cursor = this.bd.query(TABELA_NOME,
@@ -110,4 +103,5 @@ public class NotaBDHelper extends SQLiteOpenHelper {
         cursor.close();
         return notas;
     }
+    //endregion
 }
