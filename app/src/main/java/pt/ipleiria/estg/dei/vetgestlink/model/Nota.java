@@ -27,6 +27,11 @@ public class Nota implements Serializable {
         this.createdAt = createdAt;
     }
 
+    public Nota() {
+        this.nota = "";
+        this.createdAt = getCreatedAt();
+    }
+
 
     public Nota() {
         this.nota = "";
