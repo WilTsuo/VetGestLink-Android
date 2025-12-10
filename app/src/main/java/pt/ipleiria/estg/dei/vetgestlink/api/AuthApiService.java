@@ -61,6 +61,10 @@ public class AuthApiService {
                         String token = response.getString("token");
 
                         // Parse user profile
+                        // resposta:
+                        // auth_key
+                        // user_id
+                        // username
                         JSONObject userProfileObj = response.getJSONObject("userprofile");
                         UserProfile userProfile = new UserProfile();
                         userProfile.setId(userProfileObj.getInt("id"));
@@ -87,6 +91,7 @@ public class AuthApiService {
                         errorMsg = "Credenciais inválidas";
                     } else if (statusCode == 404) {
                         errorMsg = "Servidor não encontrado";
+                        errorMsg = "URL:" + url;
                     } else {
                         errorMsg += " (Código: " + statusCode + ")";
                     }

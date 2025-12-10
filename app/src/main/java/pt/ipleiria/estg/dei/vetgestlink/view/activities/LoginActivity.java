@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Singleton.getInstance().init(getApplicationContext());
+        Singleton.getInstance(getApplicationContext());
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -109,14 +109,14 @@ public class LoginActivity extends AppCompatActivity {
             android.widget.EditText etMainUrl = dialogView.findViewById(R.id.etMainUrl);
 
             // Pre-fill current value
-            etMainUrl.setText(Singleton.getInstance().getMainUrl());
+            etMainUrl.setText(Singleton.getInstance(getApplicationContext()).getMainUrl());
 
             builder.setView(dialogView)
                     .setTitle("Configurar URL")
                     .setPositiveButton("Guardar", (dialog, which) -> {
                         String url = ApiClient.getInstance(context).getBaseUrl(); //geturl
                         if (!url.isEmpty()) {
-                            Singleton.getInstance().setMainUrl(getApplicationContext(), url);
+                            Singleton.getInstance(getApplicationContext()).setMainUrl(url);
                             Toast.makeText(LoginActivity.this, "URL guardada", Toast.LENGTH_SHORT).show();
                         }
                     })
