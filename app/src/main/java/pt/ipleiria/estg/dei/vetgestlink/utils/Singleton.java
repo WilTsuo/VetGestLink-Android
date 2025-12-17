@@ -19,6 +19,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.model.NotaMerda;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
 
 public class Singleton {
@@ -252,9 +253,10 @@ public class Singleton {
                 url,
                 null,
                 response -> {
-                    List<Nota> notas = parseNotas(response);
+                    List<NotaMerda> notas = parseNotas(response);
                     if (callback != null) {
-                        callback.onSuccess(notas);
+                        //callback.onSuccess(notas);
+                        //TODO TIRAR O NOTA MERDA E USAR O NOTA AQUI
                     }
                 },
                 error -> {
@@ -385,14 +387,14 @@ public class Singleton {
     }
 
     //parse de notas a partir de um JSONArray (devolvido pelo get notas)
-    private List<Nota> parseNotas(JSONArray jsonArray) {
-        List<Nota> notas = new ArrayList<>();
+    private List<NotaMerda> parseNotas(JSONArray jsonArray) {
+        List<NotaMerda> notas = new ArrayList<>();
 
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
 
-                Nota nota = new Nota();
+                NotaMerda nota = new NotaMerda();
                 nota.setId(obj.getInt("id"));
                 nota.setNota(obj.getString("nota"));
                 nota.setCreatedAt(obj.optString("created_at", ""));
