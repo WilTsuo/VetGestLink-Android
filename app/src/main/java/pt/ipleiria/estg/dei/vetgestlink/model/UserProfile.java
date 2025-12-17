@@ -9,6 +9,8 @@ public class UserProfile {
     
     private int id;
     private String nomecompleto;
+
+    private String username;
     private String nif;
     private String telemovel;
     private String dtanascimento; // Formato: YYYY-MM-DD
@@ -25,17 +27,32 @@ public class UserProfile {
     private String moradaCdpostal;
     private String moradaLocalidade;
     private String moradaCidade;
-    
+
+    /**
+     * resposta de login experada (exemplo):
+     * {
+     *   "success": true,
+     *   "message": "Login bem-sucedido",
+     *   "token": "ak_cliente_000000000000000000000",
+     *   "user": {
+     *     "id": 21,
+     *     "username": "cliente",
+     *     "email": "cliente@vetgest.pt"
+     *   }
+     * }
+    **/
+
+
     // Construtor vazio
     public UserProfile() {}
     
     // Getters e Setters
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public void setId(int id) { this.userId = id; }
     
     public String getNomecompleto() { return nomecompleto; }
     public void setNomecompleto(String nomecompleto) { this.nomecompleto = nomecompleto; }
-    
+    public void setUsername(String username) { this.username = username; }
     public String getEmail() { return userEmail; }
     public void setEmail(String email) { this.userEmail = email; }
 
@@ -64,6 +81,8 @@ public class UserProfile {
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
     
     public String getUserUsername() { return userUsername; }
+
+    public String getUsername() { return username; }
     public void setUserUsername(String userUsername) { this.userUsername = userUsername; }
     
     public boolean isEliminado() { return eliminado; }

@@ -13,20 +13,6 @@
         android:padding="24dp">
 
         <!-- Logo Container -->
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnChangeUrl"
-            android:layout_width="47dp"
-            android:layout_height="51dp"
-            android:layout_margin="8dp"
-            android:layout_marginStart="12dp"
-            android:text=""
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.962" />
-
         <androidx.cardview.widget.CardView
             android:id="@+id/cvLogo"
             android:layout_width="128dp"
@@ -37,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="48dp">
+            android:layout_marginTop="8dp">
 
             <ImageView
                 android:id="@+id/ivLogo"
@@ -265,7 +251,25 @@
             app:layout_constraintStart_toEndOf="@id/tvNoAccount"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Copyright Text -->
+        <!-- Change URL Button (ajustado para não prender ao parent bottom) -->
+
+        <ImageView
+            android:id="@+id/btnChangeUrl"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_corners"
+            android:contentDescription="@string/url_desc"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/link_url"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
         <TextView
             android:id="@+id/tvCopyright"
             android:layout_width="wrap_content"
@@ -278,7 +282,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="32dp" />
 
-        <!-- All Rights Reserved Text -->
+        <!-- All Rights Reserved Text (removida a constraint Bottom_toBottomOf parent) -->
         <TextView
             android:id="@+id/tvRights"
             android:layout_width="wrap_content"
@@ -289,7 +293,6 @@
             app:layout_constraintTop_toBottomOf="@id/tvCopyright"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp" />
 

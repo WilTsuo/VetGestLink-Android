@@ -1,6 +1,5 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.activities;
 
-import static pt.ipleiria.estg.dei.vetgestlink.api.ApiClient.context;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +7,13 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.api.ApiClient;
-import pt.ipleiria.estg.dei.vetgestlink.api.AuthApiService;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
@@ -38,10 +36,9 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword;
     private MaterialButton btnLogin;
     private TextView tvSignUp;
-    private MaterialButton btnChangeUrl;
+    private ImageView btnChangeUrl;
 
     // API Service
-    private AuthApiService authApiService;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -52,9 +49,6 @@ public class LoginActivity extends AppCompatActivity {
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
-        // Inicializar serviço de autenticação
-        authApiService = new AuthApiService(this);
 
         // Inicializar views
         initializeViews();
@@ -94,11 +88,12 @@ public class LoginActivity extends AppCompatActivity {
 
         // Link "Solicite acesso"
         tvSignUp.setOnClickListener(v -> {
-            String url = ApiClient.getInstance(context).getBaseUrl(); //geturl
+            String url = Singleton.getInstance(getApplicationContext()).getMainUrl();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         });
 
+        // Botão para alterar URL que a API usa
         btnChangeUrl.setOnClickListener(v -> {
             android.app.AlertDialog.Builder builder =
                     new android.app.AlertDialog.Builder(LoginActivity.this);
@@ -114,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
             builder.setView(dialogView)
                     .setTitle("Configurar URL")
                     .setPositiveButton("Guardar", (dialog, which) -> {
-                        String url = ApiClient.getInstance(context).getBaseUrl(); //geturl
+                        String url = etMainUrl.getText().toString().trim(); //guarda a url
                         if (!url.isEmpty()) {
                             Singleton.getInstance(getApplicationContext()).setMainUrl(url);
                             Toast.makeText(LoginActivity.this, "URL guardada", Toast.LENGTH_SHORT).show();
@@ -145,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setText("Entrando...");
 
         // Chamar API de login
-        authApiService.login(username, password, new AuthApiService.LoginCallback() {
+        Singleton.getInstance(getApplicationContext()).login(username, password, new Singleton.LoginCallback() {
             @Override
             public void onSuccess(String token, UserProfile userProfile) {
                 // Salvar token
@@ -161,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Mostrar mensagem de sucesso e navegar para MainActivity na UI thread
                 runOnUiThread(() -> {
                     Toast.makeText(LoginActivity.this,
-                            "Bem-vindo, " + userProfile.getNomecompleto() + "!",
+                            "Bem-vindo, " + userProfile.getUsername() + "!",
                             Toast.LENGTH_SHORT).show();
 
                     // Navegar para a MainActivity

@@ -27,13 +27,7 @@ public class Nota {
 
     public Nota() {
         this.nota = "";
-        this.createdAt = getCreatedAt();
-    }
-
-
-    public Nota() {
-        this.nota = "";
-        this.createdAt = getCreatedAt();
+        this.createdAt = "";
     }
 
 

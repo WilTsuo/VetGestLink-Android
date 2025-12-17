@@ -71,8 +71,8 @@
     <string name="error_password_mismatch">As senhas não coincidem</string>
     <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
 
-    <string name="logo_description">Descrição do logo</string>
-    <string name="app_subtitle">Subtítulo do app</string>
+    <string name="logo_description">Logo VetgGestLink</string>
+    <string name="app_subtitle">Gestão Veterinária Completa</string>
     <string name="username_hint">Nome de usuário</string>
     <string name="password_hint">Senha</string>
     <string name="remember_me">Lembrar-me</string>
@@ -90,9 +90,9 @@
     <string name="editar">Editar</string>
     <string name="excluir">Excluir</string>
     <string name="data">Data</string>
-
-
-
+    <string name="url_desc">Botão Mudar URL</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
