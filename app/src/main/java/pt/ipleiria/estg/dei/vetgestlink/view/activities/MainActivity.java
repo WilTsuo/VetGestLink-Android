@@ -1,9 +1,11 @@
-// app/src/main/java/pt/ipleiria/estg/dei/vetgestlink/view/activities/MainActivity.java
 package pt.ipleiria.estg.dei.vetgestlink.view.activities;
+
+import static java.security.AccessController.getContext;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,7 +24,7 @@ import pt.ipleiria.estg.dei.vetgestlink.view.fragments.NotasFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PagamentosFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PerfilFragment;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,11 +85,10 @@ public class MainActivity extends AppCompatActivity {
         // SharedPreferences (uso local)
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String token = sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
+
         if (token == null || token.isEmpty()) {
-            // Token ausente: voltar para Login
             Toast.makeText(this, "Sessão não encontrada. Faça login novamente.", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }

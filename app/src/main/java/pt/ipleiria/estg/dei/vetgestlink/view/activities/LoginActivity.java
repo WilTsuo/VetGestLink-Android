@@ -1,6 +1,5 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.activities;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -262,4 +261,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.putBoolean(KEY_REMEMBER_ME, false);
         editor.apply();
     }
+
+
 }

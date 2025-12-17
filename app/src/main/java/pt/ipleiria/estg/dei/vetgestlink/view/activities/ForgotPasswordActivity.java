@@ -133,10 +133,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
+    /*
     @Override
     public void onBackPressed() {
         // Voltar ao login
         super.onBackPressed();
         finish();
     }
+     */
 }

@@ -151,14 +151,16 @@ public class UserProfile {
         if (nomecompleto != null && !nomecompleto.isEmpty()) {
             String[] parts = nomecompleto.split(" ");
             if (parts.length >= 2) {
-                return parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1);
+                // Convert chars to String properly
+                return "" + parts[0].charAt(0) + parts[parts.length - 1].charAt(0);
             } else {
                 return nomecompleto.substring(0, Math.min(2, nomecompleto.length()));
             }
         }
         return "??";
     }
-    
+
+
     @Override
     public String toString() {
         return "UserProfile{" +
