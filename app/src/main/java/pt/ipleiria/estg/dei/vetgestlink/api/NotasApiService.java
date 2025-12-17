@@ -17,7 +17,7 @@ import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
  */
 public class NotasApiService {
 
-    private Context context;
+    private final Context context;
 
     public NotasApiService(Context context) {
         this.context = context;
@@ -215,7 +215,7 @@ public class NotasApiService {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
 
-                Nota nota = new Nota();
+                /*Nota nota = new Nota();
                 nota.setId(obj.getInt("id"));
                 nota.setNota(obj.getString("nota"));
                 nota.setCreatedAt(obj.optString("created_at", ""));
@@ -229,6 +229,8 @@ public class NotasApiService {
                 }
 
                 notas.add(nota);
+
+                 */
             }
         } catch (JSONException e) {
             e.printStackTrace();

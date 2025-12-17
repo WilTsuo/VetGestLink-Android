@@ -17,7 +17,7 @@ import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
  */
 public class UserProfileApiService {
 
-    private Context context;
+    private final Context context;
 
     public UserProfileApiService(Context context) {
         this.context = context;

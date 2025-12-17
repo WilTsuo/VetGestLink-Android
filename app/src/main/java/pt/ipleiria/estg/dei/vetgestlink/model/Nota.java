@@ -1,43 +1,33 @@
 package pt.ipleiria.estg.dei.vetgestlink.model;
 
 /**
- * Model para Nota do Animal
- * Baseado na tabela 'notas' do banco de dados
+ * Model for Nota (matches database table + includes API/UI extra fields)
  */
 public class Nota {
 
+    // ----- Fields from the database table "notas" -----
     private int id;
-    private String nota;            // Conteúdo da nota (VARCHAR 500)
-    private String createdAt;       // Formato: YYYY-MM-DD HH:MM:SS
-    private String updatedAt;       // Formato: YYYY-MM-DD HH:MM:SS
+    private String nota;
+    private String createdAt;
+    private String updatedAt;
     private int userprofilesId;
     private int animaisId;
 
-    // Campos auxiliares (não vêm do banco diretamente)
-    private String nomeAnimal;
-    private String titulo;          // Extraído dos primeiros caracteres da nota
+    // ----- EXTRA fields from API (not saved locally) -----
+    private String animalNome;  // not in DB → provided by API
+    private String autor;       // not in DB → provided by API
 
+    // ----- UI Helper field -----
+    private String titulo;      // extracted preview text
 
-    // Constructors
+    // Constructor for DB + parser
     public Nota(int id, String nota, String createdAt) {
         this.id = id;
         this.nota = nota;
         this.createdAt = createdAt;
     }
 
-    public Nota() {
-        this.nota = "";
-        this.createdAt = getCreatedAt();
-    }
-
-
-    public Nota() {
-        this.nota = "";
-        this.createdAt = getCreatedAt();
-    }
-
-
-
+    // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -56,65 +46,52 @@ public class Nota {
     public int getAnimaisId() { return animaisId; }
     public void setAnimaisId(int animaisId) { this.animaisId = animaisId; }
 
-    public String getNomeAnimal() { return nomeAnimal; }
-    public void setNomeAnimal(String nomeAnimal) { this.nomeAnimal = nomeAnimal; }
+    public String getAnimalNome() { return animalNome; }
+    public void setAnimalNome(String animalNome) { this.animalNome = animalNome; }
+
+    public String getAutor() { return autor; }
+    public void setAutor(String autor) { this.autor = autor; }
 
     public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    // --------------------
-    // Helper Methods
-    // --------------------
+    // ----- UI Helpers -----
 
-    /**
-     * Retorna um título extraído da nota (primeiras palavras ou primeiros 50 caracteres)
-     */
     public String getTitulo() {
-        if (titulo != null && !titulo.isEmpty()) return titulo;
+        if (titulo != null && !titulo.isEmpty())
+            return titulo;
 
-        if (nota != null && !nota.isEmpty()) {
-            int maxLength = Math.min(50, nota.length());
-            String tituloExtraido = nota.substring(0, maxLength);
+        if (nota == null || nota.isEmpty())
+            return "";
 
-            if (nota.length() > 50) {
-                int lastSpace = tituloExtraido.lastIndexOf(' ');
-                if (lastSpace > 0) tituloExtraido = tituloExtraido.substring(0, lastSpace);
+        int maxLength = Math.min(50, nota.length());
+        String extracted = nota.substring(0, maxLength);
+
+        if (nota.length() > 50) {
+            int lastSpace = extracted.lastIndexOf(' ');
+            if (lastSpace > 0) {
+                extracted = extracted.substring(0, lastSpace);
             }
-
-            return tituloExtraido;
         }
 
-        return "";
+        return extracted;
     }
 
-    /**
-     * Retorna a descrição completa da nota
-     */
     public String getDescricao() {
         return nota;
     }
 
-    /**
-     * Retorna a data formatada em "DD MMM YYYY"
-     */
     public String getData() {
-        if (createdAt == null || createdAt.isEmpty()) return "";
+        if (createdAt == null || createdAt.isEmpty())
+            return "";
 
         try {
-            String[] parts = createdAt.split(" ");
-            String[] dateParts = parts[0].split("-");
+            String[] parts = createdAt.split(" ")[0].split("-");
+            String[] meses = {"Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"};
 
-            if (dateParts.length == 3) {
-                String[] meses = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-                        "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
-                int mes = Integer.parseInt(dateParts[1]);
-                return dateParts[2] + " " + meses[mes - 1] + " " + dateParts[0];
-            }
+            return parts[2] + " " + meses[Integer.parseInt(parts[1]) - 1] + " " + parts[0];
         } catch (Exception e) {
-            // Caso falhe, retorna a data original
             return createdAt;
         }
-
-        return createdAt;
     }
 
     @Override

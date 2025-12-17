@@ -16,7 +16,7 @@ public class AuthApiService {
 
     private static final String TAG = "AuthApiService";
 
-    private Context context;
+    private final Context context;
 
     public AuthApiService(Context context) {
         this.context = context;
@@ -46,7 +46,7 @@ public class AuthApiService {
             return;
         }
 
-        Log.d(TAG, "Enviando login para: " + url + " payload: " + jsonBody.toString());
+        Log.d(TAG, "Enviando login para: " + url + " payload: " + jsonBody);
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.POST,
