@@ -18,8 +18,6 @@ public class NotaJsonParser {
                 String textoNota = jsonNota.optString("nota", "");
                 String createdAt = jsonNota.optString("created_at", "");
                 String updatedAt = jsonNota.optString("updated_at", "");
-                int userprofilesId = jsonNota.optInt("userprofiles_id", -1);
-                int animaisId = jsonNota.optInt("animais_id", -1);
 
                 Nota n = new Nota(id, textoNota, createdAt);
 
@@ -27,10 +25,6 @@ public class NotaJsonParser {
                 n.setUpdatedAt(updatedAt);
                 n.setAnimalNome(jsonNota.optString("animal_nome", ""));
                 n.setAutor(jsonNota.optString("autor", ""));
-
-                // DB FIELDS
-                n.setUserprofilesId(userprofilesId);
-                n.setAnimaisId(animaisId);
 
                 notas.add(n);
 
@@ -53,10 +47,6 @@ public class NotaJsonParser {
             n.setUpdatedAt(json.optString("updated_at", ""));
             n.setAnimalNome(json.optString("animal_nome", ""));
             n.setAutor(json.optString("autor", ""));
-
-            // DB FK’s
-            n.setUserprofilesId(json.optInt("userprofiles_id", -1));
-            n.setAnimaisId(json.optInt("animais_id", -1));
 
             return n;
 

@@ -17,7 +17,7 @@ public class Animal {
     private String especieNome; // Join com especies
     private int userprofilesId;
     private Integer racasId; // Pode ser NULL
-    private String racaNome; // Join com racas
+    private String racaNome;
     private boolean eliminado;
 
     public Animal() {}

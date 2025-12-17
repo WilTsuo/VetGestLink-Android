@@ -55,7 +55,7 @@
             app:layout_constraintVertical_bias="0.015" />
 
         <ListView
-            android:id="@+id/listView"
+            android:id="@+id/lvNotas"
             android:layout_width="match_parent"
             android:layout_height="610dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"

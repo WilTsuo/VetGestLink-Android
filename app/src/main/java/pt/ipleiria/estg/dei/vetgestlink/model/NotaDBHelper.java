@@ -14,13 +14,12 @@ public class NotaDBHelper extends SQLiteOpenHelper {
     private static final String BD_NOME = "bdNotas";
     private static final String TABELA_NOME = "notas";
 
-    // ---- DB Columns (MUST MATCH DATABASE TABLE) ----
     private final String ID = "id";
     private final String NOTA = "nota";
     private final String CREATED_AT = "created_at";
     private final String UPDATED_AT = "updated_at";
-    private final String USERPROFILES_ID = "userprofiles_id";
-    private final String ANIMAIS_ID = "animais_id";
+    private final String ANIMALNOME = "animalNome";
+    private final String AUTOR = "autor";
 
     private static final int BD_VERSION = 1;
 
@@ -40,8 +39,8 @@ public class NotaDBHelper extends SQLiteOpenHelper {
                         NOTA + " TEXT NOT NULL, " +
                         CREATED_AT + " TEXT, " +
                         UPDATED_AT + " TEXT, " +
-                        USERPROFILES_ID + " INTEGER, " +
-                        ANIMAIS_ID + " INTEGER" +
+                        ANIMALNOME + " TEXT, " +
+                        AUTOR + " TEXT" +
                         ");";
 
         sqLiteDatabase.execSQL(createTableNotas);
@@ -60,7 +59,7 @@ public class NotaDBHelper extends SQLiteOpenHelper {
 
         Cursor cursor = this.bd.query(
                 TABELA_NOME,
-                new String[]{ID, NOTA, CREATED_AT, UPDATED_AT, USERPROFILES_ID, ANIMAIS_ID},
+                new String[]{ID, NOTA, CREATED_AT, UPDATED_AT, ANIMALNOME, AUTOR},
                 null, null, null, null, null
         );
 
@@ -71,10 +70,6 @@ public class NotaDBHelper extends SQLiteOpenHelper {
                         cursor.getString(1),
                         cursor.getString(2)
                 );
-
-                nota.setUpdatedAt(cursor.getString(3));
-                nota.setUserprofilesId(cursor.getInt(4));
-                nota.setAnimaisId(cursor.getInt(5));
 
                 lista.add(nota);
 
@@ -90,8 +85,8 @@ public class NotaDBHelper extends SQLiteOpenHelper {
         values.put(NOTA, n.getNota());
         values.put(CREATED_AT, n.getCreatedAt());
         values.put(UPDATED_AT, n.getUpdatedAt());
-        values.put(USERPROFILES_ID, n.getUserprofilesId());
-        values.put(ANIMAIS_ID, n.getAnimaisId());
+        values.put(ANIMALNOME, n.getAnimalNome());
+        values.put(AUTOR, n.getUpdatedAt());
 
         long id = this.bd.insert(TABELA_NOME, null, values);
 
