@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,8 +69,7 @@ public class MainActivity extends AppCompatActivity {
      *             }
      *         });
      * **/
-    private BottomNavigationView bottomNavigationView; // pode ser usado futuramente
-
+    private BottomNavigationView bottomNavigationView;
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
 
@@ -94,27 +94,41 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //tratamento dos fragments para o bottom navigaton view
-        Fragment firstFragment = new MarcacoesFragment();
-        Fragment secondFragment = new PagamentosFragment();
-        Fragment thirdFragment = new NotasFragment();
-        Fragment fourthfragment = new PerfilFragment();
-        Fragment fithfragment = new DefinicoesFragment();
+        Fragment fragment_marcacoes = new MarcacoesFragment();
+        Fragment fragment_pagamentos = new PagamentosFragment();
+        Fragment fragment_notas = new NotasFragment();
+        Fragment fragment_perfil = new PerfilFragment();
+        Fragment fragment_definicoes = new DefinicoesFragment();
 
+        bottomNavigationView.setSelectedItemId(R.id.notas);
+        setCurrentFragment(fragment_notas, "Notas e Lembretes");
 
-        setCurrentFragment(thirdFragment);
-
-
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.consultas) {
+                setCurrentFragment(fragment_marcacoes, "Marcação de Consultas");
+            } else if (id == R.id.pagamentos) {
+                setCurrentFragment(fragment_pagamentos, "Historico de Pagamentos");
+            } else if (id == R.id.notas) {
+                setCurrentFragment(fragment_notas, "Notas e Lembretes");
+            } else if (id == R.id.perfil) {
+                setCurrentFragment(fragment_perfil, "Perfil do Utilizador");
+            } else if (id == R.id.definicoes) {
+                setCurrentFragment(fragment_definicoes, "Definições");
+            }
+            return true;
+        });
     }
 
     //define qual dos fragments vai ser mostrado
-    private void setCurrentFragment(Fragment fragment) {
-        //atualiza o bottomNavigation view para mostrra como selecionado o fragment correspondente
-
-
+    private void setCurrentFragment(Fragment fragment, String title) {
         //muda o fragment que está a ser mostrado
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+
+        TextView toolbar_subtitle = findViewById(R.id.toolbar_subtitle);
+        toolbar_subtitle.setText(title);
     }
 }

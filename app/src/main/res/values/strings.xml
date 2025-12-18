@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VetGestLink</string>
-
+    <string name="fragment_name"></string>
     <!-- Navigation -->
     <string name="nav_appointments">Consultas</string>
     <string name="nav_payments">Pagamentos</string>
