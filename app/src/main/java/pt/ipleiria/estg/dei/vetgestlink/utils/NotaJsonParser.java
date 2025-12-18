@@ -18,13 +18,11 @@ public class NotaJsonParser {
                 String textoNota = jsonNota.optString("nota", "");
                 String createdAt = jsonNota.optString("created_at", "");
                 String updatedAt = jsonNota.optString("updated_at", "");
+                String animalNome = jsonNota.optString("animal_nome", "");
+                String autor = jsonNota.optString("autor", "");
+                String titulo = jsonNota.optString("titulo", "");
 
-                Nota n = new Nota(id, textoNota, createdAt);
-
-                // EXTRA API FIELDS
-                n.setUpdatedAt(updatedAt);
-                n.setAnimalNome(jsonNota.optString("animal_nome", ""));
-                n.setAutor(jsonNota.optString("autor", ""));
+                Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo);
 
                 notas.add(n);
 
@@ -40,13 +38,12 @@ public class NotaJsonParser {
             int id = json.getInt("id");
             String textoNota = json.optString("nota", "");
             String createdAt = json.optString("created_at", "");
+            String updatedAt = json.optString("updated_at", "");
+            String animalNome = json.optString("animal_nome", "");
+            String autor = json.optString("autor", "");
+            String titulo = json.optString("titulo", "");
 
-            Nota n = new Nota(id, textoNota, createdAt);
-
-            // EXTRA FIELDS
-            n.setUpdatedAt(json.optString("updated_at", ""));
-            n.setAnimalNome(json.optString("animal_nome", ""));
-            n.setAutor(json.optString("autor", ""));
+            Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo);
 
             return n;
 
