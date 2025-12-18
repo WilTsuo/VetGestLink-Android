@@ -17,9 +17,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.AnimaisListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.AuthListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.LembretesListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.MarcacoesListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotaListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
-import pt.ipleiria.estg.dei.vetgestlink.model.NotaMerda;
+import pt.ipleiria.estg.dei.vetgestlink.model.NotaDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
 
 public class Singleton {
@@ -30,9 +37,57 @@ public class Singleton {
     private static final String TAG = "VetGestLink";
     private static final String TAG_LOGIN = "AuthService";
     private static Singleton instance;
+    //region - arrays e notadbhelper
+    private ArrayList<Nota> notas;
+    private NotaDBHelper notasDB=null;
+    //endregion
     private final Context context;
     private RequestQueue requestQueue; //queue do volley
     private String mainUrl;
+    //region - Listeners
+    private AuthListener authListener;
+    private NotasListener NotasListener;
+    private NotaListener NotaListener;
+    private AuthListener Authlistener;
+    private AnimaisListener AnimaisListener;
+    private FaturasListener FaturasListener;
+    private MarcacoesListener MarcacoesListener;
+    private LembretesListener LembretesListener;
+    //endregion
+    //endregion
+
+    //region - Setters Listeners
+    public void setNotasListener(NotasListener notasListener) {
+        NotasListener = notasListener;
+    }
+
+    public void setAuthListener(AuthListener authListener) {
+        this.authListener = authListener;
+    }
+
+    public void setNotaListener(NotaListener notaListener) {
+        NotaListener = notaListener;
+    }
+
+    public void setAuthlistener(AuthListener authlistener) {
+        Authlistener = authlistener;
+    }
+
+    public void setAnimaisListener(AnimaisListener animaisListener) {
+        AnimaisListener = animaisListener;
+    }
+
+    public void setFaturasListener(FaturasListener faturasListener) {
+        FaturasListener = faturasListener;
+    }
+
+    public void setMarcacoesListener(MarcacoesListener marcacoesListener) {
+        MarcacoesListener = marcacoesListener;
+    }
+
+    public void setLembretesListener(LembretesListener lembretesListener) {
+        LembretesListener = lembretesListener;
+    }
     //endregion
 
     //region defenicao de Callbacks (message, login, notas ,userprofile)
@@ -61,6 +116,9 @@ public class Singleton {
         this.requestQueue = Volley.newRequestQueue(this.context); //inicializa a request queue do volley (no inicio logo como a stora disse)
         SharedPreferences prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.mainUrl = prefs.getString(KEY_MAIN_URL, DEFAULT_MAIN_URL);
+
+        notas = new ArrayList<>();
+        notasDB = new NotaDBHelper(context);
     }
 
     //ponto de acceco ao singleton para n haver asneiras (chamamos, enviamos o context e ele devolve a instancia do singleton)
@@ -238,6 +296,40 @@ public class Singleton {
     // endregion
 
     //region CRUD Notas e funcoes relacionadas
+    public Nota getNota(int id){
+
+        for(Nota n:notas)
+            if(n.getId()==id)
+                return n;
+        return null;
+    }
+    //region- CRUD bd local
+    public ArrayList<Nota> getNotasBD() {
+
+        notas = notasDB.getAllNotasBD();
+        return new ArrayList<>(notas);
+    }
+
+    public void adicionarNotaBD(Nota nota){
+        notasDB.adicionarNotaBD(nota);
+    }
+    public void adicionarNotasBD(ArrayList<Nota> notas){
+        notasDB.removerAllNotasBD();
+        for(Nota l:notas) {
+            adicionarNotaBD(l);
+        }
+    }
+    public void removerNotaBD(int idnota){
+        Nota n= getNota(idnota);
+        if(n!=null) {
+            notasDB.removerNotaBD(idnota);
+        }
+    }
+    public void removerNotasBD(){
+        notasDB.removerAllNotasBD();
+    }
+    //endregion
+
     //obter lista de notas de um animal, se nenhum animal for especificado retorna a lista completa realacionada a este user
     public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
         String url;
@@ -253,10 +345,10 @@ public class Singleton {
                 url,
                 null,
                 response -> {
-                    List<NotaMerda> notas = parseNotas(response);
+                    List<Nota> notas = NotaJsonParser.parserJsonNotas(response);
                     if (callback != null) {
-                        //callback.onSuccess(notas);
-                        //TODO TIRAR O NOTA MERDA E USAR O NOTA AQUI
+                        callback.onSuccess(notas);
+
                     }
                 },
                 error -> {
@@ -386,35 +478,6 @@ public class Singleton {
         addToRequestQueue(request);
     }
 
-    //parse de notas a partir de um JSONArray (devolvido pelo get notas)
-    private List<NotaMerda> parseNotas(JSONArray jsonArray) {
-        List<NotaMerda> notas = new ArrayList<>();
-
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-
-                NotaMerda nota = new NotaMerda();
-                nota.setId(obj.getInt("id"));
-                nota.setNota(obj.getString("nota"));
-                nota.setCreatedAt(obj.optString("created_at", ""));
-                nota.setUpdatedAt(obj.optString("updated_at", ""));
-                nota.setUserprofilesId(obj.optInt("userprofiles_id", 0));
-                nota.setAnimaisId(obj.optInt("animais_id", 0));
-
-                // Campo adicional que pode vir da API
-                if (obj.has("animal_nome")) {
-                    nota.setNomeAnimal(obj.getString("animal_nome"));
-                }
-
-                notas.add(nota);
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "Erro ao parsear notas", e);
-        }
-
-        return notas;
-    }
     // endregion
 
     //region Gestao do userProfile e handler de informação associada
