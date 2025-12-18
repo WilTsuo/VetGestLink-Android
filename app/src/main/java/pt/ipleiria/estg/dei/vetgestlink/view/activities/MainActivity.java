@@ -93,13 +93,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-
         //tratamento dos fragments para o bottom navigaton view
         Fragment firstFragment = new MarcacoesFragment();
         Fragment secondFragment = new PagamentosFragment();
         Fragment thirdFragment = new NotasFragment();
         Fragment fourthfragment = new PerfilFragment();
         Fragment fithfragment = new DefinicoesFragment();
+
 
         setCurrentFragment(thirdFragment);
 
@@ -108,9 +108,13 @@ public class MainActivity extends AppCompatActivity {
 
     //define qual dos fragments vai ser mostrado
     private void setCurrentFragment(Fragment fragment) {
+        //atualiza o bottomNavigation view para mostrra como selecionado o fragment correspondente
+
+
+        //muda o fragment que está a ser mostrado
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.flfragment, fragment)
+                .replace(R.id.fragment_container, fragment)
                 .commit();
     }
 }

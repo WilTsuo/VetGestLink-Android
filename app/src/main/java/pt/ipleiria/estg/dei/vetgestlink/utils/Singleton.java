@@ -118,7 +118,7 @@ public class Singleton {
 
     //construtor simples de endpoints
     public String buildUrl(String endpoint) {
-        // endpoint example: "/login" or "login"
+        // endpoint example: "/auth/login" or "auth/login" FUNFA BEM OS DOIS
         String base = getMainUrl();
         if (endpoint.startsWith("/")) {
             return base + endpoint;
@@ -157,8 +157,8 @@ public class Singleton {
 
                             // Parse user profile
                             // 1) { "user": { "id", "username", "email" } }
-                            UserProfile userProfile = new UserProfile();
 
+                            UserProfile userProfile = new UserProfile();
                             JSONObject userObj = response.optJSONObject("user");
                             if (userObj != null) {
                                 userProfile.setId(userObj.optInt("id", 0));

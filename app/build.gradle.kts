@@ -5,12 +5,12 @@ plugins {
 android {
     namespace = "pt.ipleiria.estg.dei.vetgestlink"
     compileSdk {
-        version = release(36)
+        version = release(34)
     }
 
     defaultConfig {
         applicationId = "pt.ipleiria.estg.dei.vetgestlink"
-        minSdk = 24
+        minSdk = 29
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -47,7 +47,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
 
 // ===== MATERIAL DESIGN =====
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
 
 // ===== LAYOUT =====
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

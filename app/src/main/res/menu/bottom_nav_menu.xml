@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item
-    android:id="@+id/test"
-    android:title="Test"
-    android:icon="@android:drawable/ic_menu_help" />
+    <item
+        android:id="@+id/consultas"
+        android:title="Consultas"
+        android:icon="@drawable/consultas"/>
+    <item
+        android:id="@+id/pagamentos"
+        android:title="Pagamentos"
+        android:icon="@drawable/pagamentos"/>
+    <item
+        android:id="@+id/notas"
+        android:title="Notas"
+        android:icon="@drawable/notas"/>
+    <item
+        android:id="@+id/perfil"
+        android:title="Perfil"
+        android:icon="@drawable/perfil"/>
+    <item
+        android:id="@+id/definicoes"
+        android:title="Definições"
+        android:icon="@drawable/definicoes"/>
 </menu>
