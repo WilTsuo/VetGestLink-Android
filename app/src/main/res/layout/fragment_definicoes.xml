@@ -1,14 +1,283 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.DefinicoesFragment">
+    android:background="#F5F6FA">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/definicoes" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-</FrameLayout>
+        <!-- Title -->
+        <TextView
+            android:text="Definições"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="Gerir preferências da conta"
+            android:textSize="14sp"
+            android:textColor="#7A7A7A"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- ===================== -->
+        <!-- Server Configuration -->
+        <!-- ===================== -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="Configuração do Servidor"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="Configure o endereço da API"
+                    android:textSize="13sp"
+                    android:textColor="#7A7A7A"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="URL do Servidor"
+                    android:textSize="13sp"/>
+
+                <EditText
+                    android:id="@+id/etServerUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@android:color/transparent"
+                    android:hint="https://api.vetgestlink.com"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+
+                    <Button
+                        android:id="@+id/btnTestConnection"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Testar Conexão"
+                        android:textColor="#1B8F43"
+                        android:backgroundTint="@android:color/transparent"/>
+
+                    <Button
+                        android:id="@+id/btnSaveServer"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Guardar"
+                        android:backgroundTint="#1B8F43"
+                        android:textColor="@android:color/white"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="12dp"
+                    android:text="💡 Dica: Contacte o administrador da clínica se precisar alterar o servidor."
+                    android:textSize="12sp"
+                    android:textColor="#3A6EDC"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ===================== -->
+        <!-- Notifications -->
+        <!-- ===================== -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="Notificações"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <LinearLayout
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Lembretes de Consultas"/>
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Receber notificações antes das consultas"
+                            android:textSize="12sp"
+                            android:textColor="#7A7A7A"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:id="@+id/switchConsultas"
+                        android:checked="true"
+                        android:text="Consultas"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Faturas e Pagamentos"/>
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Alertas sobre faturas pendentes"
+                            android:textSize="12sp"
+                            android:textColor="#7A7A7A"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:id="@+id/switchFaturas"
+                        android:checked="true"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Promoções e Novidades"/>
+                        <TextView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:text="Receber ofertas especiais"
+                            android:textSize="12sp"
+                            android:textColor="#7A7A7A"/>
+                    </LinearLayout>
+
+                    <Switch
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:id="@+id/switchPromocoes"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ===================== -->
+        <!-- About -->
+        <!-- ===================== -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="Sobre a Aplicação"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:text="VetGestLink Cliente v1.0.0"/>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="© 2025 VetGestLink"/>
+
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:text="Todos os direitos reservados"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Logout -->
+        <Button
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Terminar Sessão"
+            android:textColor="#E53935"
+            android:backgroundTint="@android:color/transparent"/>
+
+    </LinearLayout>
+</ScrollView>
