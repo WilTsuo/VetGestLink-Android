@@ -32,8 +32,7 @@
             android:id="@+id/btnClose"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_close"/>
+            android:layout_alignParentEnd="true" />
 
 
         <!-- Cartão de total -->
