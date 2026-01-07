@@ -26,7 +26,9 @@ public class FaturaJsonParser {
 
                 Fatura f = new Fatura(id,  total,  createdAt,  estado,  eliminado,  metodoPagamento,  numeroItens);
 
-                faturas.add(f);
+                if (!eliminado) {
+                    faturas.add(f);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();

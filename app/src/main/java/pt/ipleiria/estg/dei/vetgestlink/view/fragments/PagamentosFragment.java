@@ -1,66 +1,123 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
 import pt.ipleiria.estg.dei.vetgestlink.R;
+import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
+import pt.ipleiria.estg.dei.vetgestlink.view.adapters.ListaFaturasAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PagamentosFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class PagamentosFragment extends Fragment {
+public class PagamentosFragment extends Fragment implements FaturasListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private ListView lvFaturas;
+    private Button btnTodos, btnPendente, btnPago;
+    private TextView tvQuantidadePendente, tvQuantidadePaga;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<Fatura> listaFaturas = new ArrayList<>();
+    private ArrayList<Fatura> listaFiltrada = new ArrayList<>();
+    private ListaFaturasAdapter adapter;
 
-    public PagamentosFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PagamentosFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PagamentosFragment newInstance(String param1, String param2) {
-        PagamentosFragment fragment = new PagamentosFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public PagamentosFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pagamentos, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_pagamentos, container, false);
+
+        lvFaturas = view.findViewById(R.id.lvFaturas);
+        btnTodos = view.findViewById(R.id.btnTodos);
+        btnPendente = view.findViewById(R.id.btnPendente);
+        btnPago = view.findViewById(R.id.btnPago);
+        tvQuantidadePendente = view.findViewById(R.id.tvQuantidadePendente);
+        tvQuantidadePaga = view.findViewById(R.id.tvQuantidadePaga);
+
+        // Adapter FIRST (empty list)
+        adapter = new ListaFaturasAdapter(requireContext(), listaFiltrada);
+        lvFaturas.setAdapter(adapter);
+
+        // Singleton + listener
+        Singleton singleton = Singleton.getInstance(requireContext());
+        singleton.setFaturasListener(this);
+
+        // Token
+        String token = getActivity()
+                .getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE)
+                .getString("access_token", "");
+
+        if (!token.isEmpty()) {
+            singleton.getFaturas(token);
+        }
+
+        // Filters
+        btnTodos.setOnClickListener(v -> filtrar("TODOS"));
+        btnPendente.setOnClickListener(v -> filtrar("PENDENTE"));
+        btnPago.setOnClickListener(v -> filtrar("PAGO"));
+
+        return view;
+    }
+
+    private void filtrar(String tipo) {
+        listaFiltrada.clear();
+
+        for (Fatura f : listaFaturas) {
+            if (tipo.equals("TODOS")) {
+                listaFiltrada.add(f);
+            } else if (tipo.equals("PENDENTE") && !f.isEstado()) {
+                listaFiltrada.add(f);
+            } else if (tipo.equals("PAGO") && f.isEstado()) {
+                listaFiltrada.add(f);
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    private void atualizarResumo() {
+        float totalPendente = 0;
+        float totalPago = 0;
+
+        for (Fatura f : listaFaturas) {
+            if (f.isEstado()) {
+                totalPago += f.getTotal();
+            } else {
+                totalPendente += f.getTotal();
+            }
+        }
+
+        tvQuantidadePendente.setText("€ " + String.format("%.2f", totalPendente));
+        tvQuantidadePaga.setText("€ " + String.format("%.2f", totalPago));
+    }
+
+    @Override
+    public void onRefreshListaFaturas(ArrayList<Fatura> faturas) {
+        //para debug
+        Log.d("FRAG_FATURAS", "Recebidas: " + faturas.size());
+
+        listaFaturas.clear();
+        listaFaturas.addAll(faturas);
+
+        filtrar("TODOS");
+        atualizarResumo();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Singleton.getInstance(requireContext()).setFaturasListener(null);
     }
 }

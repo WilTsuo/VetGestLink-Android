@@ -25,6 +25,7 @@ import pt.ipleiria.estg.dei.vetgestlink.Listeners.MarcacoesListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
 import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.model.NotaDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
@@ -554,5 +555,34 @@ public class Singleton {
 
         return animais;
     }
+    //endregion
+
+    //region Faturas
+    public void getFaturas(String accessToken) {
+
+        String url = buildUrl("fatura/all?access-token=" + accessToken);
+
+        Log.d("API_FATURAS_URL", url);
+
+        JsonArrayRequest req = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    ArrayList<Fatura> faturas =
+                            FaturaJsonParser.parserJsonFaturas(response);
+
+                    if (FaturasListener != null) {
+                        FaturasListener.onRefreshListaFaturas(faturas);
+                    }
+                },
+                error -> {
+                    Log.e("API_FATURAS", "Erro", error);
+                }
+        );
+
+        addToRequestQueue(req);
+    }
+
     //endregion
 }
