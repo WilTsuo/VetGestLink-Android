@@ -244,24 +244,19 @@ public class Singleton {
                             // Parse user profile
                             // 1) { "user": { "id", "username", "email" } }
 
+                            // Parse user profile CORRETAMENTE
                             UserProfile userProfile = new UserProfile();
                             JSONObject userObj = response.optJSONObject("user");
                             if (userObj != null) {
-                                userProfile.setId(userObj.optInt("id", 0));
+                                int userId = userObj.optInt("id", 0);
+                                userProfile.setId(userId);
                                 userProfile.setUsername(userObj.optString("username", ""));
                                 userProfile.setEmail(userObj.optString("email", ""));
+
+                                // Guardar nas SharedPreferences
+                                SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                                prefs.edit().putInt("userprofile_id", userId).apply();
                             }
-                            // Parse user profile antigo (se tivermos de usar por algum santo motivo)
-                            //else {
-                                //JSONObject userProfileObj = response.optJSONObject("userprofile");
-                                //if (userProfileObj != null) {
-                                    //userProfile.setId(userProfileObj.optInt("id", 0));
-                                    //userProfile.setNomecompleto(userProfileObj.optString("nomecompleto", ""));
-                                    //userProfile.setEmail(userProfileObj.optString("email", ""));
-                                    //userProfile.setContacto(userProfileObj.optString("contacto", ""));
-                                    //userProfile.setFotoUrl(userProfileObj.optString("foto_url", ""));
-                                //}
-                            //}
 
                             callback.onSuccess(token, userProfile);
                         } else {
@@ -363,7 +358,7 @@ public class Singleton {
         String url;
 
         if (animalId != null) {
-            url = buildUrl("nota/?access-token=" + accessToken + "&animal_id=" + animalId);
+            url = buildUrl("animal/"+animalId+"/notas?access-token=" + accessToken);
         } else {
             url = buildUrl("nota/all?access-token=" + accessToken);
         }
@@ -393,7 +388,7 @@ public class Singleton {
     }
     //criar nota
     public void criarNota(String accessToken, int animalId, String nota, MessageCallback callback) {
-        String url = buildUrl("nota?access-token=" + accessToken);
+        String url = buildUrl("nota/create?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("animais_id", animalId);

@@ -21,8 +21,9 @@ public class NotaJsonParser {
                 String animalNome = jsonNota.optString("animal_nome", "");
                 String autor = jsonNota.optString("autor", "");
                 String titulo = jsonNota.optString("titulo", "");
+                Integer userprofileId = jsonNota.optInt("userprofiles_id", -1);
 
-                Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo);
+                Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo, userprofileId);
 
                 notas.add(n);
 
@@ -42,8 +43,10 @@ public class NotaJsonParser {
             String animalNome = json.optString("animal_nome", "");
             String autor = json.optString("autor", "");
             String titulo = json.optString("titulo", "");
+            Integer userprofileId = json.optInt("userprofiles_id", -1);
 
-            Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo);
+
+            Nota n = new Nota(id, textoNota,  createdAt,  updatedAt,  animalNome,  autor,  titulo, userprofileId);
 
             return n;
 
