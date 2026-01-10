@@ -69,7 +69,7 @@
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/ic_calendar_small"
+                android:src="@drawable/ic_consultas_nav"
                 app:tint="#6b7280" />
 
             <TextView

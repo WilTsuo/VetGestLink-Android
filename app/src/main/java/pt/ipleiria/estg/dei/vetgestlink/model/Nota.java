@@ -6,16 +6,15 @@ public class Nota {
     private String nota;
     private String createdAt;
     private String updatedAt;
-
+    private int userprofileId;
     private String animalNome;
     private String autor;
-    //Helper field
     private String titulo;
 
 
 
     // Constructor
-    public Nota(int id, String nota, String createdAt, String updatedAt, String animalNome, String autor, String titulo) {
+    public Nota(int id, String nota, String createdAt, String updatedAt, String animalNome, String autor, String titulo,Integer userprofileId) {
         this.id = id;
         this.nota = nota;
         this.createdAt = createdAt;
@@ -23,10 +22,18 @@ public class Nota {
         this.animalNome = animalNome;
         this.autor = autor;
         this.titulo = titulo;
+        this.userprofileId = userprofileId;
     }
 
 
     // Getters & Setters
+    public int getUserprofileId() {
+        return userprofileId;
+    }
+
+    public void setUserprofileId(int userprofileId) {
+        this.userprofileId = userprofileId;
+    }
 
     public int getId() {
         return id;

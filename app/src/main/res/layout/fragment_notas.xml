@@ -17,7 +17,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:startIconDrawable="@drawable/paw_solid_full"
+            app:startIconDrawable="@drawable/ic_paw_solid_full"
             app:endIconMode="dropdown_menu">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -27,15 +27,6 @@
                 android:hint="@string/escolha_animal"
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/tvAnimalSub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/icon_gray"
-            android:textSize="14sp"
-            android:paddingTop="4dp"/>
 
         <!-- Botão grande horizontal para adicionar nota -->
         <com.google.android.material.button.MaterialButton
