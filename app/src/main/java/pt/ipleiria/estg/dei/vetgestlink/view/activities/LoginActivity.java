@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
+import pt.ipleiria.estg.dei.vetgestlink.models.UserProfile;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 /**
@@ -43,11 +43,22 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        Singleton.getInstance(getApplicationContext());
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        // Verifica se o utilizador escolheu ser lembrado para entrar direto
+        if (sharedPreferences.getBoolean(KEY_REMEMBER_ME, false)) {
+            String username = sharedPreferences.getString(KEY_USERNAME, "");
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("user_username", username);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_login);
+        Singleton.getInstance(getApplicationContext());
 
         // Inicializar views
         initializeViews();
@@ -97,18 +108,16 @@ public class LoginActivity extends AppCompatActivity {
             android.app.AlertDialog.Builder builder =
                     new android.app.AlertDialog.Builder(LoginActivity.this);
 
-            // Inflate custom view
             android.view.LayoutInflater inflater = getLayoutInflater();
             android.view.View dialogView = inflater.inflate(R.layout.dialog_change_url, null);
             android.widget.EditText etMainUrl = dialogView.findViewById(R.id.etMainUrl);
 
-            // Pre-fill current value
             etMainUrl.setText(Singleton.getInstance(getApplicationContext()).getMainUrl());
 
             builder.setView(dialogView)
                     .setTitle("Configurar URL")
                     .setPositiveButton("Guardar", (dialog, which) -> {
-                        String url = etMainUrl.getText().toString().trim(); //guarda a url
+                        String url = etMainUrl.getText().toString().trim();
                         if (!url.isEmpty()) {
                             Singleton.getInstance(getApplicationContext()).setMainUrl(url);
                             Toast.makeText(LoginActivity.this, "URL guardada", Toast.LENGTH_SHORT).show();
@@ -118,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
                     .create()
                     .show();
         });
-
     }
 
     /**
@@ -129,120 +137,78 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         boolean rememberMe = cbRememberMe.isChecked();
 
-        // Validar campos
         if (!validateInputs(username, password)) {
             return;
         }
 
-        // Desabilitar botão e mostrar loading
         btnLogin.setEnabled(false);
         btnLogin.setText("Entrando...");
 
-        // Chamar API de login
         Singleton.getInstance(getApplicationContext()).login(username, password, new Singleton.LoginCallback() {
             @Override
             public void onSuccess(String token, UserProfile userProfile) {
-                // Salvar token
                 saveAccessToken(token);
 
-                // Salvar credenciais se "Lembrar-me" estiver marcado
                 if (rememberMe) {
                     saveCredentials(username, password);
                 } else {
                     clearCredentials();
                 }
 
-                // Mostrar mensagem de sucesso e navegar para MainActivity na UI thread
                 runOnUiThread(() -> {
                     Toast.makeText(LoginActivity.this,
                             "Bem-vindo, " + userProfile.getUsername() + "!",
                             Toast.LENGTH_SHORT).show();
 
-                    // Navegar para a MainActivity
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("user_username", username);
                     startActivity(intent);
-
-                    // Finalizar LoginActivity
                     finish();
                 });
             }
 
             @Override
             public void onError(String error) {
-                // Reabilitar botão na UI thread
                 runOnUiThread(() -> {
                     btnLogin.setEnabled(true);
                     btnLogin.setText(getString(R.string.login_button));
-
-                    // Mostrar erro
                     Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
                 });
             }
         });
     }
 
-    /**
-     * Salva o token de acesso no SharedPreferences
-     */
     private void saveAccessToken(String token) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_ACCESS_TOKEN, token);
         editor.apply();
     }
 
-    /**
-     * Valida os campos de entrada
-     */
     private boolean validateInputs(String username, String password) {
-        // Validar username
         if (username.isEmpty()) {
             etUsername.setError("Nome de utilizador é obrigatório");
             etUsername.requestFocus();
             return false;
         }
-
-        if (username.length() < 3) {
-            etUsername.setError("Nome de utilizador deve ter no mínimo 3 caracteres");
-            etUsername.requestFocus();
-            return false;
-        }
-
-        // Validar senha
         if (password.isEmpty()) {
             etPassword.setError("Senha é obrigatória");
             etPassword.requestFocus();
             return false;
         }
-
-        if (password.length() < 6) {
-            etPassword.setError("Senha deve ter no mínimo 6 caracteres");
-            etPassword.requestFocus();
-            return false;
-        }
-
         return true;
     }
 
-    /**
-     * Carrega credenciais salvas do SharedPreferences
-     */
     private void loadSavedCredentials() {
         boolean rememberMe = sharedPreferences.getBoolean(KEY_REMEMBER_ME, false);
-
         if (rememberMe) {
             String savedUsername = sharedPreferences.getString(KEY_USERNAME, "");
             String savedPassword = sharedPreferences.getString(KEY_PASSWORD, "");
-
             etUsername.setText(savedUsername);
             etPassword.setText(savedPassword);
             cbRememberMe.setChecked(true);
         }
     }
 
-    /**
-     * Salva credenciais no SharedPreferences
-     */
     private void saveCredentials(String username, String password) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_USERNAME, username);
@@ -251,9 +217,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    /**
-     * Limpa credenciais do SharedPreferences
-     */
     private void clearCredentials() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(KEY_USERNAME);
@@ -261,6 +224,4 @@ public class LoginActivity extends AppCompatActivity {
         editor.putBoolean(KEY_REMEMBER_ME, false);
         editor.apply();
     }
-
-
 }

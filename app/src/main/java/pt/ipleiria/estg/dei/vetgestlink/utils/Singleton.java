@@ -17,20 +17,34 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.AnimaisListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.AuthListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.LembretesListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.MarcacoesListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotaListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotasListener;
-import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
-import pt.ipleiria.estg.dei.vetgestlink.model.NotaDBHelper;
-import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
+//Listeners
+import pt.ipleiria.estg.dei.vetgestlink.listeners.AnimaisListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.AuthListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.FaturasListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.LembretesListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.MarcacoesListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.NotaListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.NotasListener;
+
+//Modelos
+import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.MarcacaoDBHelper;
+
+
+import pt.ipleiria.estg.dei.vetgestlink.models.NotaDBHelper;
+import pt.ipleiria.estg.dei.vetgestlink.models.UserProfile;
 
 public class Singleton {
     // region variaveis e constantes do singleton
+
+    //Variaveis
+    private ArrayList<Marcacao> marcacoes;
+    private MarcacaoDBHelper marcacoesDB = null;
+
+
+    //Constantes
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_MAIN_URL = "main_url";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
@@ -92,6 +106,12 @@ public class Singleton {
     //endregion
 
     //region defenicao de Callbacks (message, login, notas ,userprofile)
+
+    public interface MarcacoesCallback {
+        void onSuccess(ArrayList<Marcacao> marcacoes);
+        void onError(String error);
+    }
+
     public interface MessageCallback {
         void onSuccess(String message);
         void onError(String error);
@@ -109,6 +129,11 @@ public class Singleton {
         void onSuccess(UserProfile userProfile, List<Animal> animais);
         void onError(String error);
     }
+
+    public interface ProfileCallback {
+        void onSuccess(String nome, String email, String telefone, String moradaCompleta);
+        void onError(String error);
+    }
     // endregion
 
     // region Construtor e Instanciação do Singleton
@@ -119,7 +144,9 @@ public class Singleton {
         this.mainUrl = prefs.getString(KEY_MAIN_URL, DEFAULT_MAIN_URL);
 
         notas = new ArrayList<>();
+        marcacoes = new ArrayList<>();
         notasDB = new NotaDBHelper(context);
+        marcacoesDB = new MarcacaoDBHelper(context);
     }
 
     //ponto de acceco ao singleton para n haver asneiras (chamamos, enviamos o context e ele devolve a instancia do singleton)
@@ -640,5 +667,85 @@ public class Singleton {
         );
         addToRequestQueue(request);
     }
+    //endregion
+
+    //region - Gestao de Marcacoes e handler de informação associada
+    public ArrayList<Marcacao> getMarcacoesLocal() {
+        return marcacoes;
+    }
+    public void getMarcacoesAPI(String accessToken, final MarcacoesCallback callback) {
+        String url = buildUrl("marcacao/all?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        ArrayList<Marcacao> lista = MarcacaoJsonParser.parserJsonMarcacoes(response.toString());
+
+                        // Guarda localmente para uso offline
+                        adicionarMarcacoesBD(lista);
+                        this.marcacoes = lista;
+
+                        if (callback != null) callback.onSuccess(lista);
+                        if (MarcacoesListener != null) MarcacoesListener.onRefreshListaMarcacoes(lista);
+
+                    } catch (Exception e) {
+                        if (callback != null) callback.onError("Erro ao processar dados");
+                    }
+                },
+                error -> {
+                    // Se falhar (offline), tenta carregar da BD local
+                    ArrayList<Marcacao> localData = getMarcacoesBD();
+                    if (callback != null) {
+                        if (!localData.isEmpty()) {
+                            callback.onSuccess(localData);
+                        } else {
+                            callback.onError("Sem ligação e sem dados locais");
+                        }
+                    }
+                });
+        addToRequestQueue(request);
+    }
+    public ArrayList<Marcacao> getMarcacoesBD() {
+        marcacoes = marcacoesDB.getAllMarcacoesBD();
+        return new ArrayList<>(this.marcacoes);
+    }
+    public void adicionarMarcacoesBD(ArrayList<Marcacao> lista) {
+        marcacoesDB.removerAllMarcacoesBD();
+        for (Marcacao m : lista) {
+            marcacoesDB.adicionarMarcacaoBD(m);
+        }
+    }
+    //endregion
+
+    //region - Gestão de Perfil e handler de informação associada
+    public void getProfile(String token, ProfileCallback callback) {
+        String url = mainUrl + "/profile?access-token=" + token;
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        JSONObject user = response.getJSONObject("user");
+                        JSONObject profile = response.getJSONObject("profile");
+                        JSONObject morada = response.getJSONObject("morada");
+
+                        String nome = profile.getString("nomecompleto");
+                        String email = user.getString("email");
+                        String telefone = profile.getString("telemovel");
+                        String moradaCompleta = morada.getString("rua") + ", " +
+                                morada.getString("nporta") + "\n" +
+                                morada.getString("cdpostal") + " " +
+                                morada.getString("localidade");
+
+                        callback.onSuccess(nome, email, telefone, moradaCompleta);
+                    } catch (JSONException e) {
+                        callback.onError("Erro ao processar dados do perfil");
+                    }
+                },
+                error -> callback.onError("Erro na rede: " + error.getMessage())
+        );
+        getRequestQueue().add(request);
+    }
+
+
     //endregion
 }

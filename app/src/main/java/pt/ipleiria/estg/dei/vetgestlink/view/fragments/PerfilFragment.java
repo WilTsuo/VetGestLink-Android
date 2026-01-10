@@ -1,66 +1,91 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
 import pt.ipleiria.estg.dei.vetgestlink.R;
+import pt.ipleiria.estg.dei.vetgestlink.adapters.AnimalAdapter;
+import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PerfilFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PerfilFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private TextView tvNome, tvEmail, tvTelefone, tvMorada, tvAnimalCount;
+    private RecyclerView rvAnimais;
+    private AnimalAdapter adapter;
+    private List<Animal> listaAnimais;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public PerfilFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PerfilFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PerfilFragment newInstance(String param1, String param2) {
-        PerfilFragment fragment = new PerfilFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_perfil, container, false);
+
+        // Inicializar Views
+        tvNome = view.findViewById(R.id.tvNomeCompleto);
+        tvEmail = view.findViewById(R.id.tvEmail);
+        tvTelefone = view.findViewById(R.id.tvTelefone);
+        tvMorada = view.findViewById(R.id.tvMorada);
+        tvAnimalCount = view.findViewById(R.id.tvAnimalCount);
+        rvAnimais = view.findViewById(R.id.rvAnimais);
+
+        rvAnimais.setLayoutManager(new LinearLayoutManager(getContext()));
+        listaAnimais = new ArrayList<>();
+        adapter = new AnimalAdapter(listaAnimais);
+        rvAnimais.setAdapter(adapter);
+
+        carregarDados();
+
+        return view;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_perfil, container, false);
+    private void carregarDados() {
+        SharedPreferences prefs = getActivity().getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("access_token", "");
+
+        Singleton singleton = Singleton.getInstance(getContext());
+
+        // 1. Carregar Perfil
+        singleton.getProfile(token, new Singleton.ProfileCallback() {
+            @Override
+            public void onSuccess(String nome, String email, String telefone, String moradaCompleta) {
+                tvNome.setText(nome);
+                tvEmail.setText(email);
+                tvTelefone.setText(telefone);
+                tvMorada.setText(moradaCompleta);
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 2. Carregar Animais
+        singleton.getAnimais(token, new Singleton.AnimaisCallback() {
+            @Override
+            public void onSuccess(List<Animal> animais) {
+                listaAnimais.clear();
+                listaAnimais.addAll(animais);
+                adapter.notifyDataSetChanged();
+                tvAnimalCount.setText(animais.size() + " animais registados");
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

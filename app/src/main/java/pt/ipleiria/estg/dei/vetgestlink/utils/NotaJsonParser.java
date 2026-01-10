@@ -3,7 +3,7 @@ package pt.ipleiria.estg.dei.vetgestlink.utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 
 public class NotaJsonParser {
 

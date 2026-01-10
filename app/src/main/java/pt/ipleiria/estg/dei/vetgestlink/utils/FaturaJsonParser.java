@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
 
 public class FaturaJsonParser {
     //Parse list of faturas

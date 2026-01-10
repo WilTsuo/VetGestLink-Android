@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.NotasAdapter;
 

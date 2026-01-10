@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 
 public class MainActivityAdapter extends BaseAdapter {
 

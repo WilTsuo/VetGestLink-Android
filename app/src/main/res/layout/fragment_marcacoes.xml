@@ -1,14 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F9FAFB"
     tools:context=".view.fragments.MarcacoesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Título Principal -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/marcacoes" />
+        android:id="@+id/tvPageTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
+        android:text="Todas as Consultas"
+        android:textColor="#101828"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <!-- Subtítulo -->
+    <TextView
+        android:id="@+id/tvPageSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
+        android:text="Histórico e agendamentos"
+        android:textColor="#6A7282"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPageTitle" />
+
+    <!-- Filtro de Animal (Dropdown) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilAnimalFilter"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:startIconDrawable="@drawable/paw_solid_full"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPageSubtitle">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/autoCompleteAnimal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Filtrar por animal"
+            android:inputType="none"
+            android:fontFamily="sans-serif"
+            android:textSize="14sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Filtros Rápidos (Estado) -->
+    <HorizontalScrollView
+        android:id="@+id/filterScrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tilAnimalFilter">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="16dp">
+
+            <Button
+                android:id="@+id/btnFilterTodas"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_chip_selected"
+                android:fontFamily="sans-serif"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:text="Todas"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnFilterPendente"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_chip_unselected"
+                android:fontFamily="sans-serif"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:text="Pendente"
+                android:textAllCaps="false"
+                android:textColor="#364153"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnFilterCancelada"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_chip_unselected"
+                android:fontFamily="sans-serif"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:text="Cancelada"
+                android:textAllCaps="false"
+                android:textColor="#364153"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnFilterRealizada"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="43dp"
+                android:background="@drawable/filter_chip_unselected"
+                android:fontFamily="sans-serif"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:text="Realizada"
+                android:textAllCaps="false"
+                android:textColor="#364153"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- RecyclerView para Lista de Consultas -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMarcacoes"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        tools:listitem="@layout/item_marcacao_card" />
+
+    <!-- ProgressBar para Loading -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="#15803d"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+
+    <!-- TextView para Empty State -->
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="12dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="Nenhuma consulta encontrada"
+        android:textColor="#6A7282"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

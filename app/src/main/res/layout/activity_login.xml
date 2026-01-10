@@ -262,7 +262,7 @@
             android:contentDescription="@string/url_desc"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/link_url"
+            android:src="@drawable/ic_link_url"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 
 public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHolder> {
 

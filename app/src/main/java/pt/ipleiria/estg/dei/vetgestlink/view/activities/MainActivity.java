@@ -1,12 +1,8 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.activities;
 
-import static java.security.AccessController.getContext;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,16 +12,11 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
-import pt.ipleiria.estg.dei.vetgestlink.view.adapters.MainActivityAdapter;
-import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.DefinicoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.MarcacoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.NotasFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PagamentosFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PerfilFragment;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 

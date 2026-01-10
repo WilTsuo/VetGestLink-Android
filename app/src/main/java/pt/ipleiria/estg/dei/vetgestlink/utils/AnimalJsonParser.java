@@ -5,8 +5,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 
 public class AnimalJsonParser {
     public static ArrayList<Animal> parserJsonAnimal(JSONArray resposta) {
