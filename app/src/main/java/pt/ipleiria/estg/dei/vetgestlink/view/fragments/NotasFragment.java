@@ -1,66 +1,154 @@
+// java
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
+import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
+import pt.ipleiria.estg.dei.vetgestlink.view.adapters.NotasAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link NotasFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class NotasFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private MaterialAutoCompleteTextView autoCompleteAnimal;
+    private TextView tvAnimalSub;
+    private RecyclerView recyclerNotas;
+    private NotasAdapter notasAdapter;
+    private List<Animal> animais = new ArrayList<>();
+    private List<Nota> notas = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String PREFS_NAME = "VetGestLinkPrefs";
+    private static final String KEY_ACCESS_TOKEN = "access_token";
 
-    public NotasFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NotasFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NotasFragment newInstance(String param1, String param2) {
-        NotasFragment fragment = new NotasFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public NotasFragment() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notas, container, false);
+        View root = inflater.inflate(R.layout.fragment_notas, container, false);
+
+        autoCompleteAnimal = root.findViewById(R.id.autoCompleteAnimal);
+        tvAnimalSub = root.findViewById(R.id.tvAnimalSub);
+        recyclerNotas = root.findViewById(R.id.recyclerNotas);
+
+        recyclerNotas.setLayoutManager(new LinearLayoutManager(requireContext()));
+        notasAdapter = new NotasAdapter(notas);
+        recyclerNotas.setAdapter(notasAdapter);
+
+        autoCompleteAnimal.setOnItemClickListener((parent, view, position, id) -> {
+            // obter o nome seleccionado do adapter e procurar o Animal correspondente na lista 'animais'
+            String selectedName = (String) parent.getItemAtPosition(position);
+            Animal selected = null;
+            for (Animal a : animais) {
+                if (a.getNome() != null && a.getNome().equals(selectedName)) {
+                    selected = a;
+                    break;
+                }
+            }
+            if (selected != null) {
+                tvAnimalSub.setText(selected.getNome());
+                loadNotasForAnimal(getAccessToken(), selected.getId());
+            }
+        });
+
+        loadAnimalsAndNotas();
+
+        return root;
+    }
+
+    private String getAccessToken() {
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_ACCESS_TOKEN, null);
+    }
+
+    private void loadAnimalsAndNotas() {
+        String token = getAccessToken();
+        if (token == null) {
+            animais.clear();
+            notas.clear();
+            notasAdapter.updateList(notas);
+            ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+            autoCompleteAnimal.setAdapter(emptyAdapter);
+            autoCompleteAnimal.setText("", false);
+            tvAnimalSub.setText("");
+            return;
+        }
+
+        // usar o endpoint que devolve apenas nomes e ids
+        Singleton.getInstance(requireContext()).getNomesAnimais(token, new Singleton.AnimaisCallback() {
+            @Override
+            public void onSuccess(List<Animal> animaisList) {
+                requireActivity().runOnUiThread(() -> {
+                    animais.clear();
+                    animais.addAll(animaisList);
+
+                    List<String> nomes = new ArrayList<>();
+                    for (Animal a : animais) nomes.add(a.getNome());
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, nomes);
+                    autoCompleteAnimal.setAdapter(adapter);
+
+                    if (!animais.isEmpty()) {
+                        autoCompleteAnimal.setText(nomes.get(0), false);
+                        tvAnimalSub.setText(animais.get(0).getNome());
+                        loadNotasForAnimal(token, animais.get(0).getId());
+                    } else {
+                        loadNotasForAnimal(token, null);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                requireActivity().runOnUiThread(() -> {
+                    animais.clear();
+                    notas.clear();
+                    notasAdapter.updateList(notas);
+                    ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+                    autoCompleteAnimal.setAdapter(emptyAdapter);
+                    autoCompleteAnimal.setText("", false);
+                    tvAnimalSub.setText("");
+                });
+            }
+        });
+    }
+
+    private void loadNotasForAnimal(String token, Integer animalId) {
+        if (token == null) return;
+        Singleton.getInstance(requireContext()).getNotas(token, animalId, new Singleton.NotasCallback() {
+            @Override
+            public void onSuccess(List<Nota> resultNotas) {
+                requireActivity().runOnUiThread(() -> {
+                    notas.clear();
+                    notas.addAll(resultNotas);
+                    notasAdapter.updateList(notas);
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                requireActivity().runOnUiThread(() -> {
+                    notas.clear();
+                    notasAdapter.updateList(notas);
+                });
+            }
+        });
     }
 }

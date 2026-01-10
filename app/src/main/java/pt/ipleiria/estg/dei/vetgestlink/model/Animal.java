@@ -29,6 +29,11 @@ public class Animal {
         this.racaNome = racaNome;
     }
 
+    public Animal(int id, String nome){
+        this.id = id;
+        this.nome = nome;
+    }
+
     // Getters e Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

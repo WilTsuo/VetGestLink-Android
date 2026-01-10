@@ -1,21 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/lvNotas"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddNota"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_add"/>
+        <!-- Dropdown (Material AutoComplete) com ícone e subtítulo -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilAnimal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:startIconDrawable="@drawable/paw_solid_full"
+            app:endIconMode="dropdown_menu">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/autoCompleteAnimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/escolha_animal"
+                android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvAnimalSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/icon_gray"
+            android:textSize="14sp"
+            android:paddingTop="4dp"/>
+
+        <!-- Botão grande horizontal para adicionar nota -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddNota"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            app:icon="@drawable/ic_add"
+            app:iconTint="@android:color/white"
+            app:iconPadding="8dp"
+            android:text="@string/add_note"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:cornerRadius="8dp"
+            android:backgroundTint="@color/primary_green" />
+
+        <!-- Lista de notas (usa RecyclerView para cartões de nota) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerNotas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"/>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

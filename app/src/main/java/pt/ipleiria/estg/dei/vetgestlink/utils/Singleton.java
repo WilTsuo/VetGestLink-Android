@@ -35,7 +35,9 @@ public class Singleton {
     private static final String KEY_MAIN_URL = "main_url";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
     private static final String TAG = "VetGestLink";
-    private static final String TAG_LOGIN = "AuthService";
+    private static final String TAG_ANIMAIS = "Vetgetlink-AnimaisService";
+    private static final String TAG_NOTAS = "Vetgetlink-NotasService";
+    private static final String TAG_LOGIN = "Vetgetlink-AuthService";
     private static Singleton instance;
     //region - arrays e notadbhelper
     private ArrayList<Nota> notas;
@@ -53,7 +55,6 @@ public class Singleton {
     private FaturasListener FaturasListener;
     private MarcacoesListener MarcacoesListener;
     private LembretesListener LembretesListener;
-    //endregion
     //endregion
 
     //region - Setters Listeners
@@ -481,8 +482,17 @@ public class Singleton {
     // endregion
 
     //region Gestao do userProfile e handler de informação associada
+    private UserProfile parseUserProfile(JSONObject obj) throws JSONException {
+        UserProfile profile = new UserProfile();
+        profile.setId(obj.getInt("id"));
+        profile.setNomecompleto(obj.optString("nomecompleto", ""));
+        profile.setEmail(obj.optString("email", ""));
+        profile.setContacto(obj.optString("contacto", ""));
+        profile.setFotoUrl(obj.optString("foto_url", ""));
+        return profile;
+    }
     public void getUserProfile(String accessToken, UserProfileCallback callback) {
-        String url = buildUrl("userprofile?access-token=" + accessToken);
+        String url = buildUrl("profile?access-token=" + accessToken);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
@@ -508,17 +518,9 @@ public class Singleton {
 
         addToRequestQueue(request);
     }
+    //endregion
 
-    private UserProfile parseUserProfile(JSONObject obj) throws JSONException {
-        UserProfile profile = new UserProfile();
-        profile.setId(obj.getInt("id"));
-        profile.setNomecompleto(obj.optString("nomecompleto", ""));
-        profile.setEmail(obj.optString("email", ""));
-        profile.setContacto(obj.optString("contacto", ""));
-        profile.setFotoUrl(obj.optString("foto_url", ""));
-        return profile;
-    }
-
+    //region - Gestao de Animais e handler de informação associada
     private List<Animal> parseAnimais(JSONArray jsonArray) {
         List<Animal> animais = new ArrayList<>();
 
@@ -553,6 +555,90 @@ public class Singleton {
         }
 
         return animais;
+    }
+
+    private List<Animal> parseAnimaisNome(JSONArray jsonArray) {
+        List<Animal> animais = new ArrayList<>();
+
+        if (jsonArray == null) {
+            return animais;
+        }
+
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+
+                Animal animal = new Animal();
+                animal.setId(obj.getInt("id"));
+                animal.setNome(obj.getString("nome"));
+
+                animais.add(animal);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return animais;
+    }
+
+    public interface AnimaisCallback {
+        void onSuccess(List<Animal> animais);
+        void onError(String error);
+    }
+
+    public void getAnimais(String accessToken, AnimaisCallback callback) {
+        String url = buildUrl("animal/all?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    List<Animal> animais = parseAnimais(response);
+                    if (callback != null) {
+                        callback.onSuccess(animais);
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao carregar animais";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) {
+                        callback.onError(errorMsg);
+                    }
+                }
+        );
+        addToRequestQueue(request);
+    }
+
+    public void getNomesAnimais(String accessToken, AnimaisCallback callback) {
+        String url = buildUrl("animal/nomes?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    List<Animal> animais = parseAnimaisNome(response);
+                    if (callback != null) {
+                        callback.onSuccess(animais);
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao carregar nomes dos animais";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) {
+                        callback.onError(errorMsg);
+                    }
+                }
+        );
+        addToRequestQueue(request);
     }
     //endregion
 }

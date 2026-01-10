@@ -41,6 +41,7 @@
     <string name="notes_title">Notas</string>
     <string name="no_notes">Nenhuma nota disponível</string>
     <string name="add_note">Nova Nota</string>
+    <string name="escolha_animal">Escolha um animal</string>
 
     <!-- Profile -->
     <string name="profile_title">Perfil</string>
@@ -91,6 +92,7 @@
     <string name="excluir">Excluir</string>
     <string name="data">Data</string>
     <string name="url_desc">Botão Mudar URL</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="marcacoes">Consultas</string>
     <string name="pagamentos">Pagamentos</string>
