@@ -11,7 +11,6 @@
 
     <!-- Login -->
     <string name="login_title">Bem-vindo</string>
-    <string name="email">Email</string>
     <string name="password">Senha</string>
     <string name="login_button">Entrar</string>
     <string name="register_link">Não tem conta? Registre-se</string>
@@ -46,7 +45,12 @@
     <!-- Profile -->
     <string name="profile_title">Perfil</string>
     <string name="edit_profile">Editar Perfil</string>
-
+    <string name="meus_animais">Meus Animais</string>
+    <string name="animais_registados">0 animais registados</string>
+    <string name="dados_proprietario">Dados do Proprietário</string>
+    <string name="tv_nome_profile_title">Nome Completo</string>
+    <string name="tv_contacto_emergencia_sub_title">Contacto de Emergência</string>
+    <string name="tv_clinica_message_title">Clínica VetGestLink 24h</string>
     <!-- Settings -->
     <string name="settings_title">Configurações</string>
     <string name="notifications">Notificações</string>
@@ -55,6 +59,10 @@
     <string name="about">Sobre</string>
 
     <!-- Common -->
+    <string name="telemovel_vetgest">+351 210 123 456</string>
+    <string name="telefone">Telefone</string>
+    <string name="morada">Morada</string>
+    <string name="email">Email</string>
     <string name="save">Salvar</string>
     <string name="cancel">Cancelar</string>
     <string name="delete">Excluir</string>
@@ -63,6 +71,7 @@
     <string name="error">Erro</string>
     <string name="loading">Carregando...</string>
     <string name="success">Sucesso</string>
+
 
     <!-- Error messages -->
     <string name="error_network">Erro de conexão. Verifique sua internet.</string>

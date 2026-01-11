@@ -12,6 +12,28 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/meus_animais"
+                android:textColor="#333333"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAnimalCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/animais_registados"
+                android:textColor="#777777" />
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvAnimais"
             android:layout_width="match_parent"
@@ -19,22 +41,6 @@
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false"
             tools:listitem="@layout/item_animal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Meus Animais"
-            android:textColor="#333333"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvAnimalCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 animais registados"
-            android:textColor="#777777" />
-
         <!-- Dados do Proprietário -->
 
         <com.google.android.material.card.MaterialCardView
@@ -58,7 +64,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dados do Proprietário"
+                        android:text="@string/dados_proprietario"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -67,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="Editar"
+                        android:text="@string/edit"
                         android:textAllCaps="false"
                         app:icon="@drawable/ic_edit" />
                 </RelativeLayout>
@@ -75,7 +81,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nome Completo"
+                    android:text="@string/tv_nome_profile_title"
                     android:textColor="#555555" />
 
                 <TextView
@@ -85,12 +91,12 @@
                     android:layout_marginBottom="12dp"
                     android:background="#F1F3F4"
                     android:padding="12dp"
-                    android:text="Carregando..." />
+                    android:text="@string/loading" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Email"
+                    android:text="@string/email"
                     android:textColor="#555555" />
 
                 <TextView
@@ -100,12 +106,12 @@
                     android:layout_marginBottom="12dp"
                     android:background="#F1F3F4"
                     android:padding="12dp"
-                    android:text="Carregando..." />
+                    android:text="@string/loading" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Telefone"
+                    android:text="@string/telefone"
                     android:textColor="#555555" />
 
                 <TextView
@@ -115,12 +121,12 @@
                     android:layout_marginBottom="12dp"
                     android:background="#F1F3F4"
                     android:padding="12dp"
-                    android:text="Carregando..." />
+                    android:text="@string/loading" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Morada"
+                    android:text="@string/morada"
                     android:textColor="#555555" />
 
                 <TextView
@@ -129,10 +135,20 @@
                     android:layout_height="wrap_content"
                     android:background="#F1F3F4"
                     android:padding="12dp"
-                    android:text="Carregando..." />
+                    android:text="@string/loading" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+        <!-- Lembretes -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvLembretes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_lembrete" />
+
+        
 
         <!-- Contacto de Emergência -->
         <com.google.android.material.card.MaterialCardView
@@ -156,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="8dp"
-                    android:text="Contacto de Emergência"
+                    android:text="@string/tv_contacto_emergencia_sub_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:drawableStartCompat="@android:drawable/ic_menu_call" />
@@ -165,13 +181,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Clínica VetGestLink 24h" />
+                    android:text="@string/tv_clinica_message_title" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="+351 210 123 456"
+                    android:text="@string/telemovel_vetgest"
                     android:textColor="#2E7D32"
                     android:textSize="18sp"
                     android:textStyle="bold" />
