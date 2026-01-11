@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHolder> {

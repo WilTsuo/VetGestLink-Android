@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.vetgestlink.adapters;
+package pt.ipleiria.estg.dei.vetgestlink.view.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,12 +29,12 @@ public class AnimalAdapter extends RecyclerView.Adapter<AnimalAdapter.AnimalView
     public void onBindViewHolder(@NonNull AnimalViewHolder holder, int position) {
         Animal animal = animais.get(position);
         holder.tvNome.setText(animal.getNome());
-        holder.tvRaca.setText(animal.getRaca());
+        holder.tvRaca.setText(animal.getRacaNome());
         holder.tvIdade.setText(animal.getIdade() + " anos");
         holder.tvPeso.setText(animal.getPeso() + " kg");
-        holder.tvEspecie.setText(animal.getEspecie());
+        holder.tvEspecie.setText(animal.getEspecieNome());
         holder.tvGenero.setText(animal.getSexo().equals("M") ? "Macho" : "Fêmea");
-        holder.tvMicrochip.setText(animal.getMicrochip() == 1 ? "Sim" : "Não");
+        holder.tvMicrochip.setText(animal.getMicrochip() == true ? "Sim" : "Não");
     }
 
     @Override

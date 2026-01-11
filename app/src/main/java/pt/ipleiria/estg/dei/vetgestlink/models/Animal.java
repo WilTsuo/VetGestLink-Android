@@ -5,7 +5,7 @@ public class Animal {
     private String nome;
     private String dtanascimento;
     private float peso;
-    private boolean microship;
+    private boolean microchip;
     private String sexo;
     private int especiesId;
     private String especieNome;
@@ -26,11 +26,47 @@ public class Animal {
     public String getDtanascimento() { return dtanascimento; }
     public void setDtanascimento(String dtanascimento) { this.dtanascimento = dtanascimento; }
 
+    public int getIdade() {
+        // Validação da data de nascimento
+        if (dtanascimento == null || dtanascimento.trim().isEmpty()) {
+            return 0;
+        }
+
+        try {
+            // Parse da data de nascimento (formato esperado: yyyy-MM-dd)
+            String[] parts = dtanascimento.split("-");
+            if (parts.length != 3) {
+                return 0;
+            }
+
+            int yearOfBirth = Integer.parseInt(parts[0]);
+            int monthOfBirth = Integer.parseInt(parts[1]);
+            int dayOfBirth = Integer.parseInt(parts[2]);
+
+            // Data atual
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            java.util.Calendar birthDate = java.util.Calendar.getInstance();
+            birthDate.set(yearOfBirth, monthOfBirth - 1, dayOfBirth);
+
+            // Cálculo da diferença em milissegundos
+            long diffInMillis = now.getTimeInMillis() - birthDate.getTimeInMillis();
+
+            // Conversão para dias
+            int idadeEmDias = (int) (diffInMillis / (1000 * 60 * 60 * 24));
+
+            return Math.max(0, idadeEmDias); // Garantir que não retorna valores negativos
+
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+
     public float getPeso() { return peso; }
     public void setPeso(float peso) { this.peso = peso; }
 
-    public boolean isMicroship() { return microship; }
-    public void setMicroship(boolean microship) { this.microship = microship; }
+    public boolean getMicrochip() { return microchip; }
+    public void setMicrochip(boolean microchip) { this.microchip = microchip; }
 
     public String getSexo() { return sexo; }
     public void setSexo(String sexo) { this.sexo = sexo; }

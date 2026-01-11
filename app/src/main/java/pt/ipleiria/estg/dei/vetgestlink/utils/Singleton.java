@@ -559,7 +559,7 @@ public class Singleton {
                 animal.setNome(obj.getString("nome"));
                 animal.setDtanascimento(obj.optString("dtanascimento", ""));
                 animal.setPeso((float) obj.optDouble("peso", 0.0));
-                animal.setMicroship(obj.optBoolean("microship", false));
+                animal.setMicrochip(obj.optBoolean("microship", false));
                 animal.setSexo(obj.optString("sexo", ""));
                 animal.setEspeciesId(obj.optInt("especies_id", 0));
                 animal.setEspecieNome(obj.optString("especie_nome", ""));
