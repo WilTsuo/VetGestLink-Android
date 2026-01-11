@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.vetgestlink.adapters;
+package pt.ipleiria.estg.dei.vetgestlink.view.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;

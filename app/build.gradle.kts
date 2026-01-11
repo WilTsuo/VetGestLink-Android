@@ -63,6 +63,8 @@ dependencies {
 // ===== VOLLEY (HTTP Client) =====
     implementation("com.android.volley:volley:1.2.1")
 
+//===== GLIDE (LOADER DE IMAGENS) =====
+    implementation("com.github.bumptech.glide:glide:4.15.1")
 
 // ===== SWIPE REFRESH =====
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
