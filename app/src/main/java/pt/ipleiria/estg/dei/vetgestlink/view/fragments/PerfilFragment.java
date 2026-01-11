@@ -19,12 +19,13 @@ import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.AnimalAdapter;
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
+import pt.ipleiria.estg.dei.vetgestlink.view.adapters.PerfilAnimalAdapter;
 
 public class PerfilFragment extends Fragment {
 
     private TextView tvNome, tvEmail, tvTelefone, tvMorada, tvAnimalCount;
     private RecyclerView rvAnimais;
-    private AnimalAdapter adapter;
+    private PerfilAnimalAdapter adapter;
     private List<Animal> listaAnimais;
 
     @Nullable
@@ -32,7 +33,6 @@ public class PerfilFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_perfil, container, false);
 
-        // Inicializar Views
         tvNome = view.findViewById(R.id.tvNomeCompleto);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvTelefone = view.findViewById(R.id.tvTelefone);
@@ -42,7 +42,7 @@ public class PerfilFragment extends Fragment {
 
         rvAnimais.setLayoutManager(new LinearLayoutManager(getContext()));
         listaAnimais = new ArrayList<>();
-        adapter = new AnimalAdapter(listaAnimais);
+        adapter = new PerfilAnimalAdapter(listaAnimais);
         rvAnimais.setAdapter(adapter);
 
         carregarDados();
@@ -56,7 +56,6 @@ public class PerfilFragment extends Fragment {
 
         Singleton singleton = Singleton.getInstance(getContext());
 
-        // 1. Carregar Perfil
         singleton.getProfile(token, new Singleton.ProfileCallback() {
             @Override
             public void onSuccess(String nome, String email, String telefone, String moradaCompleta) {
@@ -72,7 +71,6 @@ public class PerfilFragment extends Fragment {
             }
         });
 
-        // 2. Carregar Animais
         singleton.getAnimais(token, new Singleton.AnimaisCallback() {
             @Override
             public void onSuccess(List<Animal> animais) {
