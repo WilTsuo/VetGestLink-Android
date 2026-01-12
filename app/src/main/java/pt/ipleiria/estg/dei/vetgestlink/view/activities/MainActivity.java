@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.DefinicoesFragment;
+import pt.ipleiria.estg.dei.vetgestlink.view.fragments.LembretesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.MarcacoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.NotasFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PagamentosFragment;
@@ -20,46 +21,6 @@ import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PerfilFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * // Configurar ListView
-     *         ListView listView = findViewById(R.id.listView);
-     *
-     *         MainActivityAdapter adapter = new MainActivityAdapter(this, new MainActivityAdapter.OnNotaClickListener() {
-     *             @Override
-     *             public void onEditClick(Nota nota) {
-     *                 Toast.makeText(MainActivity.this, "Editar: " + nota.getTitulo(), Toast.LENGTH_SHORT).show();
-     *                 // Aqui pode abrir dialog_nota para editar
-     *             }
-     *
-     *             @Override
-     *             public void onDeleteClick(Nota nota) {
-     *                 Toast.makeText(MainActivity.this, "Excluir: " + nota.getTitulo(), Toast.LENGTH_SHORT).show();
-     *                 // Implementar chamada à API para deletar e atualizar adapter se necessário
-     *             }
-     *         });
-     *
-     *         listView.setAdapter(adapter);
-     *
-     *         // Inicializar serviço de notas e buscar (uso local)
-     *         Singleton singleton = Singleton.getInstance(MainActivity.this);
-     *
-     *         singleton.getNotas(token, 1, new Singleton.NotasCallback() {
-     *             @Override
-     *             public void onSuccess(List<Nota> notas) {
-     *                 runOnUiThread(() -> {
-     *                     adapter.setNotas(notas);
-     *                     if (notas == null || notas.isEmpty()) {
-     *                         Toast.makeText(MainActivity.this, R.string.no_notes, Toast.LENGTH_SHORT).show();
-     *                     }
-     *                 });
-     *             }
-     *
-     *             @Override
-     *             public void onError(String error) {
-     *                 runOnUiThread(() -> Toast.makeText(MainActivity.this, error, Toast.LENGTH_LONG).show());
-     *             }
-     *         });
-     * **/
     private BottomNavigationView bottomNavigationView;
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
@@ -122,4 +83,17 @@ public class MainActivity extends AppCompatActivity {
         TextView toolbar_subtitle = findViewById(R.id.toolbar_subtitle);
         toolbar_subtitle.setText(title);
     }
+
+    public void navegarParaLembretes() {
+        Fragment fragment = new LembretesFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        TextView toolbarSubtitle = findViewById(R.id.toolbar_subtitle);
+        toolbarSubtitle.setText("Lembretes");
+    }
+
 }

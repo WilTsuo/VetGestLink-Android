@@ -42,6 +42,10 @@
     <string name="add_note">Nova Nota</string>
     <string name="escolha_animal">Escolha um animal</string>
 
+    <!-- Lembretes -->
+    <string name="lembretes_title">Lembretes</string>
+    <string name="ver_lembretes">Ver Todos os Lembretes</string>
+
     <!-- Profile -->
     <string name="profile_title">Perfil</string>
     <string name="edit_profile">Editar Perfil</string>
