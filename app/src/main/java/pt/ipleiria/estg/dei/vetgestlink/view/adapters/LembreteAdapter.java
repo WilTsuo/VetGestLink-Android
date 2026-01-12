@@ -1,3 +1,4 @@
+
 package pt.ipleiria.estg.dei.vetgestlink.view.adapters;
 
 import android.app.AlertDialog;
@@ -19,12 +20,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
+import pt.ipleiria.estg.dei.vetgestlink.models.Lembrete;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.LembreteViewHolder> {
 
-    private List<Nota> lembretes;
+    private List<Lembrete> lembretes;
     private int currentUserId;
     private OnLembreteChangedListener listener;
 
@@ -35,7 +36,7 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
         void onLembreteChanged();
     }
 
-    public LembreteAdapter(List<Nota> lembretes, int currentUserId) {
+    public LembreteAdapter(List<Lembrete> lembretes, int currentUserId) {
         this.lembretes = lembretes;
         this.currentUserId = currentUserId;
     }
@@ -54,10 +55,10 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
 
     @Override
     public void onBindViewHolder(@NonNull LembreteViewHolder holder, int position) {
-        Nota lembrete = lembretes.get(position);
+        Lembrete lembrete = lembretes.get(position);
 
-        holder.tvDescricao.setText(lembrete.getNota() != null ? lembrete.getNota() : "");
-        holder.tvData.setText(lembrete.getData() != null ? lembrete.getData() : "");
+        holder.tvDescricao.setText(lembrete.getDescricao() != null ? lembrete.getDescricao() : "");
+        holder.tvData.setText(lembrete.getCreatedAt() != null ? lembrete.getCreatedAt() : "");
 
         holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), lembrete));
         holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), lembrete));
@@ -68,12 +69,12 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
         return lembretes != null ? lembretes.size() : 0;
     }
 
-    private void showEditDialog(Context context, Nota lembrete) {
+    private void showEditDialog(Context context, Lembrete lembrete) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_nota, null);
 
         TextInputEditText etDescricao = dialogView.findViewById(R.id.et_descricao);
-        etDescricao.setText(lembrete.getNota());
+        etDescricao.setText(lembrete.getDescricao());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(dialogView)
@@ -94,7 +95,7 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
             }
 
             String token = getAccessToken(context);
-            Singleton.getInstance(context).atualizarNota(token, lembrete.getId(), descricao, new Singleton.MessageCallback() {
+            Singleton.getInstance(context).atualizarLembrete(token, lembrete.getId(), descricao, new Singleton.MessageCallback() {
                 @Override
                 public void onSuccess(String message) {
                     Toast.makeText(context, "Lembrete atualizado", Toast.LENGTH_SHORT).show();
@@ -112,13 +113,13 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
         });
     }
 
-    private void showDeleteDialog(Context context, Nota lembrete) {
+    private void showDeleteDialog(Context context, Lembrete lembrete) {
         new AlertDialog.Builder(context)
                 .setTitle("Eliminar Lembrete")
                 .setMessage("Tem certeza que deseja eliminar este lembrete?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     String token = getAccessToken(context);
-                    Singleton.getInstance(context).deletarNota(token, lembrete.getId(), new Singleton.MessageCallback() {
+                    Singleton.getInstance(context).deletarLembrete(token, lembrete.getId(), new Singleton.MessageCallback() {
                         @Override
                         public void onSuccess(String message) {
                             Toast.makeText(context, "Lembrete eliminado", Toast.LENGTH_SHORT).show();

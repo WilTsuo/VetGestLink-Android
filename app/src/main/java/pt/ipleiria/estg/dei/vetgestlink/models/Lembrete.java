@@ -7,9 +7,6 @@ public class Lembrete {
     private String updatedAt;       // Formato: YYYY-MM-DD HH:MM:SS
     private int userprofilesId;
 
-    //constructor
-
-
     public Lembrete(int id, String descricao, String createdAt, String updatedAt, int userprofilesId) {
         this.id = id;
         this.descricao = descricao;

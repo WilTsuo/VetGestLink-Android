@@ -699,4 +699,178 @@ public class Singleton {
     }
     //endregion
 
+    // region - Gestão de Lembretes
+    public interface LembretesCallback {
+        void onSuccess(List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lembretes);
+        void onError(String error);
+    }
+
+    private List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> parseLembretes(JSONArray jsonArray) {
+        List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lista = new ArrayList<>();
+        if (jsonArray == null) return lista;
+
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                int id = obj.optInt("id", 0);
+                String descricao = obj.optString("descricao", "");
+                String createdAt = obj.optString("created_at", "");
+                String updatedAt = obj.optString("updated_at", "");
+                int userprofilesId = obj.optInt("userprofiles_id", 0);
+
+                pt.ipleiria.estg.dei.vetgestlink.models.Lembrete l =
+                        new pt.ipleiria.estg.dei.vetgestlink.models.Lembrete(id, descricao, createdAt, updatedAt, userprofilesId);
+
+                lista.add(l);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "Erro no parseLembretes: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public void getLembretes(String accessToken, LembretesCallback callback) {
+        String url = buildUrl("lembrete/all?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lista = parseLembretes(response);
+                    if (callback != null) callback.onSuccess(lista);
+                },
+                error -> {
+                    String errorMsg = "Erro ao carregar lembretes";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) callback.onError(errorMsg);
+                }
+        );
+        addToRequestQueue(request);
+    }
+
+    public void deletarLembrete(String accessToken, int lembreteId, MessageCallback callback) {
+        String url = buildUrl("lembrete/delete/" + lembreteId + "?access-token=" + accessToken);
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.DELETE,
+                url,
+                null,
+                response -> {
+                    try {
+                        boolean success = response.optBoolean("success", false);
+                        String message = response.optString("message", "");
+                        if (success) {
+                            if (callback != null) callback.onSuccess(message);
+                        } else {
+                            if (callback != null) callback.onError(message);
+                        }
+                    } catch (Exception e) {
+                        if (callback != null) callback.onError("Erro ao processar resposta");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao eliminar lembrete";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) callback.onError(errorMsg);
+                }
+        );
+
+        addToRequestQueue(request);
+    }
+
+    public void atualizarLembrete(String accessToken, int lembreteId, String descricao, MessageCallback callback) {
+        String url = buildUrl("lembrete/update/" + lembreteId + "?access-token=" + accessToken);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("descricao", descricao);
+        } catch (JSONException e) {
+            if (callback != null) callback.onError("Erro ao preparar dados");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.PUT,
+                url,
+                jsonBody,
+                response -> {
+                    try {
+                        boolean success = response.optBoolean("success", false);
+                        String message = response.optString("message", "");
+                        if (success) {
+                            if (callback != null) callback.onSuccess(message);
+                        } else {
+                            if (callback != null) callback.onError(message);
+                        }
+                    } catch (Exception e) {
+                        if (callback != null) callback.onError("Erro ao processar resposta");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao atualizar lembrete";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) callback.onError(errorMsg);
+                }
+        );
+
+        addToRequestQueue(request);
+    }
+
+    public void criarLembrete(String accessToken, String descricao, MessageCallback callback) {
+        String url = buildUrl("lembrete/create?access-token=" + accessToken);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("descricao", descricao);
+        } catch (JSONException e) {
+            if (callback != null) callback.onError("Erro ao preparar dados");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonBody,
+                response -> {
+                    try {
+                        boolean success = response.optBoolean("success", false);
+                        String message = response.optString("message", "");
+                        if (success) {
+                            if (callback != null) callback.onSuccess(message);
+                        } else {
+                            if (callback != null) callback.onError(message);
+                        }
+                    } catch (Exception e) {
+                        if (callback != null) callback.onError("Erro ao processar resposta");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao criar lembrete";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) callback.onError(errorMsg);
+                }
+        );
+
+        addToRequestQueue(request);
+    }
+
+    // endregion
+
 }

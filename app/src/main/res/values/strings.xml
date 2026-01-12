@@ -45,6 +45,8 @@
     <!-- Lembretes -->
     <string name="lembretes_title">Lembretes</string>
     <string name="ver_lembretes">Ver Todos os Lembretes</string>
+    <string name="no_lembretes">Nenhum lembrete disponível</string>
+    <string name="add_lembrete">Novo Lembrete</string>
 
     <!-- Profile -->
     <string name="profile_title">Perfil</string>
