@@ -9,13 +9,11 @@ public class UserProfile {
     
     private int id;
     private String nomecompleto;
-
     private String username;
     private String nif;
     private String telemovel;
     private String dtanascimento; // Formato: YYYY-MM-DD
     private String dtaregisto; // Formato: YYYY-MM-DD HH:MM:SS
-    private int userId;
     private String userEmail; // Join com user
     private String userUsername; // Join com user
     private boolean eliminado;
@@ -48,7 +46,7 @@ public class UserProfile {
     
     // Getters e Setters
     public int getId() { return id; }
-    public void setId(int id) { this.userId = id; }
+    public void setId(int id) { this.id = id; }
     
     public String getNomecompleto() { return nomecompleto; }
     public void setNomecompleto(String nomecompleto) { this.nomecompleto = nomecompleto; }
@@ -73,10 +71,7 @@ public class UserProfile {
     
     public String getDtaregisto() { return dtaregisto; }
     public void setDtaregisto(String dtaregisto) { this.dtaregisto = dtaregisto; }
-    
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
-    
+
     public String getUserEmail() { return userEmail; }
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
     
