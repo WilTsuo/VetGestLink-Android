@@ -76,7 +76,7 @@ public class NotasFragment extends Fragment {
         btnAddNota.setAlpha(apiOk ? 1f : 0.5f);
         btnAddNota.setOnClickListener(v -> {
             if (!apiAvailable) {
-                Toast.makeText(requireContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Houve um problema na Ligação a API, verifique a sua conexao a Internet", Toast.LENGTH_SHORT).show();
                 return;
             }
             showAddNotaDialog();
@@ -123,15 +123,36 @@ public class NotasFragment extends Fragment {
     private void loadAnimalsAndNotas() {
         String token = getAccessToken();
         if (token == null) {
-            animais.clear();
-            notas.clear();
-            notasAdapter.updateList(notas);
-            ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
-            autoCompleteAnimal.setAdapter(emptyAdapter);
-            autoCompleteAnimal.setText("", false);
+            // Sem token: tenta usar cache local de notas em vez de limpar tudo
+            ArrayList<Nota> cached = Singleton.getInstance(requireContext()).getNotasBD();
+            if (cached != null && !cached.isEmpty()) {
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    // Mantém animais vazios (não há nomes) mas mostra notas em cache
+                    animais.clear();
+                    ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+                    autoCompleteAnimal.setAdapter(emptyAdapter);
+                    autoCompleteAnimal.setText("", false);
+
+                    notas.clear();
+                    notas.addAll(cached);
+                    notasAdapter.updateList(notas);
+
+                    Toast.makeText(requireContext(), "Offline — a usar notas em cache", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                // Sem token e sem cache: limpa a UI
+                animais.clear();
+                notas.clear();
+                notasAdapter.updateList(notas);
+                ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+                autoCompleteAnimal.setAdapter(emptyAdapter);
+                autoCompleteAnimal.setText("", false);
+            }
             return;
         }
 
+        // restante implementação inalterada...
         Singleton.getInstance(requireContext()).getNomesAnimais(token, new Singleton.AnimaisCallback() {
             @Override
             public void onSuccess(List<Animal> animaisList) {
@@ -317,7 +338,7 @@ public class NotasFragment extends Fragment {
         Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positive.setOnClickListener(v -> {
             if (!apiAvailable) {
-                Toast.makeText(requireContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Houve um problema na Ligação a API, verifique a sua conexao a Internet", Toast.LENGTH_SHORT).show();
                 return;
             }
 
