@@ -223,6 +223,7 @@ public class Singleton {
 
     // region Gestao do Login e Auth Handler
     public void login(String username, String password, LoginCallback callback) {
+        // Se a rota for diferente (ex: "v1/auth/login"), ajuste aqui
         String url = buildUrl("auth/login");
 
         JSONObject jsonBody = new JSONObject();
@@ -230,98 +231,68 @@ public class Singleton {
             jsonBody.put("username", username);
             jsonBody.put("password", password);
         } catch (JSONException e) {
-            callback.onError("Erro ao preparar dados de login");
+            callback.onError("Erro ao criar JSON de login");
             return;
         }
 
-        Log.d(TAG_LOGIN, "Enviando login para: " + url + " payload: " + jsonBody);
+        Log.d(TAG_LOGIN, "A tentar login em: " + url);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
                 jsonBody,
                 response -> {
-                    Log.d(TAG_LOGIN, "Resposta do login: " + response);
+                    Log.d(TAG_LOGIN, "Resposta JSON: " + response.toString());
+
                     try {
+                        // 1. Verifica sucesso
                         boolean success = response.optBoolean("success", false);
 
                         if (success) {
-                            String token = response.optString("token", "");
+                            String token = response.optString("token");
 
-                            // Parse user profile
-                            // 1) { "user": { "id", "username", "email" } }
+                            // 2. PARSING DO USER (AQUI ESTAVA O ERRO)
+                            // O JSON tem: "user": { "id": 9, ... }
+                            if (response.has("user")) {
+                                JSONObject userJson = response.getJSONObject("user");
 
-                            // Parse user profile CORRETAMENTE
-                            UserProfile userProfile = new UserProfile();
-                            JSONObject userObj = response.optJSONObject("user");
-                            if (userObj != null) {
-                                int userId = userObj.optInt("id", 0);
-                                userProfile.setId(userId);
-                                userProfile.setUsername(userObj.optString("username", ""));
-                                userProfile.setEmail(userObj.optString("email", ""));
+                                int id = userJson.optInt("id", -1);
+                                String email = userJson.optString("email");
+                                String userUsername = userJson.optString("username");
 
-                                // Guardar nas SharedPreferences
-                                SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                                prefs.edit().putInt("userprofile_id", userId).apply();
+                                // Validação extra
+                                if (id > 0) {
+                                    UserProfile userProfile = new UserProfile();
+                                    userProfile.setId(id);
+                                    userProfile.setUsername(userUsername);
+                                    userProfile.setEmail(email);
+
+                                    callback.onSuccess(token, userProfile);
+                                } else {
+                                    callback.onError("Erro Crítico: ID inválido recebido do servidor (" + id + ")");
+                                }
+                            } else {
+                                callback.onError("Erro: Resposta do servidor não contém objeto 'user'");
                             }
-
-                            callback.onSuccess(token, userProfile);
                         } else {
-                            String message = response.optString("message", "Login falhou");
-                            callback.onError(message);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG_LOGIN, "Erro ao parsear resposta de login", e);
-                        callback.onError("Erro ao processar resposta do servidor");
-                    }
-
-                    try {
-                        boolean success = response.optBoolean("success", false);
-
-                        if (success) {
-                            String token = response.getString("token");
-
-                            // Parse user profile
-                            // resposta:
-                            // auth_key
-                            // user_id
-                            // username
-                            JSONObject userProfileObj = response.getJSONObject("user");
-                            UserProfile userProfile = new UserProfile();
-                            userProfile.setId(userProfileObj.getInt("id")); //guarda user_id
-                            userProfile.setUsername(userProfileObj.optString("username", "ERRO!!!!!!!"));   // guarda username
-                            userProfile.setEmail(userProfileObj.optString("email", "ERROO!!!!!!!"));        // guarda email
-
-                            callback.onSuccess(token, userProfile);
-                        } else {
-                            String message = response.optString("message", "Login falhou");
-                            callback.onError(message);
+                            String msg = response.optString("message", "Credenciais inválidas");
+                            callback.onError(msg);
                         }
                     } catch (JSONException e) {
-                        Log.e(TAG_LOGIN, "Erro ao parsear resposta de login", e);
-                        callback.onError("Erro ao processar resposta do servidor");
+                        Log.e(TAG_LOGIN, "Erro JSON", e);
+                        callback.onError("Erro ao ler dados: " + e.getMessage());
                     }
                 },
                 error -> {
-                    Log.e(TAG_LOGIN, "Erro no pedido de login", error);
-                    String errorMsg = "Erro ao fazer login";
+                    String err = "Erro de conexão";
                     if (error.networkResponse != null) {
-                        int statusCode = error.networkResponse.statusCode;
-                        if (statusCode == 401) {
-                            errorMsg = "Credenciais inválidas";
-                        } else if (statusCode == 404) {
-                            errorMsg = "Servidor não encontrado";
-                        } else {
-                            errorMsg += " (Código: " + statusCode + ")";
-                        }
-                    } else if (error.getMessage() != null) {
-                        errorMsg = "Erro de conexão: " + error.getMessage();
+                        err = "Erro " + error.networkResponse.statusCode;
                     }
-                    callback.onError(errorMsg);
+                    callback.onError(err);
                 }
         );
 
-        addToRequestQueue(request);
+        getRequestQueue().add(request);
     }
     // endregion
 

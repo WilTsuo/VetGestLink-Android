@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log; // Importante para debug
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,19 +17,16 @@ import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.UserProfile;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
-/**
- * View - Activity de Login
- * Responsável pela interface de autenticação do utilizador
- */
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "LoginDebug"; // Tag para filtrar no Logcat
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_USERNAME = "saved_username";
     private static final String KEY_PASSWORD = "saved_password";
     private static final String KEY_REMEMBER_ME = "remember_me";
     private static final String KEY_ACCESS_TOKEN = "access_token";
+    private static final String KEY_USER_ID = "user_id";
 
-    // Views
     private TextInputEditText etUsername;
     private TextInputEditText etPassword;
     private CheckBox cbRememberMe;
@@ -37,42 +35,39 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvSignUp;
     private ImageView btnChangeUrl;
 
-    // API Service
     private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // Verifica se o utilizador escolheu ser lembrado para entrar direto
+        // Verifica login automático
         if (sharedPreferences.getBoolean(KEY_REMEMBER_ME, false)) {
-            String username = sharedPreferences.getString(KEY_USERNAME, "");
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("user_username", username);
-            startActivity(intent);
-            finish();
-            return;
+            // DEBUG: Verificar se temos o ID guardado antes de entrar automaticamente
+            int savedId = sharedPreferences.getInt(KEY_USER_ID, -1);
+            Log.d(TAG, "Login Automático. ID guardado: " + savedId);
+
+            // Se o ID for inválido (-1 ou 0), forçamos o utilizador a fazer login novamente
+            if (savedId <= 0) {
+                Log.w(TAG, "ID inválido no login automático. A forçar novo login.");
+                clearCredentials(); // Limpa para obrigar a meter a senha
+            } else {
+                String username = sharedPreferences.getString(KEY_USERNAME, "");
+                goToMainActivity(username);
+                return;
+            }
         }
 
         setContentView(R.layout.activity_login);
         Singleton.getInstance(getApplicationContext());
 
-        // Inicializar views
         initializeViews();
-
-        // Carregar credenciais salvas (se houver)
         loadSavedCredentials();
-
-        // Configurar listeners
         setupListeners();
     }
 
-    /**
-     * Inicializa todas as views da tela
-     */
     private void initializeViews() {
         btnChangeUrl = findViewById(R.id.btnChangeUrl);
         etUsername = findViewById(R.id.etUsername);
@@ -83,35 +78,25 @@ public class LoginActivity extends AppCompatActivity {
         tvSignUp = findViewById(R.id.tvSignUp);
     }
 
-    /**
-     * Configura os listeners dos elementos da UI
-     */
     private void setupListeners() {
-        // Botão de login
         btnLogin.setOnClickListener(v -> performLogin());
 
-        // Link "Esqueci a senha"
         tvForgotPassword.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
 
-        // Link "Solicite acesso"
         tvSignUp.setOnClickListener(v -> {
             String url = Singleton.getInstance(getApplicationContext()).getMainUrl();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         });
 
-        // Botão para alterar URL que a API usa
         btnChangeUrl.setOnClickListener(v -> {
-            android.app.AlertDialog.Builder builder =
-                    new android.app.AlertDialog.Builder(LoginActivity.this);
-
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(LoginActivity.this);
             android.view.LayoutInflater inflater = getLayoutInflater();
             android.view.View dialogView = inflater.inflate(R.layout.dialog_change_url, null);
             android.widget.EditText etMainUrl = dialogView.findViewById(R.id.etMainUrl);
-
             etMainUrl.setText(Singleton.getInstance(getApplicationContext()).getMainUrl());
 
             builder.setView(dialogView)
@@ -124,22 +109,16 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     })
                     .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
-                    .create()
-                    .show();
+                    .create().show();
         });
     }
 
-    /**
-     * Executa o processo de login
-     */
     private void performLogin() {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         boolean rememberMe = cbRememberMe.isChecked();
 
-        if (!validateInputs(username, password)) {
-            return;
-        }
+        if (!validateInputs(username, password)) return;
 
         btnLogin.setEnabled(false);
         btnLogin.setText("Entrando...");
@@ -147,7 +126,20 @@ public class LoginActivity extends AppCompatActivity {
         Singleton.getInstance(getApplicationContext()).login(username, password, new Singleton.LoginCallback() {
             @Override
             public void onSuccess(String token, UserProfile userProfile) {
-                saveAccessToken(token);
+                Log.d(TAG, "Login OK. ID recebido: " + userProfile.getId());
+
+                // BLOQUEIO DE SEGURANÇA: Se o ID for 0, não deixa entrar
+                if (userProfile.getId() <= 0) {
+                    runOnUiThread(() -> {
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Entrar");
+                        Toast.makeText(LoginActivity.this, "Erro: ID de utilizador inválido (0). Contacte o suporte.", Toast.LENGTH_LONG).show();
+                    });
+                    return;
+                }
+
+                // Se chegou aqui, o ID é válido (ex: 9)
+                saveSessionData(token, userProfile.getId());
 
                 if (rememberMe) {
                     saveCredentials(username, password);
@@ -156,32 +148,36 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 runOnUiThread(() -> {
-                    Toast.makeText(LoginActivity.this,
-                            "Bem-vindo, " + userProfile.getUsername() + "!",
-                            Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("user_username", username);
-                    startActivity(intent);
-                    finish();
+                    Toast.makeText(LoginActivity.this, "Bem-vindo " + userProfile.getUsername(), Toast.LENGTH_SHORT).show();
+                    goToMainActivity(username);
                 });
             }
 
             @Override
             public void onError(String error) {
+                Log.e(TAG, "Erro Login: " + error);
                 runOnUiThread(() -> {
                     btnLogin.setEnabled(true);
-                    btnLogin.setText(getString(R.string.login_button));
+                    btnLogin.setText("Entrar");
                     Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
                 });
             }
         });
     }
 
-    private void saveAccessToken(String token) {
+    private void saveSessionData(String token, int userId) {
+        Log.d(TAG, "A guardar sessão -> Token: [Oculto], UserID: " + userId);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_ACCESS_TOKEN, token);
+        editor.putInt(KEY_USER_ID, userId);
         editor.apply();
+    }
+
+    private void goToMainActivity(String username) {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra("user_username", username);
+        startActivity(intent);
+        finish();
     }
 
     private boolean validateInputs(String username, String password) {
