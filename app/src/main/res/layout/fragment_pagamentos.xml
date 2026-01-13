@@ -1,14 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.PagamentosFragment">
+    android:orientation="vertical"
+    android:background="#F5F5F5"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Sumario financeiro -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/pagamentos" />
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="#2E7D32"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="$ Resumo Financeiro"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Pendente"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:id="@+id/tvQuantidadePendente"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="€ 0.00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Pago"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:id="@+id/tvQuantidadePaga"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="€ 0.00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <!-- Filtros -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnTodos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todos"
+            android:backgroundTint="#2E7D32"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btnPendente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pendente"
+            android:textColor="#2E7D32"
+            android:backgroundTint="@android:color/white"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btnPago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pago"
+            android:textColor="#2E7D32"
+            android:backgroundTint="@android:color/white"/>
+    </LinearLayout>
+
+    <!-- Lista de faturas -->
+    <ListView
+        android:id="@+id/lvFaturas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="12dp"/>
+
+</LinearLayout>
