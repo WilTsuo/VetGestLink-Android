@@ -14,9 +14,9 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.OnPagarClickListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.OnPagarClickListener;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
 
 public class ListaFaturasAdapter extends ArrayAdapter<Fatura> {
 
