@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 
@@ -49,6 +51,8 @@ public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapte
         String urlImagem = BASE_URL_IMAGENS + animal.getFotoUrl();
         Glide.with(holder.itemView.getContext())
                 .load(urlImagem)
+                .diskCacheStrategy(DiskCacheStrategy.NONE) // Não guarda em disco
+                .skipMemoryCache(true)                     // Não lê da memória RAM
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(holder.ivFoto);
