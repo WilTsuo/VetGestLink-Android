@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
+import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 
 public class MetodosPagamentoAdapter extends ArrayAdapter<MetodoPagamento> {
 

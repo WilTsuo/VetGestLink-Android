@@ -60,7 +60,6 @@ public class DefinicoesFragment extends Fragment {
 
         sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        etServerUrl = view.findViewById(R.id.etServerUrl);
         switchNotifications = view.findViewById(R.id.switchNotifications);
 
         // 1. Carregar URL

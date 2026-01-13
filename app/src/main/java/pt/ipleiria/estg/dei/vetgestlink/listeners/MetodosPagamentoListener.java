@@ -1,8 +1,8 @@
-package pt.ipleiria.estg.dei.vetgestlink.Listeners;
+package pt.ipleiria.estg.dei.vetgestlink.listeners;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
+import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 
 public interface MetodosPagamentoListener {
     void onRefreshMetodosPagamento(ArrayList<MetodoPagamento> listaMetodos);

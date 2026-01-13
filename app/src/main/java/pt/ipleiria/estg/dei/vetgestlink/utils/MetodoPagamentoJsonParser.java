@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
+import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 
 public class MetodoPagamentoJsonParser {
 

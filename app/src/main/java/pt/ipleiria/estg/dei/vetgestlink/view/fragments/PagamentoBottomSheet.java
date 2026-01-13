@@ -18,10 +18,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.MetodosPagamentoListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.MetodosPagamentoListener;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
-import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.MetodosPagamentoAdapter;
 

@@ -27,12 +27,14 @@ import pt.ipleiria.estg.dei.vetgestlink.listeners.LembretesListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.MarcacoesListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotasListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.MetodosPagamentoListener;
 
 //Modelos
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
 import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
-import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 import pt.ipleiria.estg.dei.vetgestlink.models.MarcacaoDBHelper;
 
 

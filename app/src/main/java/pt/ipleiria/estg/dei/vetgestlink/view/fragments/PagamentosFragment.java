@@ -16,11 +16,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.OnFaturaClickListner;
-import pt.ipleiria.estg.dei.vetgestlink.Listeners.OnPagarClickListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.FaturasListener;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.OnFaturaClickListner;
+import pt.ipleiria.estg.dei.vetgestlink.listeners.OnPagarClickListener;
 import pt.ipleiria.estg.dei.vetgestlink.R;
-import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.ListaFaturasAdapter;
 
