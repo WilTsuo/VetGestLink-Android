@@ -6,109 +6,101 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
 
 public class NotaDBHelper extends SQLiteOpenHelper {
-    private static final String BD_NOME = "bdNotas";
-    private static final String TABELA_NOME = "notas";
 
-    private final String ID = "id";
-    private final String NOTA = "nota";
-    private final String CREATED_AT = "created_at";
-    private final String UPDATED_AT = "updated_at";
-    private final String ANIMALNOME = "animalNome";
-    private final String AUTOR = "autor";
+    private static final String DATABASE_NAME = "vetgestlink.db";
+    private static final int DATABASE_VERSION = 1;
 
-    private static final int BD_VERSION = 1;
+    private static final String TABLE_NAME = "notas";
+    private static final String COL_ID = "id";
+    private static final String COL_NOTA = "nota";
+    private static final String COL_CREATED_AT = "created_at";
+    private static final String COL_UPDATED_AT = "updated_at";
+    private static final String COL_USERPROFILE_ID = "userprofile_id";
+    private static final String COL_ANIMAL_NOME = "animal_nome";
+    private static final String COL_AUTOR = "autor";
+    private static final String COL_TITULO = "titulo";
 
-    private final SQLiteDatabase bd;
-
-    public NotaDBHelper(@Nullable Context context) {
-        super(context, BD_NOME, null, BD_VERSION);
-        this.bd = getWritableDatabase();
+    public NotaDBHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
-        String createTableNotas =
-                "CREATE TABLE " + TABELA_NOME + " (" +
-                        ID + " INTEGER PRIMARY KEY, " +
-                        NOTA + " TEXT NOT NULL, " +
-                        CREATED_AT + " TEXT, " +
-                        UPDATED_AT + " TEXT, " +
-                        ANIMALNOME + " TEXT, " +
-                        AUTOR + " TEXT" +
-                        ");";
-
-        sqLiteDatabase.execSQL(createTableNotas);
+    public void onCreate(SQLiteDatabase db) {
+        String sql = "CREATE TABLE " + TABLE_NAME + " (" +
+                COL_ID + " INTEGER PRIMARY KEY, " +
+                COL_NOTA + " TEXT, " +
+                COL_CREATED_AT + " TEXT, " +
+                COL_UPDATED_AT + " TEXT, " +
+                COL_USERPROFILE_ID + " INTEGER, " +
+                COL_ANIMAL_NOME + " TEXT, " +
+                COL_AUTOR + " TEXT, " +
+                COL_TITULO + " TEXT" +
+                ");";
+        db.execSQL(sql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABELA_NOME);
+        // Simples estratégia: apagar e recriar. Ajustar conforme necessário.
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
-    //region - CRUD
     public ArrayList<Nota> getAllNotasBD() {
-
         ArrayList<Nota> lista = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null);
+        if (c != null) {
+            try {
+                while (c.moveToNext()) {
+                    int id = c.getInt(c.getColumnIndexOrThrow(COL_ID));
+                    String notaText = c.getString(c.getColumnIndexOrThrow(COL_NOTA));
+                    String createdAt = c.getString(c.getColumnIndexOrThrow(COL_CREATED_AT));
+                    String updatedAt = c.getString(c.getColumnIndexOrThrow(COL_UPDATED_AT));
+                    int userprofileId = c.getInt(c.getColumnIndexOrThrow(COL_USERPROFILE_ID));
+                    String animalNome = c.getString(c.getColumnIndexOrThrow(COL_ANIMAL_NOME));
+                    String autor = c.getString(c.getColumnIndexOrThrow(COL_AUTOR));
+                    String titulo = c.getString(c.getColumnIndexOrThrow(COL_TITULO));
 
-        Cursor cursor = this.bd.query(
-                TABELA_NOME,
-                new String[]{ID, NOTA, CREATED_AT, UPDATED_AT, ANIMALNOME, AUTOR},
-                null, null, null, null, null
-        );
-
-        if (cursor.moveToFirst()) {
-            do {
-                Nota nota = new Nota(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getString(4),
-                        cursor.getString(5),
-                        cursor.getString(6),
-                        null
-                );
-
-                lista.add(nota);
-
-            } while (cursor.moveToNext());
-            cursor.close();
+                    Nota n = new Nota(id, notaText, createdAt, updatedAt, animalNome, autor, titulo, userprofileId);
+                    lista.add(n);
+                }
+            } finally {
+                c.close();
+            }
         }
+        db.close();
         return lista;
     }
-    public Nota adicionarNotaBD(Nota n) {
 
+    public void adicionarNotaBD(Nota nota) {
+        SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(ID, n.getId());
-        values.put(NOTA, n.getNota());
-        values.put(CREATED_AT, n.getCreatedAt());
-        values.put(UPDATED_AT, n.getUpdatedAt());
-        values.put(ANIMALNOME, n.getAnimalNome());
-        values.put(AUTOR, n.getUpdatedAt());
+        values.put(COL_ID, nota.getId());
+        values.put(COL_NOTA, nota.getNota());
+        values.put(COL_CREATED_AT, nota.getCreatedAt());
+        values.put(COL_UPDATED_AT, nota.getUpdatedAt());
+        values.put(COL_USERPROFILE_ID, nota.getUserprofileId());
+        values.put(COL_ANIMAL_NOME, nota.getAnimalNome());
+        values.put(COL_AUTOR, nota.getAutor());
+        values.put(COL_TITULO, nota.getTitulo());
 
-        long id = this.bd.insert(TABELA_NOME, null, values);
-
-        return id > -1 ? n : null;
-    }
-
-    public boolean removerNotaBD(int id) {
-        int linhas = this.bd.delete(TABELA_NOME, ID + "=?", new String[]{String.valueOf(id)});
-        return linhas > 0;
+        db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
     }
 
     public void removerAllNotasBD() {
-
-        this.bd.delete(TABELA_NOME, null, null);
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        db.close();
     }
 
-
-    //endregion
-
+    public void removerNotaBD(int idNota) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(idNota)});
+        db.close();
+    }
 }

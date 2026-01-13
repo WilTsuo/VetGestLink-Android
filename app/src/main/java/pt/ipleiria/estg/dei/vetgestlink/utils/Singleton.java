@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -52,6 +54,7 @@ public class Singleton {
     private static final String TAG_ANIMAIS = "Vetgetlink-AnimaisService";
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
     private static final String TAG_LOGIN = "Vetgetlink-AuthService";
+    private static final String TAG_HEAlTH = "Vetgetlink-HealthService";
     private static Singleton instance;
     //region - arrays e notadbhelper
     private ArrayList<Nota> notas;
@@ -71,7 +74,7 @@ public class Singleton {
     private LembretesListener LembretesListener;
     //endregion
 
-    //region - Setters Listeners
+    //region Setters Listeners
     public void setNotasListener(NotasListener notasListener) {
         NotasListener = notasListener;
     }
@@ -133,6 +136,10 @@ public class Singleton {
     public interface ProfileCallback {
         void onSuccess(String nome, String email, String telefone, String moradaCompleta);
         void onError(String error);
+    }
+
+    public interface ApiHealthCallback {
+        void onResult(boolean responding);
     }
     // endregion
 
@@ -356,7 +363,6 @@ public class Singleton {
     //obter lista de notas de um animal, se nenhum animal for especificado retorna a lista completa realacionada a este user
     public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
         String url;
-
         if (animalId != null) {
             url = buildUrl("animal/"+animalId+"/notas?access-token=" + accessToken);
         } else {
@@ -368,19 +374,34 @@ public class Singleton {
                 url,
                 null,
                 response -> {
-                    List<Nota> notas = NotaJsonParser.parserJsonNotas(response);
-                    if (callback != null) {
-                        callback.onSuccess(notas);
+                    List<Nota> notasList = NotaJsonParser.parserJsonNotas(response);
+                    if (notasList == null) notasList = new ArrayList<>();
 
+                    // Guarda localmente (limpa e insere)
+                    adicionarNotasBD(new ArrayList<>(notasList));
+
+                    // Atualiza cache em memória
+                    this.notas = new ArrayList<>(notasList);
+
+                    if (callback != null) {
+                        callback.onSuccess(notasList);
                     }
                 },
                 error -> {
-                    String errorMsg = url;
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    }
+                    // Ao falhar a API, tenta carregar da BD local
+                    ArrayList<Nota> local = getNotasBD();
                     if (callback != null) {
-                        callback.onError(errorMsg);
+                        if (local != null && !local.isEmpty()) {
+                            callback.onSuccess(local);
+                        } else {
+                            String errorMsg = "Erro ao carregar notas";
+                            if (error.networkResponse != null) {
+                                errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                            } else if (error.getMessage() != null) {
+                                errorMsg += ": " + error.getMessage();
+                            }
+                            callback.onError(errorMsg);
+                        }
                     }
                 }
         );
@@ -539,7 +560,7 @@ public class Singleton {
 
     //endregion
 
-    //region - Gestao de Animais e handler de informação associada
+    //region Gestao de Animais e handler de informação associada
     private List<Animal> parseAnimais(JSONArray jsonArray) {
         List<Animal> animais = new ArrayList<>();
         if (jsonArray == null) return animais;
@@ -651,7 +672,7 @@ public class Singleton {
     }
     //endregion
 
-    //region - Gestao de Marcacoes e handler de informação associada
+    //region Gestao de Marcacoes e handler de informação associada
     public ArrayList<Marcacao> getMarcacoesLocal() {
         return marcacoes;
     }
@@ -699,7 +720,7 @@ public class Singleton {
     }
     //endregion
 
-    // region - Gestão de Lembretes
+    // region Gestão de Lembretes
     public interface LembretesCallback {
         void onSuccess(List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lembretes);
         void onError(String error);
@@ -873,4 +894,26 @@ public class Singleton {
 
     // endregion
 
+    // region Verificação do estado da API
+    public void isApiResponding(final ApiHealthCallback callback) {
+        String url = buildUrl("health");
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    // qualquer resposta significa que a API respondeu
+                    if (callback != null) callback.onResult(true);
+                },
+                error -> {
+                    Log.d(TAG, "Health check failed: " + (error != null ? error.toString() : "null"));
+                    if (callback != null) callback.onResult(false);
+                });
+
+        // timeout curto para considerar a API inacessível rapidamente
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                3000, // timeout em ms
+                0, // sem retries
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        addToRequestQueue(request, TAG_HEAlTH);
+    }
+    // endregion
 }

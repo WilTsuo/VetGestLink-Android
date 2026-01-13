@@ -3,6 +3,9 @@ package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,7 +22,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +42,7 @@ public class NotasFragment extends Fragment {
     private List<Animal> animais = new ArrayList<>();
     private List<Nota> notas = new ArrayList<>();
     private MaterialButton btnAddNota;
+    private boolean apiAvailable = true;
 
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
@@ -62,6 +65,23 @@ public class NotasFragment extends Fragment {
         notasAdapter = new NotasAdapter(notas, currentUserId);
         recyclerNotas.setAdapter(notasAdapter);
 
+        updateApiState();
+
+        // verificar disponibilidade de rede/API e aplicar estado
+        boolean apiOk = isThereNetworkAvaliability(requireContext());
+        notasAdapter.setApiAvailable(apiOk);
+
+        // aplica estado ao botão do fragment
+        btnAddNota.setEnabled(apiOk);
+        btnAddNota.setAlpha(apiOk ? 1f : 0.5f);
+        btnAddNota.setOnClickListener(v -> {
+            if (!apiAvailable) {
+                Toast.makeText(requireContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            showAddNotaDialog();
+        });
+
         notasAdapter.setOnNotaChangedListener(() -> {
             String selectedName = autoCompleteAnimal.getText() != null ? autoCompleteAnimal.getText().toString() : "";
             Animal selected = null;
@@ -75,8 +95,6 @@ public class NotasFragment extends Fragment {
                 loadNotasForAnimal(getAccessToken(), selected.getId());
             }
         });
-
-        btnAddNota.setOnClickListener(v -> showAddNotaDialog());
 
         autoCompleteAnimal.setOnItemClickListener((parent, view, position, id) -> {
             String selectedName = (String) parent.getItemAtPosition(position);
@@ -117,6 +135,7 @@ public class NotasFragment extends Fragment {
         Singleton.getInstance(requireContext()).getNomesAnimais(token, new Singleton.AnimaisCallback() {
             @Override
             public void onSuccess(List<Animal> animaisList) {
+                if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     animais.clear();
                     animais.addAll(animaisList);
@@ -138,23 +157,97 @@ public class NotasFragment extends Fragment {
 
             @Override
             public void onError(String error) {
+                if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
-                    animais.clear();
-                    notas.clear();
-                    notasAdapter.updateList(notas);
-                    ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
-                    autoCompleteAnimal.setAdapter(emptyAdapter);
-                    autoCompleteAnimal.setText("", false);
+                    // Se já temos animais carregados na memória => mantemos e recarregamos notas (cache/API)
+                    if (!animais.isEmpty()) {
+                        String selectedName = autoCompleteAnimal.getText() != null ? autoCompleteAnimal.getText().toString() : "";
+                        Animal selected = null;
+                        for (Animal a : animais) {
+                            if (a.getNome() != null && a.getNome().equals(selectedName)) {
+                                selected = a;
+                                break;
+                            }
+                        }
+                        if (selected != null) {
+                            loadNotasForAnimal(token, selected.getId());
+                        } else {
+                            loadNotasForAnimal(token, animais.get(0).getId());
+                        }
+                        Toast.makeText(requireContext(), "Offline — a usar dados em cache se disponíveis", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Não temos animais carregados: tenta usar notas da BD local
+                    ArrayList<Nota> cachedNotas = Singleton.getInstance(requireContext()).getNotasBD();
+                    if (cachedNotas != null && !cachedNotas.isEmpty()) {
+                        notas.clear();
+                        notas.addAll(cachedNotas);
+                        notasAdapter.updateList(notas);
+
+                        ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+                        autoCompleteAnimal.setAdapter(emptyAdapter);
+                        autoCompleteAnimal.setText("", false);
+
+                        Toast.makeText(requireContext(), "Offline — a usar notas em cache", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Sem dados locais: manter UI limpa
+                        animais.clear();
+                        notas.clear();
+                        notasAdapter.updateList(notas);
+                        ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+                        autoCompleteAnimal.setAdapter(emptyAdapter);
+                        autoCompleteAnimal.setText("", false);
+                        Toast.makeText(requireContext(), "Sem ligação e sem dados locais", Toast.LENGTH_SHORT).show();
+                    }
                 });
             }
         });
     }
 
     private void loadNotasForAnimal(String token, Integer animalId) {
-        if (token == null) return;
+        if (token == null) {
+            // sem token não tentamos API; tentamos carregar cache filtrado
+            if (!isAdded()) return;
+            requireActivity().runOnUiThread(() -> {
+                ArrayList<Nota> cached = Singleton.getInstance(requireContext()).getNotasBD();
+                if (cached != null && !cached.isEmpty()) {
+                    // tenta filtrar por nome do animal (se conseguirmos obter o nome a partir do id)
+                    List<Nota> filtered = new ArrayList<>();
+                    String animalName = null;
+                    if (animalId != null) {
+                        for (Animal a : animais) {
+                            if (a.getId() == animalId) {
+                                animalName = a.getNome();
+                                break;
+                            }
+                        }
+                    }
+                    if (animalName != null) {
+                        for (Nota n : cached) {
+                            if (n.getAnimalNome() != null && n.getAnimalNome().equals(animalName)) {
+                                filtered.add(n);
+                            }
+                        }
+                    } else {
+                        filtered.addAll(cached);
+                    }
+
+                    notas.clear();
+                    notas.addAll(filtered);
+                    notasAdapter.updateList(notas);
+                } else {
+                    notas.clear();
+                    notasAdapter.updateList(notas);
+                }
+            });
+            return;
+        }
+
         Singleton.getInstance(requireContext()).getNotas(token, animalId, new Singleton.NotasCallback() {
             @Override
             public void onSuccess(List<Nota> resultNotas) {
+                if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     notas.clear();
                     notas.addAll(resultNotas);
@@ -164,9 +257,44 @@ public class NotasFragment extends Fragment {
 
             @Override
             public void onError(String error) {
+                if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
-                    notas.clear();
-                    notasAdapter.updateList(notas);
+                    // tenta usar notas em cache e filtrar pelo animal se possível
+                    ArrayList<Nota> cached = Singleton.getInstance(requireContext()).getNotasBD();
+                    List<Nota> filtered = new ArrayList<>();
+
+                    String animalName = null;
+                    if (animalId != null) {
+                        for (Animal a : animais) {
+                            if (a.getId() == animalId) {
+                                animalName = a.getNome();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (cached != null && !cached.isEmpty()) {
+                        if (animalName != null) {
+                            for (Nota n : cached) {
+                                if (n.getAnimalNome() != null && n.getAnimalNome().equals(animalName)) {
+                                    filtered.add(n);
+                                }
+                            }
+                        } else {
+                            filtered.addAll(cached);
+                        }
+                    }
+
+                    if (!filtered.isEmpty()) {
+                        notas.clear();
+                        notas.addAll(filtered);
+                        notasAdapter.updateList(notas);
+                        Toast.makeText(requireContext(), "Offline — a usar notas em cache", Toast.LENGTH_SHORT).show();
+                    } else {
+                        notas.clear();
+                        notasAdapter.updateList(notas);
+                        Toast.makeText(requireContext(), "Erro ao carregar notas e sem cache disponível", Toast.LENGTH_SHORT).show();
+                    }
                 });
             }
         });
@@ -188,6 +316,11 @@ public class NotasFragment extends Fragment {
 
         Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positive.setOnClickListener(v -> {
+            if (!apiAvailable) {
+                Toast.makeText(requireContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String descricao = etDescricao.getText() != null ? etDescricao.getText().toString().trim() : "";
 
             if (descricao.isEmpty()) {
@@ -234,5 +367,41 @@ public class NotasFragment extends Fragment {
                 }
             });
         });
+    }
+
+    private void applyApiState(boolean ok) {
+        apiAvailable = ok;
+        if (notasAdapter != null) notasAdapter.setApiAvailable(ok);
+        if (btnAddNota != null) {
+            btnAddNota.setEnabled(ok);
+            btnAddNota.setAlpha(ok ? 1f : 0.5f);
+        }
+    }
+
+    private void updateApiState() {
+        // primeiro verifica se há rede local
+        boolean networkOk = isThereNetworkAvaliability(requireContext());
+        if (!networkOk) {
+            // sem rede => marca API como indisponível
+            requireActivity().runOnUiThread(() -> applyApiState(false));
+            return;
+        }
+
+        // se houver rede, pergunta ao endpoint /health via Singleton (assíncrono)
+        Singleton.getInstance(requireContext()).isApiResponding(responding -> {
+            if (getActivity() == null) return;
+            requireActivity().runOnUiThread(() -> applyApiState(responding));
+        });
+    }
+
+    private boolean isThereNetworkAvaliability(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        Network network = cm.getActiveNetwork();
+        if (network == null) return false;
+        NetworkCapabilities caps = cm.getNetworkCapabilities(network);
+        return caps != null && (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
     }
 }

@@ -31,6 +31,9 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
 
+    // flag para disponibilidade da API
+    private boolean apiAvailable = true;
+
     public interface OnNotaChangedListener {
         void onNotaChanged();
     }
@@ -46,6 +49,12 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
 
     public void updateList(List<Nota> novasNotas) {
         this.notas = novasNotas;
+        notifyDataSetChanged();
+    }
+
+    // setter para actualizar disponibilidade da API em runtime
+    public void setApiAvailable(boolean apiAvailable) {
+        this.apiAvailable = apiAvailable;
         notifyDataSetChanged();
     }
 
@@ -80,9 +89,27 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
         holder.btnEditar.setVisibility(isOwner ? View.VISIBLE : View.GONE);
         holder.btnExcluir.setVisibility(isOwner ? View.VISIBLE : View.GONE);
 
+        // aplica estado (enabled + alpha) conforme disponibilidade da API
+        boolean enabled = isOwner && apiAvailable;
+        float alpha = enabled ? 1f : 0.5f;
+
+        holder.btnEditar.setEnabled(enabled);
+        holder.btnEditar.setAlpha(alpha);
+        holder.btnExcluir.setEnabled(enabled);
+        holder.btnExcluir.setAlpha(alpha);
+
+        // listeners: se a API estiver disponível usa as ações normais, senão mostra toast e não abre dialogs
         if (isOwner) {
-            holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), n));
-            holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), n));
+            if (apiAvailable) {
+                holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), n));
+                holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), n));
+            } else {
+                holder.btnEditar.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show());
+                holder.btnExcluir.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show());
+            }
+        } else {
+            holder.btnEditar.setOnClickListener(null);
+            holder.btnExcluir.setOnClickListener(null);
         }
     }
 
@@ -92,6 +119,12 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     }
 
     private void showEditDialog(Context context, Nota nota) {
+        // segurança: se API não disponível não abre diálogo
+        if (!apiAvailable) {
+            Toast.makeText(context, "ERROOOOOO", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_nota, null);
 
@@ -120,10 +153,8 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
             Singleton.getInstance(context).atualizarNota(token, nota.getId(), descricao, new Singleton.MessageCallback() {
                 @Override
                 public void onSuccess(String message) {
-                    Toast.makeText(context, "Nota atualizada", Toast.LENGTH_SHORT).show();
-                    if (listener != null) {
-                        listener.onNotaChanged();
-                    }
+                    Toast.makeText(context, message != null ? message : "Nota actualizada", Toast.LENGTH_SHORT).show();
+                    if (listener != null) listener.onNotaChanged();
                     dialog.dismiss();
                 }
 
@@ -136,6 +167,12 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     }
 
     private void showDeleteDialog(Context context, Nota nota) {
+        // segurança: se API não disponível não abre diálogo
+        if (!apiAvailable) {
+            Toast.makeText(context, "ERROOOOOO", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new AlertDialog.Builder(context)
                 .setTitle("Eliminar Nota")
                 .setMessage("Tem certeza que deseja eliminar esta nota?")

@@ -59,38 +59,47 @@ public class PerfilFragment extends Fragment {
     }
 
     private void carregarDados() {
-        SharedPreferences prefs = getActivity().getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE);
         String token = prefs.getString("access_token", "");
 
-        Singleton singleton = Singleton.getInstance(getContext());
+        if (token == null || token.isEmpty()) {
+            // limpa UI se não houver token
+            tvNome.setText("");
+            tvEmail.setText("");
+            tvTelefone.setText("");
+            tvMorada.setText("");
+            return;
+        }
 
-        singleton.getProfile(token, new Singleton.ProfileCallback() {
+        Singleton.getInstance(requireContext()).getProfile(token, new Singleton.ProfileCallback() {
             @Override
-            public void onSuccess(String nome, String email, String telefone, String moradaCompleta) {
-                tvNome.setText(nome);
-                tvEmail.setText(email);
-                tvTelefone.setText(telefone);
-                tvMorada.setText(moradaCompleta);
+            public void onSuccess(final String nome, final String email, final String telefone, final String moradaCompleta) {
+                if (!isAdded()) {
+                    android.util.Log.w("PerfilFragment", "getProfile.onSuccess while fragment detached");
+                    return;
+                }
+                requireActivity().runOnUiThread(() -> {
+                    tvNome.setText(nome != null ? nome : "");
+                    tvEmail.setText(email != null ? email : "");
+                    tvTelefone.setText(telefone != null ? telefone : "");
+                    tvMorada.setText(moradaCompleta != null ? moradaCompleta : "");
+                });
             }
 
             @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        singleton.getAnimais(token, new Singleton.AnimaisCallback() {
-            @Override
-            public void onSuccess(List<Animal> animais) {
-                listaAnimais.clear();
-                listaAnimais.addAll(animais);
-                adapter.notifyDataSetChanged();
-                tvAnimalCount.setText(animais.size() + " animais registados");
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            public void onError(final String error) {
+                if (!isAdded()) {
+                    android.util.Log.w("PerfilFragment", "getProfile.onError while fragment detached: " + error);
+                    return;
+                }
+                requireActivity().runOnUiThread(() -> {
+                    Context ctx = getContext();
+                    if (ctx != null) {
+                        Toast.makeText(ctx, "Erro: " + error, Toast.LENGTH_SHORT).show();
+                    } else {
+                        android.util.Log.w("PerfilFragment", "Context null ao tentar mostrar Toast: " + error);
+                    }
+                });
             }
         });
     }
