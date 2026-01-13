@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +17,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.OnFaturaClickListner;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.OnPagarClickListener;
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.ListaFaturasAdapter;
 
-public class PagamentosFragment extends Fragment implements FaturasListener {
+public class PagamentosFragment extends Fragment implements FaturasListener, OnPagarClickListener {
 
     private ListView lvFaturas;
     private Button btnTodos, btnPendente, btnPago;
@@ -47,8 +50,13 @@ public class PagamentosFragment extends Fragment implements FaturasListener {
         tvQuantidadePaga = view.findViewById(R.id.tvQuantidadePaga);
 
         // Adapter FIRST (empty list)
-        adapter = new ListaFaturasAdapter(requireContext(), listaFiltrada);
+        adapter = new ListaFaturasAdapter(
+                requireContext(),
+                listaFiltrada,
+                this
+        );
         lvFaturas.setAdapter(adapter);
+
 
         // Singleton + listener
         Singleton singleton = Singleton.getInstance(requireContext());
@@ -120,4 +128,30 @@ public class PagamentosFragment extends Fragment implements FaturasListener {
         super.onDestroyView();
         Singleton.getInstance(requireContext()).setFaturasListener(null);
     }
+
+    @Override
+    public void onPagarClick(Fatura fatura) {
+
+        FragmentManager fm = requireActivity().getSupportFragmentManager();
+
+        // Prevent duplicate bottom sheets
+        Fragment existing = fm.findFragmentByTag("PagamentoBottomSheet");
+        if (existing != null) {
+            return; // already open
+        }
+
+        PagamentoBottomSheet sheet =
+                PagamentoBottomSheet.newInstance(
+                        fatura.getId(),
+                        fatura.getTotal()
+                );
+
+        sheet.show(fm, "PagamentoBottomSheet");
+    }
+
+
+
+
+
+
 }

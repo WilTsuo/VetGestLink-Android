@@ -10,7 +10,7 @@
     app:strokeColor="#DDDDDD">
 
     <TextView
-        android:id="@+id/tvPaymentMethodName"
+        android:id="@+id/tvNomeMetodo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"

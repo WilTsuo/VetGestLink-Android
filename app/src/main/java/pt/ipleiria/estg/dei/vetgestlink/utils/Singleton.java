@@ -22,10 +22,12 @@ import pt.ipleiria.estg.dei.vetgestlink.Listeners.AuthListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.FaturasListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.LembretesListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.MarcacoesListener;
+import pt.ipleiria.estg.dei.vetgestlink.Listeners.MetodosPagamentoListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.Listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.model.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.model.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.model.MetodoPagamento;
 import pt.ipleiria.estg.dei.vetgestlink.model.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.model.NotaDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.model.UserProfile;
@@ -54,6 +56,10 @@ public class Singleton {
     private FaturasListener FaturasListener;
     private MarcacoesListener MarcacoesListener;
     private LembretesListener LembretesListener;
+    private MetodosPagamentoListener MetodosPagamentoListener;
+    private SharedPreferences sharedPreferences;
+
+
     //endregion
     //endregion
 
@@ -89,6 +95,10 @@ public class Singleton {
     public void setLembretesListener(LembretesListener lembretesListener) {
         LembretesListener = lembretesListener;
     }
+
+    public void setMetodosPagamentoListener(MetodosPagamentoListener metodosPagamentoListener) {
+        MetodosPagamentoListener = metodosPagamentoListener;
+    }
     //endregion
 
     //region defenicao de Callbacks (message, login, notas ,userprofile)
@@ -114,13 +124,18 @@ public class Singleton {
     // region Construtor e Instanciação do Singleton
     private Singleton(Context context) {
         this.context = context.getApplicationContext();
-        this.requestQueue = Volley.newRequestQueue(this.context); //inicializa a request queue do volley (no inicio logo como a stora disse)
-        SharedPreferences prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        this.mainUrl = prefs.getString(KEY_MAIN_URL, DEFAULT_MAIN_URL);
+
+        this.sharedPreferences =
+                this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        this.mainUrl = sharedPreferences.getString(KEY_MAIN_URL, DEFAULT_MAIN_URL);
+
+        this.requestQueue = Volley.newRequestQueue(this.context);
 
         notas = new ArrayList<>();
         notasDB = new NotaDBHelper(context);
     }
+
 
     //ponto de acceco ao singleton para n haver asneiras (chamamos, enviamos o context e ele devolve a instancia do singleton)
     public static synchronized Singleton getInstance(Context context) {
@@ -583,6 +598,89 @@ public class Singleton {
 
         addToRequestQueue(req);
     }
+
+    private ArrayList<Fatura> faturas = new ArrayList<>();
+
+    public Fatura getFatura(int id) {
+        if (faturas == null) return null;
+
+        for (Fatura f : faturas) {
+            if (f.getId() == id) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+
+
+    public void pagarFatura(
+            int idFatura,
+            int idMetodoPagamento
+    ) {
+        String token = sharedPreferences.getString("access_token", "");
+
+        String url = buildUrl("fatura/pagar?access-token=" + token);
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("id_fatura", idFatura);
+            body.put("id_metodo_pagamento", idMetodoPagamento);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest req = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                body,
+                response -> {
+                    Log.d("PAGAR_FATURA", "Pagamento realizado com sucesso");
+                    getFaturas(token); // refresh list
+                },
+                error -> {
+                    Log.e("PAGAR_FATURA", "Erro ao pagar fatura", error);
+                }
+        );
+
+        addToRequestQueue(req);
+    }
+
+    //endregion
+
+    //region Metodos de pagamento
+    public void getMetodosPagamento(String token) {
+
+        String url = buildUrl("fatura/paymentmethods?access-token=" + token);
+
+        JsonArrayRequest req = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    ArrayList<MetodoPagamento> metodos =
+                            MetodoPagamentoJsonParser.parserJsonMetodosPagamento(response);
+
+                    if (MetodosPagamentoListener != null)
+                        MetodosPagamentoListener.onRefreshMetodosPagamento(metodos);
+                },
+                error -> Log.e(TAG, "Erro ao obter métodos de pagamento", error)
+        );
+
+        addToRequestQueue(req);
+    }
+
+    private ArrayList<MetodoPagamento> metodos = new ArrayList<>();
+
+    public MetodoPagamento getMetodoPagamento(int id) {
+        for (MetodoPagamento m : metodos) {
+            if (m.getId() == id) {
+                return m;
+            }
+        }
+        return null;
+    }
+
 
     //endregion
 }
