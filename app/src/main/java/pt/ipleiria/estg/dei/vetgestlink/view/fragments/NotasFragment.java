@@ -55,7 +55,7 @@ public class NotasFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_notas, container, false);
 
         SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        currentUserId = prefs.getInt("userprofile_id", -1);
+        currentUserId = prefs.getInt("user_id", -1);
 
         autoCompleteAnimal = root.findViewById(R.id.autoCompleteAnimal);
         recyclerNotas = root.findViewById(R.id.recyclerNotas);

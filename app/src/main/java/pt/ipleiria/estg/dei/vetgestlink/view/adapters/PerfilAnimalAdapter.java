@@ -44,7 +44,7 @@ public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapte
         holder.tvEspecie.setText(animal.getEspecie() != null ? animal.getEspecie() : "");
         holder.tvGenero.setText(animal.getSexo() != null ? animal.getSexo() : "");
         String temMicrochip = (animal.getMicrochip() == 1) ? "Sim" : "Não";
-        holder.tvMicrochip.setText("Microchip: " + temMicrochip);
+        holder.tvMicrochip.setText(temMicrochip);
 
         String urlImagem = BASE_URL_IMAGENS + (animal.getFotoUrl() != null ? animal.getFotoUrl() : "");
         Glide.with(holder.itemView.getContext())
