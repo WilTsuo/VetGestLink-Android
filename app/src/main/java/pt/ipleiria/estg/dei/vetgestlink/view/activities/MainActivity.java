@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment_definicoes = new DefinicoesFragment();
 
         bottomNavigationView.setSelectedItemId(R.id.notas);
-        setCurrentFragment(fragment_notas, "Notas e Lembretes");
+        setCurrentFragment(fragment_notas, "Notas");
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();

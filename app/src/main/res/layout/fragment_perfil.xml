@@ -129,13 +129,57 @@
                     android:text="@string/morada"
                     android:textColor="#555555" />
 
-                <TextView
-                    android:id="@+id/tvMorada"
+                <LinearLayout
+                    android:id="@+id/layoutMorada"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#F1F3F4"
-                    android:padding="12dp"
-                    android:text="@string/loading" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/tvRua"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#F1F3F4"
+                        android:padding="12dp"
+                        android:text="@string/loading" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:id="@+id/tvNPorta"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:background="#F1F3F4"
+                            android:padding="12dp"
+                            android:text="@string/loading" />
+
+                        <TextView
+                            android:id="@+id/tvCdPostal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="#F1F3F4"
+                            android:padding="12dp"
+                            android:text="@string/loading" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvLocalidade"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="#F1F3F4"
+                        android:padding="12dp"
+                        android:text="@string/loading" />
+                </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
