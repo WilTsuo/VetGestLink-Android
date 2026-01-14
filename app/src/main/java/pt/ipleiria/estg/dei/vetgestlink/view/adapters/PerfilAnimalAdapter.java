@@ -38,7 +38,7 @@ public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapte
 
         holder.tvNome.setText(animal.getNome() != null ? animal.getNome() : "");
         holder.tvRacaHeader.setText((animal.getEspecie() != null ? animal.getEspecie() : "") + " - " + (animal.getRaca() != null ? animal.getRaca() : ""));
-        holder.tvIdade.setText(String.valueOf(animal.getIdade()) + " anos");
+        holder.tvIdade.setText(String.valueOf(animal.getIdade()));
         holder.tvPeso.setText(String.valueOf(animal.getPeso()) + " kg");
         holder.tvEspecie.setText(animal.getEspecie() != null ? animal.getEspecie() : "");
         holder.tvGenero.setText(animal.getSexo() != null ? animal.getSexo() : "");

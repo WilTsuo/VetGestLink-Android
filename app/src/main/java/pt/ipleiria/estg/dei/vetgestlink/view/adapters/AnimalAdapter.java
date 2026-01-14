@@ -30,7 +30,7 @@ public class AnimalAdapter extends RecyclerView.Adapter<AnimalAdapter.AnimalView
         Animal animal = animais.get(position);
         holder.tvNome.setText(animal.getNome());
         holder.tvRaca.setText(animal.getRaca());
-        holder.tvIdade.setText(animal.getIdade() + " anos");
+        holder.tvIdade.setText(animal.getIdade());
         holder.tvPeso.setText(animal.getPeso() + " kg");
         holder.tvEspecie.setText(animal.getEspecie());
         holder.tvGenero.setText(animal.getSexo().equals("M") ? "Macho" : "Fêmea");
