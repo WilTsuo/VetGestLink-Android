@@ -26,9 +26,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Fatura #2025-045"
+                android:text="Fatura"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
+
 
             <TextView
                 android:id="@+id/tvStatus"
@@ -37,6 +38,7 @@
                 android:text="Pendente"
                 android:textColor="#FBC02D"
                 android:textStyle="bold"/>
+
         </LinearLayout>
 
         <!-- Description -->
@@ -44,11 +46,11 @@
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Consulta de Rotina + Vacinação"
+            android:text="Consulta"
             android:textColor="#616161"
             android:layout_marginTop="4dp"/>
 
-        <!-- Amount -->
+        <!-- quantidade -->
         <TextView
             android:id="@+id/tvAmount"
             android:layout_width="match_parent"
@@ -58,7 +60,18 @@
             android:textColor="#388E3C"
             android:layout_marginTop="4dp"/>
 
-        <!-- Dates -->
+        <!-- Métudo de pagamento -->
+        <TextView
+            android:id="@+id/tvMetodoPagamento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Método de pagamento:"
+            android:textSize="12sp"
+            android:textColor="#388E3C"
+            android:visibility="gone"/>
+
+
+        <!-- data -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,20 +79,15 @@
             android:layout_marginTop="8dp">
 
             <TextView
-                android:id="@+id/tvIssueDate"
+                android:id="@+id/tvCreatedAt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Emitida: 15 Nov 2025"
+                android:text="Emitida:"
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="6dp"/>
 
-            <TextView
-                android:id="@+id/tvDueDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vencimento: 29 Nov 2025"
-                android:textColor="#D32F2F"/>
+
         </LinearLayout>
 
         <!-- Pay Button -->

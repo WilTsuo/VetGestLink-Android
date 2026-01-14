@@ -49,7 +49,7 @@ public class PagamentosFragment extends Fragment implements FaturasListener, OnP
         tvQuantidadePendente = view.findViewById(R.id.tvQuantidadePendente);
         tvQuantidadePaga = view.findViewById(R.id.tvQuantidadePaga);
 
-        // Adapter FIRST (empty list)
+        // Adapter
         adapter = new ListaFaturasAdapter(
                 requireContext(),
                 listaFiltrada,
@@ -148,10 +148,5 @@ public class PagamentosFragment extends Fragment implements FaturasListener, OnP
 
         sheet.show(fm, "PagamentoBottomSheet");
     }
-
-
-
-
-
 
 }

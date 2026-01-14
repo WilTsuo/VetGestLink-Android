@@ -946,36 +946,46 @@ public class Singleton {
     }
 
     public void pagarFatura(
-            int idFatura,
-            int idMetodoPagamento
+            int faturaId,
+            int metodoPagamentoId,
+            Context context
     ) {
-        String token = sharedPreferences.getString("access_token", "");
 
-        String url = buildUrl("fatura/pagar?access-token=" + token);
+        String token = context
+                .getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE)
+                .getString("access_token", "");
+
+        String url = buildUrl(
+                "fatura/pay/" + faturaId + "?access-token=" + token
+        );
 
         JSONObject body = new JSONObject();
         try {
-            body.put("id_fatura", idFatura);
-            body.put("id_metodo_pagamento", idMetodoPagamento);
-        } catch (Exception e) {
+            body.put("metodospagamentos_id", metodoPagamentoId);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        JsonObjectRequest req = new JsonObjectRequest(
-                Request.Method.POST,
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.PUT,
                 url,
                 body,
                 response -> {
-                    Log.d("PAGAR_FATURA", "Pagamento realizado com sucesso");
-                    getFaturas(token); // refresh list
+                    Log.d("PAGAR_FATURA", "Pagamento efetuado: " + response);
+                    if (FaturasListener != null) {
+                        FaturasListener.onRefreshListaFaturas(faturas);
+                    }
+                    getFaturas(token);
+
                 },
                 error -> {
                     Log.e("PAGAR_FATURA", "Erro ao pagar fatura", error);
                 }
         );
 
-        addToRequestQueue(req);
+        requestQueue.add(request);
     }
+
 
     //endregion
 

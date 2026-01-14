@@ -30,6 +30,7 @@ public class FaturaJsonParser {
                     faturas.add(f);
                 }
 
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
