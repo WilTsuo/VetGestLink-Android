@@ -33,9 +33,8 @@ public class DefinicoesFragment extends Fragment {
     private SwitchMaterial switchNotifications;
     private SharedPreferences sharedPreferences;
 
-    // Constantes das SharedPreferences (Devem ser iguais às do LoginActivity)
     private static final String PREFS_NAME = "VetGestLinkPrefs";
-    private static final String KEY_API_URL = "api_url";
+    // KEY_API_URL removida pois o Singleton gere o URL com a chave "main_url"
     private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -64,9 +63,9 @@ public class DefinicoesFragment extends Fragment {
         etServerUrl = view.findViewById(R.id.etServerUrl);
         switchNotifications = view.findViewById(R.id.switchNotifications);
 
-        // 1. Carregar URL salvo ou usar padrão
-        String savedUrl = sharedPreferences.getString(KEY_API_URL, "http://172.22.21.220");
-        etServerUrl.setText(savedUrl);
+        // 1. Carregar URL diretamente do Singleton (Garante que é o mesmo do Login)
+        String currentUrl = Singleton.getInstance(requireContext()).getMainUrl();
+        etServerUrl.setText(currentUrl);
 
         // 2. Carregar estado das notificações
         boolean isNotifEnabled = sharedPreferences.getBoolean(KEY_NOTIFICATIONS_ENABLED, false);
@@ -74,9 +73,7 @@ public class DefinicoesFragment extends Fragment {
 
         // Listener do Switch
         switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Guardar preferência
             sharedPreferences.edit().putBoolean(KEY_NOTIFICATIONS_ENABLED, isChecked).apply();
-
             if (isChecked) {
                 checkPermissionAndStartService();
             } else {
@@ -85,16 +82,12 @@ public class DefinicoesFragment extends Fragment {
             }
         });
 
-        // Listener Guardar Servidor (Lógica Real)
+        // Listener Guardar Servidor
         setupClick(view, R.id.btnSaveServer, v -> {
             String newUrl = etServerUrl.getText().toString().trim();
             if (!newUrl.isEmpty()) {
-                // Guardar nas SharedPreferences
-                sharedPreferences.edit().putString(KEY_API_URL, newUrl).apply();
-
-                // Atualizar Singleton para uso imediato na app
+                // Atualiza o Singleton (que guarda automaticamente nas SharedPreferences corretas)
                 Singleton.getInstance(requireContext()).setMainUrl(newUrl);
-
                 showToast("Configuração guardada com sucesso!");
             } else {
                 etServerUrl.setError("O URL não pode estar vazio");
@@ -103,14 +96,29 @@ public class DefinicoesFragment extends Fragment {
 
         // Listener Testar Conexão
         setupClick(view, R.id.btnTestConnection, v -> {
-            // Aqui poderia chamar um método do Singleton para fazer um ping à API
-            showToast("A testar conexão com: " + etServerUrl.getText());
+            String inputUrl = etServerUrl.getText().toString().trim();
+            if (inputUrl.isEmpty()) {
+                etServerUrl.setError("O URL não pode estar vazio");
+                return;
+            }
+
+            // Atualiza o Singleton temporariamente para testar o novo URL inserido
+            Singleton.getInstance(requireContext().getApplicationContext()).setMainUrl(inputUrl);
+
+            // Usa o método do Singleton para verificar a saúde da API
+            Singleton.getInstance(requireContext().getApplicationContext()).isApiResponding(responding -> {
+                if (responding) {
+                    showToast("Conexão estabelecida com sucesso!");
+                } else {
+                    showToast("Erro ao conectar: O servidor não respondeu.");
+                }
+            });
         });
 
-        // Listener Logout (Lógica Real)
+        // Listener Logout
         setupClick(view, R.id.btnLogout, v -> performLogout());
 
-        // Botões de Navegação (Mantêm-se como Toasts até criar os Fragments de destino)
+        // Botões de Navegação
         setupClick(view, R.id.btnChangePassword, v -> showToast("Funcionalidade: Alterar Senha"));
         setupClick(view, R.id.btnPersonalData, v -> showToast("Funcionalidade: Dados Pessoais"));
         setupClick(view, R.id.btnReportProblem, v -> showToast("Funcionalidade: Reportar Problema"));
@@ -119,18 +127,15 @@ public class DefinicoesFragment extends Fragment {
     }
 
     private void performLogout() {
-        // 1. Parar serviço de notificações
         requireContext().stopService(new Intent(requireContext(), MqttNotificationService.class));
 
-        // 2. Limpar SharedPreferences (Token, UserID, etc.)
-        // Nota: Pode querer manter o URL do servidor (KEY_API_URL), então removemos chaves específicas ou limpamos tudo
+        // Limpa as preferências, mas mantém o URL do servidor para o próximo login
+        String currentUrl = Singleton.getInstance(requireContext()).getMainUrl();
         sharedPreferences.edit().clear().apply();
 
-        // Se quiser manter o URL após logout, re-salve-o:
-        // String currentUrl = etServerUrl.getText().toString();
-        // sharedPreferences.edit().putString(KEY_API_URL, currentUrl).apply();
+        // Restaura o URL no Singleton/Prefs após o clear
+        Singleton.getInstance(requireContext()).setMainUrl(currentUrl);
 
-        // 3. Navegar para LoginActivity e limpar a stack de navegação
         Intent intent = new Intent(requireContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
