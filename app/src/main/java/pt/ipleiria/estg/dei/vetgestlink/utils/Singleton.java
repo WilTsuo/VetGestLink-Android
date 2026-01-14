@@ -28,19 +28,20 @@ import pt.ipleiria.estg.dei.vetgestlink.listeners.MarcacoesListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.MetodosPagamentoListener;
-;
 
 //Modelos
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
 import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
-import pt.ipleiria.estg.dei.vetgestlink.models.MarcacaoDBHelper;
-import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
-
-
-import pt.ipleiria.estg.dei.vetgestlink.models.NotaDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.UserProfile;
+import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
+import pt.ipleiria.estg.dei.vetgestlink.models.Lembrete;
+
+//dbhelpers
+import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.NotaDBHelper;
+import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.AnimalDBHelper;
+import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.MarcacaoDBHelper;
 
 public class Singleton {
     // region variaveis e constantes do singleton
@@ -48,7 +49,10 @@ public class Singleton {
     //Variaveis
     private ArrayList<Marcacao> marcacoes;
     private MarcacaoDBHelper marcacoesDB = null;
-
+    private ArrayList<Nota> notas;
+    private NotaDBHelper notasDB=null;
+    private ArrayList<Animal> animais;
+    private AnimalDBHelper animaisDB = null;
 
     //Constantes
     private static final String PREFS_NAME = "VetGestLinkPrefs";
@@ -59,10 +63,12 @@ public class Singleton {
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
     private static final String TAG_LOGIN = "Vetgetlink-AuthService";
     private static final String TAG_HEAlTH = "Vetgetlink-HealthService";
+    private static final String TAG_PROFILE = "Vetgetlink-ProfileService";
+    private static final String TAG_LEMBRETES = "Vetgetlink-LembretesService";
+    private static final String TAG_MARCACOES = "Vetgetlink-MarcacoesService";
     private static Singleton instance;
-    //region - arrays e notadbhelper
-    private ArrayList<Nota> notas;
-    private NotaDBHelper notasDB=null;
+    //region - arrays e dbhelper e tags e variavgeis estaticas
+
     //endregion
     private final Context context;
     private RequestQueue requestQueue; //queue do volley
@@ -78,8 +84,6 @@ public class Singleton {
     private LembretesListener LembretesListener;
     private MetodosPagamentoListener MetodosPagamentoListener;
     private SharedPreferences sharedPreferences;
-
-
     //endregion
 
     //region Setters Listeners
@@ -121,9 +125,13 @@ public class Singleton {
     //endregion
 
     //region defenicao de Callbacks (message, login, notas ,userprofile)
-
     public interface MarcacoesCallback {
         void onSuccess(ArrayList<Marcacao> marcacoes);
+        void onError(String error);
+    }
+
+    public interface LembretesCallback {
+        void onSuccess(List<Lembrete> lembretes);
         void onError(String error);
     }
 
@@ -140,16 +148,19 @@ public class Singleton {
         void onSuccess(List<Nota> notas);
         void onError(String error);
     }
+
+    public interface AnimaisCallback {
+        void onSuccess(List<Animal> animais);
+        void onError(String error);
+    }
     public interface UserProfileCallback {
         void onSuccess(UserProfile userProfile, List<Animal> animais);
         void onError(String error);
     }
-
     public interface ProfileCallback {
         void onSuccess(String nome, String email, String telefone, String moradaCompleta);
         void onError(String error);
     }
-
     public interface ApiHealthCallback {
         void onResult(boolean responding);
     }
@@ -168,8 +179,10 @@ public class Singleton {
 
         notas = new ArrayList<>();
         marcacoes = new ArrayList<>();
+        animais = new ArrayList<>();
         notasDB = new NotaDBHelper(context);
         marcacoesDB = new MarcacaoDBHelper(context);
+        animaisDB = new AnimalDBHelper(context);
     }
 
 
@@ -314,14 +327,7 @@ public class Singleton {
     // endregion
 
     //region CRUD Notas e funcoes relacionadas
-    public Nota getNota(int id){
-
-        for(Nota n:notas)
-            if(n.getId()==id)
-                return n;
-        return null;
-    }
-    //region- CRUD bd local
+    //Create e Read bd local NOTAS
     public ArrayList<Nota> getNotasBD() {
 
         notas = notasDB.getAllNotasBD();
@@ -337,16 +343,13 @@ public class Singleton {
             adicionarNotaBD(l);
         }
     }
-    public void removerNotaBD(int idnota){
-        Nota n= getNota(idnota);
-        if(n!=null) {
-            notasDB.removerNotaBD(idnota);
-        }
+
+    public Nota getNota(int id){
+        for(Nota n:notas)
+            if(n.getId()==id)
+                return n;
+        return null;
     }
-    public void removerNotasBD(){
-        notasDB.removerAllNotasBD();
-    }
-    //endregion
 
     //obter lista de notas de um animal, se nenhum animal for especificado retorna a lista completa realacionada a este user
     public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
@@ -393,7 +396,7 @@ public class Singleton {
                     }
                 }
         );
-        addToRequestQueue(request);
+        addToRequestQueue(request,TAG_NOTAS);
     }
     //criar nota
     public void criarNota(String accessToken, int animalId, String nota, MessageCallback callback) {
@@ -433,7 +436,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_NOTAS);
     }
 
     //update de notas
@@ -474,7 +477,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_NOTAS);
     }
 
     //delete de notas atravez de softdelete
@@ -507,13 +510,51 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_NOTAS);
     }
+
+    public void getTodasNotas(String accessToken, NotasCallback callback) {
+        String url = buildUrl("nota/all?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    List<Nota> notasList = NotaJsonParser.parserJsonNotas(response);
+                    if (notasList == null) notasList = new ArrayList<>();
+
+                    // LIMPA BD antes de guardar
+                    notasDB.removerAllNotasBD();
+
+                    // Guarda TODAS as notas
+                    for (Nota n : notasList) {
+                        adicionarNotaBD(n);
+                    }
+
+                    this.notas = new ArrayList<>(notasList);
+
+                    if (callback != null) {
+                        callback.onSuccess(notasList);
+                    }
+                },
+                error -> {
+                    if (callback != null) {
+                        callback.onError("Erro ao carregar notas");
+                    }
+                }
+        );
+        addToRequestQueue(request, TAG_NOTAS);
+    }
+
+    public ArrayList<Nota> getNotasByAnimalNome(String animalNome) {
+        return notasDB.getNotasByAnimalNome(animalNome);
+    }
+
 
     // endregion
 
     //region Gestao do userProfile e handler de informação associada
-
     public void getProfile(String token, ProfileCallback callback) {
         String url = buildUrl("profile?access-token=" + token);
 
@@ -545,63 +586,25 @@ public class Singleton {
         );
         addToRequestQueue(request);
     }
-
     //endregion
 
     //region Gestao de Animais e handler de informação associada
-    private List<Animal> parseAnimais(JSONArray jsonArray) {
-        List<Animal> animais = new ArrayList<>();
-        if (jsonArray == null) return animais;
+    //CRUD bd local NOTAS
+    public ArrayList<Animal> getAnimaisBD() {
 
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
+        animais = animaisDB.getAllAnimaisBD();
+        return new ArrayList<>(animais);
+    }
 
-                if (obj.optBoolean("ativo", true)) {
-                    Animal animal = new Animal();
-                    animal.setId(obj.optInt("id", 0)); // Mapeia o ID
-                    animal.setNome(obj.optString("nome", ""));
-                    animal.setEspecie(obj.optString("especie", ""));
-                    animal.setRaca(obj.optString("raca", ""));
-                    animal.setIdade(obj.optInt("idade", 0));
-                    animal.setPeso(obj.optDouble("peso", 0.0));
-                    animal.setSexo(obj.optString("sexo", ""));
-                    animal.setMicrochip(obj.optInt("microchip", 0));
-                    animal.setFotoUrl(obj.optString("foto_url", ""));
-                    animal.setDtanascimento(obj.optString("datanascimento", ""));
-
-                    animais.add(animal);
-                }
-            }
-        } catch (JSONException e) {
-            Log.e("Singleton", "Erro no parseAnimais: " + e.getMessage());
+    public void adicionarAnimalBD(Animal animal){
+        animaisDB.adicionarAnimalBD(animal);
+    }
+    public void adicionarAnimaisBD(ArrayList<Animal> animais){
+        animaisDB.removerAllAnimaisBD();
+        for(Animal l:animais) {
+            adicionarAnimalBD(l);
         }
-        return animais;
     }
-
-    private List<Animal> parseAnimaisNome(JSONArray jsonArray) {
-        List<Animal> animais = new ArrayList<>();
-        if (jsonArray == null) return animais;
-
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                Animal animal = new Animal();
-                animal.setId(obj.optInt("id", 0)); // Mapeia o ID necessário para o NotasFragment
-                animal.setNome(obj.optString("nome", ""));
-                animais.add(animal);
-            }
-        } catch (JSONException e) {
-            Log.e("Singleton", "Erro no parseAnimaisNome: " + e.getMessage());
-        }
-        return animais;
-    }
-
-    public interface AnimaisCallback {
-        void onSuccess(List<Animal> animais);
-        void onError(String error);
-    }
-
     public void getAnimais(String accessToken, AnimaisCallback callback) {
         String url = buildUrl("animal/all?access-token=" + accessToken);
 
@@ -610,27 +613,39 @@ public class Singleton {
                 url,
                 null,
                 response -> {
-                    List<Animal> animais = parseAnimais(response);
+                    List<Animal> animaisList = AnimalJsonParser.parseAnimais(response);
+                    if (animaisList == null) animaisList = new ArrayList<>();
+
+                    // Guarda localmente (limpa e insere)
+                    adicionarAnimaisBD(new ArrayList<>(animaisList));
+
+                    // Atualiza cache em memória
+                    this.animais = new ArrayList<>(animaisList);
+
                     if (callback != null) {
-                        callback.onSuccess(animais);
+                        callback.onSuccess(animaisList);
                     }
                 },
                 error -> {
-                    String errorMsg = "Erro ao carregar animais";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
+                    // Ao falhar a API, tenta carregar da BD local
+                    ArrayList<Animal> local = getAnimaisBD();
                     if (callback != null) {
-                        callback.onError(errorMsg);
+                        if (local != null && !local.isEmpty()) {
+                            callback.onSuccess(local);
+                        } else {
+                            String errorMsg = "Erro ao carregar animais";
+                            if (error.networkResponse != null) {
+                                errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                            } else if (error.getMessage() != null) {
+                                errorMsg += ": " + error.getMessage();
+                            }
+                            callback.onError(errorMsg);
+                        }
                     }
                 }
         );
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_ANIMAIS);
     }
-
-
     public void getNomesAnimais(String accessToken, AnimaisCallback callback) {
         String url = buildUrl("animal/nomes?access-token=" + accessToken);
 
@@ -639,7 +654,7 @@ public class Singleton {
                 url,
                 null,
                 response -> {
-                    List<Animal> animais = parseAnimaisNome(response);
+                    List<Animal> animais = AnimalJsonParser.parseAnimaisNome(response);
                     if (callback != null) {
                         callback.onSuccess(animais);
                     }
@@ -656,7 +671,7 @@ public class Singleton {
                     }
                 }
         );
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_ANIMAIS);
     }
     //endregion
 
@@ -709,13 +724,8 @@ public class Singleton {
     //endregion
 
     // region Gestão de Lembretes
-    public interface LembretesCallback {
-        void onSuccess(List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lembretes);
-        void onError(String error);
-    }
-
-    private List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> parseLembretes(JSONArray jsonArray) {
-        List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lista = new ArrayList<>();
+    private List<Lembrete> parseLembretes(JSONArray jsonArray) {
+        List<Lembrete> lista = new ArrayList<>();
         if (jsonArray == null) return lista;
 
         try {
@@ -727,8 +737,8 @@ public class Singleton {
                 String updatedAt = obj.optString("updated_at", "");
                 int userprofilesId = obj.optInt("userprofiles_id", 0);
 
-                pt.ipleiria.estg.dei.vetgestlink.models.Lembrete l =
-                        new pt.ipleiria.estg.dei.vetgestlink.models.Lembrete(id, descricao, createdAt, updatedAt, userprofilesId);
+                Lembrete l =
+                        new Lembrete(id, descricao, createdAt, updatedAt, userprofilesId);
 
                 lista.add(l);
             }
@@ -879,7 +889,6 @@ public class Singleton {
 
         addToRequestQueue(request);
     }
-
     // endregion
 
     // region Verificação do estado da API
@@ -945,10 +954,7 @@ public class Singleton {
         return null;
     }
 
-    public void pagarFatura(
-            int idFatura,
-            int idMetodoPagamento
-    ) {
+    public void pagarFatura(int idFatura,int idMetodoPagamento) {
         String token = sharedPreferences.getString("access_token", "");
 
         String url = buildUrl("fatura/pagar?access-token=" + token);
@@ -976,7 +982,6 @@ public class Singleton {
 
         addToRequestQueue(req);
     }
-
     //endregion
 
     //region Metodos de pagamento
@@ -1011,7 +1016,5 @@ public class Singleton {
         }
         return null;
     }
-
-
     //endregion
 }

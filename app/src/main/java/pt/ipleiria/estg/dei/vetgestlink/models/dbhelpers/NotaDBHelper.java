@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.vetgestlink.models;
+package pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,10 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
+import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
+
 public class NotaDBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "vetgestlink.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Notas.db";
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_NAME = "notas";
     private static final String COL_ID = "id";
@@ -102,5 +104,41 @@ public class NotaDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(idNota)});
         db.close();
+    }
+
+    public ArrayList<Nota> getNotasByAnimalNome(String animalNome) {
+        ArrayList<Nota> lista = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor c = db.query(
+                TABLE_NAME,
+                null,
+                COL_ANIMAL_NOME + " = ?",
+                new String[]{animalNome},
+                null, null,
+                COL_CREATED_AT + " DESC"
+        );
+
+        if (c != null) {
+            try {
+                while (c.moveToNext()) {
+                    int id = c.getInt(c.getColumnIndexOrThrow(COL_ID));
+                    String notaText = c.getString(c.getColumnIndexOrThrow(COL_NOTA));
+                    String createdAt = c.getString(c.getColumnIndexOrThrow(COL_CREATED_AT));
+                    String updatedAt = c.getString(c.getColumnIndexOrThrow(COL_UPDATED_AT));
+                    int userprofileId = c.getInt(c.getColumnIndexOrThrow(COL_USERPROFILE_ID));
+                    String animalNomeDB = c.getString(c.getColumnIndexOrThrow(COL_ANIMAL_NOME));
+                    String autor = c.getString(c.getColumnIndexOrThrow(COL_AUTOR));
+                    String titulo = c.getString(c.getColumnIndexOrThrow(COL_TITULO));
+
+                    Nota n = new Nota(id, notaText, createdAt, updatedAt, animalNomeDB, autor, titulo, userprofileId);
+                    lista.add(n);
+                }
+            } finally {
+                c.close();
+            }
+        }
+        db.close();
+        return lista;
     }
 }
