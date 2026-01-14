@@ -14,7 +14,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapter.ViewHolderAnimal> {
 
     private List<Animal> animais;
@@ -49,10 +48,9 @@ public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapte
         String urlImagem = BASE_URL_IMAGENS + (animal.getFotoUrl() != null ? animal.getFotoUrl() : "");
         Glide.with(holder.itemView.getContext())
                 .load(urlImagem)
-                .diskCacheStrategy(DiskCacheStrategy.NONE) // Não guarda em disco
-                .skipMemoryCache(true)                     // Não lê da memória RAM
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_report_image)
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // Não guarda em disco
                 .into(holder.ivFoto);
     }
 
