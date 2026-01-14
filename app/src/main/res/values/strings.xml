@@ -116,5 +116,17 @@
     <string name="notas">Notas</string>
     <string name="perfil">Perfil</string>
     <string name="definicoes">Definições</string>
+    <string name="fatura">Fatura</string>
+    <string name="status">Status</string>
+    <string name="descri_o">Descrição</string>
+    <string name="preco">€ 0.00</string>
+    <string name="m_todo_de_pagamento">Método de pagamento:</string>
+    <string name="emitida">Emitida:</string>
+    <string name="pagar_agora">Pagar Agora</string>
+    <string name="metodo_pagamento">Metodo pagamento</string>
+    <string name="resumo_financeiro">$ Resumo Financeiro</string>
+    <string name="pendente">Pendente</string>
+    <string name="pago">Pago</string>
+    <string name="todos">Todos</string>
 </resources>
 

@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="$ Resumo Financeiro"
+                android:text="@string/resumo_financeiro"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -45,14 +45,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="Pendente"
+                        android:text="@string/pendente"
                         android:textColor="#FFFFFF"/>
 
                     <TextView
                         android:id="@+id/tvQuantidadePendente"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="€ 0.00"
+                        android:text="@string/preco"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
@@ -67,14 +67,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="Pago"
+                        android:text="@string/pago"
                         android:textColor="#FFFFFF"/>
 
                     <TextView
                         android:id="@+id/tvQuantidadePaga"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="€ 0.00"
+                        android:text="@string/preco"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
@@ -95,7 +95,7 @@
             android:id="@+id/btnTodos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Todos"
+            android:text="@string/todos"
             android:backgroundTint="#2E7D32"
             android:textColor="#FFFFFF"
             android:layout_marginEnd="8dp"/>
@@ -104,7 +104,7 @@
             android:id="@+id/btnPendente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pendente"
+            android:text="@string/pendente"
             android:textColor="#2E7D32"
             android:backgroundTint="@android:color/white"
             android:layout_marginEnd="8dp"/>
@@ -113,7 +113,7 @@
             android:id="@+id/btnPago"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pago"
+            android:text="@string/pago"
             android:textColor="#2E7D32"
             android:backgroundTint="@android:color/white"/>
     </LinearLayout>

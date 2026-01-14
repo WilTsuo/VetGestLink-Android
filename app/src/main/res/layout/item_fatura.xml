@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Fatura"
+                android:text="@string/fatura"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
 
@@ -35,7 +35,7 @@
                 android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pendente"
+                android:text="@string/status"
                 android:textColor="#FBC02D"
                 android:textStyle="bold"/>
 
@@ -46,7 +46,7 @@
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Consulta"
+            android:text="@string/descri_o"
             android:textColor="#616161"
             android:layout_marginTop="4dp"/>
 
@@ -55,7 +55,7 @@
             android:id="@+id/tvAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="€ 0.00"
+            android:text="@string/preco"
             android:textStyle="bold"
             android:textColor="#388E3C"
             android:layout_marginTop="4dp"/>
@@ -65,7 +65,7 @@
             android:id="@+id/tvMetodoPagamento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Método de pagamento:"
+            android:text="@string/m_todo_de_pagamento"
             android:textSize="12sp"
             android:textColor="#388E3C"
             android:visibility="gone"/>
@@ -83,7 +83,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Emitida:"
+                android:text="@string/emitida"
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="6dp"/>
 
@@ -95,7 +95,7 @@
             android:id="@+id/btnPay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pagar Agora"
+            android:text="@string/pagar_agora"
             android:backgroundTint="#2E7D32"
             android:textColor="@android:color/white"
             android:layout_marginTop="12dp"/>
