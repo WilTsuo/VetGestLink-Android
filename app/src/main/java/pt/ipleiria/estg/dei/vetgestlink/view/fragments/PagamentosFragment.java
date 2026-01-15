@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -93,6 +94,7 @@ public class PagamentosFragment extends Fragment implements FaturasListener, OnP
         }
 
         adapter.notifyDataSetChanged();
+        atualizarBotoesFiltro(tipo);
     }
 
     private void atualizarResumo() {
@@ -148,5 +150,43 @@ public class PagamentosFragment extends Fragment implements FaturasListener, OnP
 
         sheet.show(fm, "PagamentoBottomSheet");
     }
+
+    private void atualizarBotoesFiltro(String tipo) {
+        resetBotao(btnTodos);
+        resetBotao(btnPendente);
+        resetBotao(btnPago);
+
+        switch (tipo) {
+            case "TODOS":
+                destacarBotao(btnTodos);
+                break;
+            case "PENDENTE":
+                destacarBotao(btnPendente);
+                break;
+            case "PAGO":
+                destacarBotao(btnPago);
+                break;
+        }
+    }
+
+
+    private void resetBotao(Button btn) {
+        btn.setBackgroundTintList(
+                ContextCompat.getColorStateList(requireContext(), android.R.color.white)
+        );
+        btn.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.green_700)
+        );
+    }
+
+    private void destacarBotao(Button btn) {
+        btn.setBackgroundTintList(
+                ContextCompat.getColorStateList(requireContext(), R.color.green_700)
+        );
+        btn.setTextColor(
+                ContextCompat.getColor(requireContext(), android.R.color.white)
+        );
+    }
+
 
 }
