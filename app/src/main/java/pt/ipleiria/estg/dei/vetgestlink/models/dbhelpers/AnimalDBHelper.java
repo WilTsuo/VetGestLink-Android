@@ -74,7 +74,7 @@ public class AnimalDBHelper extends SQLiteOpenHelper {
                     String nome = c.getString(c.getColumnIndexOrThrow(COL_NOME));
                     String especie = c.getString(c.getColumnIndexOrThrow(COL_ESPECIE));
                     String raca = c.getString(c.getColumnIndexOrThrow(COL_RACA));
-                    int idade = c.getInt(c.getColumnIndexOrThrow(COL_IDADE));
+                    String idade = c.getString(c.getColumnIndexOrThrow(COL_IDADE));
                     double peso = c.getDouble(c.getColumnIndexOrThrow(COL_PESO));
                     String sexo = c.getString(c.getColumnIndexOrThrow(COL_SEXO));
                     String dataNascimento = c.getString(c.getColumnIndexOrThrow(COL_DATANASCIMENTO));
@@ -85,7 +85,7 @@ public class AnimalDBHelper extends SQLiteOpenHelper {
                     String updatedAt = c.getString(c.getColumnIndexOrThrow(COL_UPDATED_AT));
 
                     Animal animal = new Animal(id, nome, especie, raca, idade, peso, sexo,
-                            dataNascimento, microchip, fotoUrl, userprofilesId, createdAt, updatedAt);
+                            microchip, fotoUrl,dataNascimento, userprofilesId, createdAt, updatedAt);
                     lista.add(animal);
                 }
             } finally {

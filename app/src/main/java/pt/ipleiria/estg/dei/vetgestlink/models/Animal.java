@@ -17,7 +17,7 @@ public class Animal {
 
     public Animal() {}
 
-    public Animal(String nome, String especie, String raca, String idade, double peso, String sexo, int microchip, String foto_url, String datanascimento, int userprofiles_id, String created_at, String updated_at) {
+    public Animal(int id, String nome, String especie, String raca, String idade, double peso, String sexo, int microchip, String foto_url, String datanascimento, int userprofiles_id, String created_at, String updated_at) {
   
         this.id = id;
         this.nome = nome;

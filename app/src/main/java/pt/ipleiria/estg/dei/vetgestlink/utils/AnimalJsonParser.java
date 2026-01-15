@@ -22,11 +22,11 @@ public class AnimalJsonParser {
 
                 if (obj.optBoolean("ativo", true)) {
                     Animal animal = new Animal();
-                    animal.setId(obj.optInt("id", 0)); // Mapeia o ID
+                    animal.setId(obj.optInt("id", 0));
                     animal.setNome(obj.optString("nome", ""));
                     animal.setEspecie(obj.optString("especie", ""));
                     animal.setRaca(obj.optString("raca", ""));
-                    animal.setIdade(obj.optInt("idade", 0));
+                    animal.setIdade(obj.optString("idade", ""));
                     animal.setPeso(obj.optDouble("peso", 0.0));
                     animal.setSexo(obj.optString("sexo", ""));
                     animal.setMicrochip(obj.optInt("microchip", 0));
