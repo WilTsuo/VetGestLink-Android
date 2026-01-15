@@ -30,7 +30,7 @@ import pt.ipleiria.estg.dei.vetgestlink.models.MqttHandler;
 
 public class MqttNotificationService extends Service {
 
-    private static final String TAG = "MqttDebug"; // Tag para filtrar no Logcat
+    private static final String TAG = "Vetgetlink-MqttDebug"; // Tag para filtrar no Logcat
     private MqttHandler mqttHandler;
 
     private static final String CLIENT_ID = "VetGestLink_Android";
@@ -53,21 +53,21 @@ public class MqttNotificationService extends Service {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         userId = prefs.getInt(KEY_USER_ID, -1);
 
-        // 1. Lógica para obter o URL dinâmico das definições
+        //apanha o url do shared prefferences
         String savedApiUrl = prefs.getString(KEY_API_URL, "http://172.22.21.220");
         brokerUrl = convertApiUrlToMqttUrl(savedApiUrl);
 
         Log.d(TAG, "Serviço criado. UserID: " + userId + " | Broker: " + brokerUrl);
     }
 
-    // Converte http://192.168.1.10 para tcp://192.168.1.10:1883
+    // Converte http:// para tcp://
     private String convertApiUrlToMqttUrl(String apiUrl) {
         String url = apiUrl.replace("http://", "tcp://").replace("https://", "tcp://");
-        // Remove barras no final se houver
+        // Remove barras no final se houver para n ficar "solto"
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
         }
-        // Adiciona a porta se não estiver especificada (assumindo 1883 padrão)
+        // Adiciona a porta 1883 se não estiver presente (mais vale prevenir que remediaar), nao é presiso pq usamos a porta default do mqqt mas é sempreuma boa pratica
         if (!url.contains(":1883")) {
             url += ":1883";
         }
@@ -132,10 +132,7 @@ public class MqttNotificationService extends Service {
                     public void deliveryComplete(IMqttDeliveryToken token) {}
                 });
 
-                // 2. Subscrever TUDO (#) para debug - REMOVER DEPOIS
-                mqttHandler.subscribe("#");
-
-                // 3. Subscrever tópicos específicos do utilizador
+                // subscrevce aos topicos especificos do user logado
                 mqttHandler.subscribe("INSERT_" + userId + "_MARCACAO");
                 mqttHandler.subscribe("UPDATE_" + userId + "_MARCACAO");
                 mqttHandler.subscribe("DELETE_" + userId + "_MARCACAO");
@@ -149,10 +146,8 @@ public class MqttNotificationService extends Service {
     private void handleMessage(String topic, String payload) {
         try {
             // Filtro de segurança: Se a mensagem não for para este user, ignora
-            // (Útil porque estamos a ouvir # para debug)
             if (!topic.contains("_" + userId + "_") && !topic.equals("test")) {
-                // Se quiser ver tudo no log, comente o return abaixo
-                // return;
+                return;
             }
 
             JSONObject json = new JSONObject(payload);

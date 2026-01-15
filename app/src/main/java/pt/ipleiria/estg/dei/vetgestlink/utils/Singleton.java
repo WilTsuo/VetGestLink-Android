@@ -44,7 +44,7 @@ import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.AnimalDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.MarcacaoDBHelper;
 
 public class Singleton {
-    // region variaveis e constantes do singleton
+    // region variaveis e constantes do singleton e as tags para o volley
 
     //Variaveis
     private ArrayList<Marcacao> marcacoes;
@@ -59,6 +59,8 @@ public class Singleton {
     private static final String KEY_MAIN_URL = "main_url";
     private static final String KEY_ACCESS_TOKEN = "access_token";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
+
+    // TAGS VOLLEY
     private static final String TAG = "VetGestLink";
     private static final String TAG_ANIMAIS = "Vetgetlink-AnimaisService";
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
@@ -67,15 +69,15 @@ public class Singleton {
     private static final String TAG_PROFILE = "Vetgetlink-ProfileService";
     private static final String TAG_LEMBRETES = "Vetgetlink-LembretesService";
     private static final String TAG_MARCACOES = "Vetgetlink-MarcacoesService";
-    
+    private static final String TAG_FATURAS = "Vetgetlink-FaturasService";
+    private static final String TAG_METODOS_PAGAMENTO = "Vetgetlink-MetodosPagamentoService";
     private static Singleton instance;
-    //region - arrays e dbhelper e tags e variavgeis estaticas
-
     //endregion
     private final Context context;
     private RequestQueue requestQueue; //queue do volley
     private String mainUrl;
-    //region - Listeners
+
+    //region Listeners
     private AuthListener authListener;
     private NotasListener NotasListener;
     private NotaListener NotaListener;
@@ -240,16 +242,15 @@ public class Singleton {
         return mainUrl;
     }
 
-    //guarda o novo url no SharedPreferences
+    //guarda o novo url na SharedPreferences
     public void setMainUrl(String url) {
         this.mainUrl = url;
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putString(KEY_MAIN_URL, url).apply();
     }
 
-    //construtor simples de endpoints
+    //construtor simples dos endpoints
     public String buildUrl(String endpoint) {
-        // endpoint example: "/auth/login" or "auth/login" FUNFA BEM OS DOIS
         String base = getMainUrl();
         if (endpoint.startsWith("/")) {
             return base + endpoint;
@@ -257,8 +258,6 @@ public class Singleton {
             return base + "/" + endpoint;
         }
     }
-
-    //pegar a token de acesso guardada
     public String getAccessToken() {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
     }
@@ -266,7 +265,6 @@ public class Singleton {
 
     // region Gestao do Login e Auth Handler
     public void login(String username, String password, LoginCallback callback) {
-        // Se a rota for diferente (ex: "v1/auth/login"), ajuste aqui
         String url = buildUrl("auth/login");
 
         JSONObject jsonBody = new JSONObject();
@@ -288,14 +286,13 @@ public class Singleton {
                     Log.d(TAG_LOGIN, "Resposta JSON: " + response.toString());
 
                     try {
-                        // 1. Verifica sucesso
+                        // verifica se deu
                         boolean success = response.optBoolean("success", false);
 
                         if (success) {
                             String token = response.optString("token");
 
-                            // 2. PARSING DO USER (AQUI ESTAVA O ERRO)
-                            // O JSON tem: "user": { "id": 9, ... }
+                            // faz parsing do user
                             if (response.has("user")) {
                                 JSONObject userJson = response.getJSONObject("user");
 
@@ -357,6 +354,8 @@ public class Singleton {
         }
     }
 
+
+    // obetem um nota atravez do id da nota
     public Nota getNota(int id){
         for(Nota n:notas)
             if(n.getId()==id)
@@ -563,12 +562,9 @@ public class Singleton {
     public ArrayList<Nota> getNotasByAnimalNome(String animalNome) {
         return notasDB.getNotasByAnimalNome(animalNome);
     }
-
-
     // endregion
 
     //region Gestao do userProfile e handler de informação associada
-
     //GET PERFIL
     public void getPerfil(String token, ProfileCallback callback) {
         String url = buildUrl("profile?access-token=" + token);
@@ -599,10 +595,8 @@ public class Singleton {
                     if (callback != null) callback.onError("Erro na rede: " + error.getMessage());
                 }
         );
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_PROFILE);
     }
-
-
     //UPDATE PERFIL
     public void atualizarPerfil(String accessToken, final String nome, final String email,
                                 final String telefone, final String rua, final String porta,
@@ -613,12 +607,12 @@ public class Singleton {
 
         JSONObject jsonBody = new JSONObject();
         try {
-            // 1. Campos principais (Raiz)
+            // saca os campos principais
             jsonBody.put("nomecompleto", nome);
             jsonBody.put("email", email);
             jsonBody.put("telemovel", telefone);
 
-            // 2. Criar objeto JSON aninhado para a Morada
+            // cria o objeto para a morada
             JSONObject jsonMorada = new JSONObject();
             jsonMorada.put("rua", rua);
             jsonMorada.put("nporta", porta);
@@ -628,7 +622,7 @@ public class Singleton {
             // 3. Adicionar o objeto morada ao corpo principal
             jsonBody.put("morada", jsonMorada);
 
-            //EXEMPLO DE JSON GERADO(OLHAR BEM OS ENDPOINTS NA API)
+            //EXEMPLO DE JSON GERADO(OLHAR BEM OS ENDPOINTS NA API PFFF )
             /*
             {
                 "nomecompleto": "Carlos Mendes",
@@ -676,11 +670,9 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_PROFILE);
     }
-
-    //region ESQUECEU A PASSWORD
-
+    // ESQUECEU PASS
     public interface atualizarPalavraPasseCallback {
         void onSuccess(String message);
         void onError(String error);
@@ -728,7 +720,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_PROFILE);
     }
     //endregion
 
@@ -853,7 +845,7 @@ public class Singleton {
                         }
                     }
                 });
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_MARCACOES);
     }
     public ArrayList<Marcacao> getMarcacoesBD() {
         marcacoes = marcacoesDB.getAllMarcacoesBD();
@@ -913,7 +905,7 @@ public class Singleton {
                     if (callback != null) callback.onError(errorMsg);
                 }
         );
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_LEMBRETES);
     }
 
     public void deletarLembrete(String accessToken, int lembreteId, MessageCallback callback) {
@@ -947,7 +939,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_LEMBRETES);
     }
 
     public void atualizarLembrete(String accessToken, int lembreteId, String descricao, MessageCallback callback) {
@@ -989,7 +981,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_LEMBRETES);
     }
 
     public void criarLembrete(String accessToken, String descricao, MessageCallback callback) {
@@ -1031,7 +1023,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(request);
+        addToRequestQueue(request, TAG_LEMBRETES);
     }
     // endregion
 
@@ -1082,7 +1074,7 @@ public class Singleton {
                 }
         );
 
-        addToRequestQueue(req);
+        addToRequestQueue(req, TAG_FATURAS);
     }
 
     private ArrayList<Fatura> faturas = new ArrayList<>();
@@ -1159,7 +1151,7 @@ public class Singleton {
                 error -> Log.e(TAG, "Erro ao obter métodos de pagamento", error)
         );
 
-        addToRequestQueue(req);
+        addToRequestQueue(req, TAG_METODOS_PAGAMENTO);
     }
 
     private ArrayList<MetodoPagamento> metodos = new ArrayList<>();

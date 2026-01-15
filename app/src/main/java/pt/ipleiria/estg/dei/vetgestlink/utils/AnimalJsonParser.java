@@ -32,7 +32,6 @@ public class AnimalJsonParser {
                     animal.setMicrochip(obj.optInt("microchip", 0));
                     animal.setFotoUrl(obj.optString("foto_url", ""));
                     animal.setDtanascimento(obj.optString("datanascimento", ""));
-
                     animais.add(animal);
                 }
             }

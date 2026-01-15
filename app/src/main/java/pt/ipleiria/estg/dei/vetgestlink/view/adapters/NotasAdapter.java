@@ -32,7 +32,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     private static final String KEY_ACCESS_TOKEN = "access_token";
 
     // flag para disponibilidade da API
-    private boolean apiAvailable = true;
+    private boolean apiAvailable = false;
 
     public interface OnNotaChangedListener {
         void onNotaChanged();
@@ -104,8 +104,8 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
                 holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), n));
                 holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), n));
             } else {
-                holder.btnEditar.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show());
-                holder.btnExcluir.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "ERROOOOOO", Toast.LENGTH_SHORT).show());
+                holder.btnEditar.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "API nao disponivel", Toast.LENGTH_SHORT).show());
+                holder.btnExcluir.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "API nao disponivel", Toast.LENGTH_SHORT).show());
             }
         } else {
             holder.btnEditar.setOnClickListener(null);
@@ -121,7 +121,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     private void showEditDialog(Context context, Nota nota) {
         // segurança: se API não disponível não abre diálogo
         if (!apiAvailable) {
-            Toast.makeText(context, "ERROOOOOO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -169,7 +169,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     private void showDeleteDialog(Context context, Nota nota) {
         // segurança: se API não disponível não abre diálogo
         if (!apiAvailable) {
-            Toast.makeText(context, "ERROOOOOO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
             return;
         }
 
