@@ -31,9 +31,6 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
 
-    // flag para disponibilidade da API
-    private boolean apiAvailable = false;
-
     public interface OnNotaChangedListener {
         void onNotaChanged();
     }
@@ -54,7 +51,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
 
     // setter para actualizar disponibilidade da API em runtime
     public void setApiAvailable(boolean apiAvailable) {
-        this.apiAvailable = apiAvailable;
+        // Apenas notifica mudanças para atualizar a UI
         notifyDataSetChanged();
     }
 
@@ -90,6 +87,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
         holder.btnExcluir.setVisibility(isOwner ? View.VISIBLE : View.GONE);
 
         // aplica estado (enabled + alpha) conforme disponibilidade da API
+        boolean apiAvailable = Singleton.getInstance(holder.itemView.getContext()).getApiAvailable();
         boolean enabled = isOwner && apiAvailable;
         float alpha = enabled ? 1f : 0.5f;
 
@@ -120,7 +118,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
 
     private void showEditDialog(Context context, Nota nota) {
         // segurança: se API não disponível não abre diálogo
-        if (!apiAvailable) {
+        if (!Singleton.getInstance(context).getApiAvailable()) {
             Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -168,7 +166,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
 
     private void showDeleteDialog(Context context, Nota nota) {
         // segurança: se API não disponível não abre diálogo
-        if (!apiAvailable) {
+        if (!Singleton.getInstance(context).getApiAvailable()) {
             Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
             return;
         }

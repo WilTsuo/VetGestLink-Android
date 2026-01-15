@@ -3,10 +3,8 @@ package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.os.Bundle;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,7 +38,6 @@ public class NotasFragment extends Fragment {
     private List<Animal> animais = new ArrayList<>();
     private List<Nota> notas = new ArrayList<>();
     private MaterialButton btnAddNota;
-    private boolean apiAvailable = true;
 
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
@@ -66,14 +63,14 @@ public class NotasFragment extends Fragment {
         updateApiState();
 
         // verificar disponibilidade de rede/API e aplicar estado
-        boolean apiOk = isNetworkAvailable(requireContext());
+        boolean apiOk = Singleton.getInstance(requireContext()).getApiAvailable();
         notasAdapter.setApiAvailable(apiOk);
 
         // aplica estado ao botão do fragment
         btnAddNota.setEnabled(apiOk);
         btnAddNota.setAlpha(apiOk ? 1f : 0.5f);
         btnAddNota.setOnClickListener(v -> {
-            if (!apiAvailable) {
+            if (!Singleton.getInstance(requireContext()).getApiAvailable()) {
                 Toast.makeText(requireContext(), "Houve um problema na Ligação a API, verifique a sua conexao a Internet", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -185,7 +182,7 @@ public class NotasFragment extends Fragment {
                 notasAdapter.updateList(notas);
             }
 
-            Toast.makeText(requireContext(), "Offline — cache", Toast.LENGTH_SHORT).show();
+            Log.d("Vetgestlin-NotasFragment", "Carregou dados do cache");
         });
     }
     private void atualizarDropdown() {
@@ -251,7 +248,7 @@ public class NotasFragment extends Fragment {
 
         Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positive.setOnClickListener(v -> {
-            if (!apiAvailable) {
+            if (!Singleton.getInstance(requireContext()).getApiAvailable()) {
                 Toast.makeText(requireContext(), "Houve um problema na Ligação a API, verifique a sua conexao a Internet", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -305,7 +302,6 @@ public class NotasFragment extends Fragment {
     }
 
     private void applyApiState(boolean ok) {
-        apiAvailable = ok;
         if (notasAdapter != null) notasAdapter.setApiAvailable(ok);
         if (btnAddNota != null) {
             btnAddNota.setEnabled(ok);
@@ -314,29 +310,9 @@ public class NotasFragment extends Fragment {
     }
 
     private void updateApiState() {
-        // primeiro verifica se há rede local
-        boolean networkOk = isNetworkAvailable(requireContext());
-        if (!networkOk) {
-            // sem rede => marca API como indisponível
-            requireActivity().runOnUiThread(() -> applyApiState(false));
-            return;
-        }
-
-        // se houver rede, pergunta ao endpoint /health via Singleton (assíncrono)
-        Singleton.getInstance(requireContext()).isApiResponding(responding -> {
+        Singleton.getInstance(requireContext()).updateApiState(requireContext(), responding -> {
             if (getActivity() == null) return;
             requireActivity().runOnUiThread(() -> applyApiState(responding));
         });
-    }
-
-    private boolean isNetworkAvailable(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) return false;
-        Network network = cm.getActiveNetwork();
-        if (network == null) return false;
-        NetworkCapabilities caps = cm.getNetworkCapabilities(network);
-        return caps != null && (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
     }
 }

@@ -58,6 +58,7 @@ public class Singleton {
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_MAIN_URL = "main_url";
     private static final String KEY_ACCESS_TOKEN = "access_token";
+    private static final String KEY_API_AVAILABLE = "api_available";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
 
     // TAGS VOLLEY
@@ -1033,10 +1034,12 @@ public class Singleton {
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 response -> {
                     // qualquer resposta significa que a API respondeu
+                    setApiAvailable(true);
                     if (callback != null) callback.onResult(true);
                 },
                 error -> {
                     Log.d(TAG, "Health check failed: " + (error != null ? error.toString() : "null"));
+                    setApiAvailable(false);
                     if (callback != null) callback.onResult(false);
                 });
 
@@ -1047,6 +1050,44 @@ public class Singleton {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         addToRequestQueue(request, TAG_HEAlTH);
+    }
+
+    // Guardar o estado da API nas SharedPreferences
+    private void setApiAvailable(boolean available) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_API_AVAILABLE, available).apply();
+    }
+
+    // Obter o estado da API das SharedPreferences (por defeito é true)
+    public boolean getApiAvailable() {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(KEY_API_AVAILABLE, true);
+    }
+
+    // Atualizar o estado da API com verificação de rede e callback
+    public void updateApiState(Context context, final ApiHealthCallback callback) {
+        // Primeiro verifica se há rede local
+        if (!isNetworkAvailable(context)) {
+            setApiAvailable(false);
+            if (callback != null) callback.onResult(false);
+            return;
+        }
+
+        // Se houver rede, verifica o endpoint /health
+        isApiResponding(callback);
+    }
+
+    // Verificar se há rede disponível
+    private boolean isNetworkAvailable(Context context) {
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        android.net.Network network = cm.getActiveNetwork();
+        if (network == null) return false;
+        android.net.NetworkCapabilities caps = cm.getNetworkCapabilities(network);
+        return caps != null && (caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET));
     }
     // endregion
 
