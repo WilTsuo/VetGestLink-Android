@@ -50,22 +50,27 @@ public class ListaFaturasAdapter extends ArrayAdapter<Fatura> {
         TextView tvDescricao = convertView.findViewById(R.id.tvDescription);
         TextView tvTotal = convertView.findViewById(R.id.tvAmount);
         TextView tvEstado = convertView.findViewById(R.id.tvStatus);
-        TextView tvData = convertView.findViewById(R.id.tvIssueDate);
+        TextView tvMetodo = convertView.findViewById(R.id.tvMetodoPagamento);
+        TextView tvData = convertView.findViewById(R.id.tvCreatedAt);
         Button btnPagar = convertView.findViewById(R.id.btnPay);
 
         tvNumero.setText("Fatura #" + fatura.getId());
         tvDescricao.setText("Itens: " + fatura.getNumeroItens());
         tvTotal.setText("€ " + String.format("%.2f", fatura.getTotal()));
+        tvMetodo.setText("Método de pagamento: " + fatura.getMetodoPagamento());
         tvData.setText("Emitida: " + fatura.getCreatedAt());
 
         if (fatura.isEstado()) {
             tvEstado.setText("Pago");
             tvEstado.setTextColor(Color.parseColor("#2E7D32"));
             btnPagar.setVisibility(View.GONE);
+            tvMetodo.setText("Método de pagamento: " + fatura.getMetodoPagamento());
+            tvMetodo.setVisibility(View.VISIBLE);
         } else {
             tvEstado.setText("Pendente");
             tvEstado.setTextColor(Color.parseColor("#FBC02D"));
             btnPagar.setVisibility(View.VISIBLE);
+            tvMetodo.setVisibility(View.GONE);
 
             btnPagar.setOnClickListener(v -> {
                 Log.d("PAGAR_CLICK", "Botão pagar clicado: " + fatura.getId());

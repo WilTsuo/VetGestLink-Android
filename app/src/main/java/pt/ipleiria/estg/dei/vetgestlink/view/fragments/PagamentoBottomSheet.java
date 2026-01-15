@@ -126,11 +126,13 @@ public class PagamentoBottomSheet extends BottomSheetDialogFragment
         Singleton.getInstance(requireContext())
                 .pagarFatura(
                         faturaId,
-                        metodo.getId()
+                        metodo.getId(),
+                        requireContext()
                 );
 
         dismiss();
     }
+
 
     @Override
     public void onRefreshMetodosPagamento(ArrayList<MetodoPagamento> metodos) {
@@ -140,4 +142,6 @@ public class PagamentoBottomSheet extends BottomSheetDialogFragment
         adapter.addAll(metodos);
         adapter.notifyDataSetChanged();
     }
+
+
 }
