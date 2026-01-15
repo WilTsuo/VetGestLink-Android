@@ -28,7 +28,7 @@ import pt.ipleiria.estg.dei.vetgestlink.listeners.MarcacoesListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.MetodosPagamentoListener;
-;
+
 
 //Modelos
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
@@ -59,6 +59,8 @@ public class Singleton {
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
     private static final String TAG_LOGIN = "Vetgetlink-AuthService";
     private static final String TAG_HEAlTH = "Vetgetlink-HealthService";
+
+    private static final String KEY_ACCESS_TOKEN = "access_token"; // Adicione esta linha
     private static Singleton instance;
     //region - arrays e notadbhelper
     private ArrayList<Nota> notas;
@@ -121,7 +123,6 @@ public class Singleton {
     //endregion
 
     //region defenicao de Callbacks (message, login, notas ,userprofile)
-
     public interface MarcacoesCallback {
         void onSuccess(ArrayList<Marcacao> marcacoes);
         void onError(String error);
@@ -147,6 +148,11 @@ public class Singleton {
 
     public interface ProfileCallback {
         void onSuccess(String nome, String email, String telefone, String moradaCompleta);
+        void onError(String error);
+    }
+
+    public interface ProfileUpdateCallback {
+        void onSuccess(String message);
         void onError(String error);
     }
 
@@ -235,6 +241,11 @@ public class Singleton {
         } else {
             return base + "/" + endpoint;
         }
+    }
+
+    //pegar a token de acesso guardada
+    public String getAccessToken() {
+        return sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
     }
     // endregion
 
@@ -514,7 +525,8 @@ public class Singleton {
 
     //region Gestao do userProfile e handler de informação associada
 
-    public void getProfile(String token, ProfileCallback callback) {
+    //GET PERFIL
+    public void getPerfil(String token, ProfileCallback callback) {
         String url = buildUrl("profile?access-token=" + token);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -546,6 +558,134 @@ public class Singleton {
         addToRequestQueue(request);
     }
 
+
+    //UPDATE PERFIL
+    public void atualizarPerfil(String accessToken, final String nome, final String email,
+                                final String telefone, final String rua, final String porta,
+                                final String postal, final String localidade,
+                                final ProfileUpdateCallback callback) {
+
+        String url = buildUrl("profile/update?access-token=" + accessToken);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            // 1. Campos principais (Raiz)
+            jsonBody.put("nomecompleto", nome);
+            jsonBody.put("email", email);
+            jsonBody.put("telemovel", telefone);
+
+            // 2. Criar objeto JSON aninhado para a Morada
+            JSONObject jsonMorada = new JSONObject();
+            jsonMorada.put("rua", rua);
+            jsonMorada.put("nporta", porta);
+            jsonMorada.put("cdpostal", postal);
+            jsonMorada.put("localidade", localidade);
+
+            // 3. Adicionar o objeto morada ao corpo principal
+            jsonBody.put("morada", jsonMorada);
+
+            //EXEMPLO DE JSON GERADO(OLHAR BEM OS ENDPOINTS NA API)
+            /*
+            {
+                "nomecompleto": "Carlos Mendes",
+                "email": "carlos.mendes@email.com",
+                "telemovel": "912 345 678",
+                "morada": {
+                  "rua": "Rua das Acácias",
+                  "nporta": "45",
+                  "cdpostal": "1000-100",
+                  "localidade": "Lisboa"
+                }
+            }
+            * */
+        } catch (JSONException e) {
+            if (callback != null) {
+                callback.onError("Erro ao preparar dados para envio.");
+            }
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.PUT,
+                url,
+                jsonBody,
+                response -> {
+                    try {
+                        String message = response.optString("message", "Perfil atualizado com sucesso!");
+                        if (callback != null) {
+                            callback.onSuccess(message);
+                        }
+                    } catch (Exception e) {
+                        if (callback != null) callback.onError("Erro ao ler resposta do servidor.");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao atualizar perfil";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    } else if (error.getMessage() != null) {
+                        errorMsg += ": " + error.getMessage();
+                    }
+                    if (callback != null) {
+                        callback.onError(errorMsg);
+                    }
+                }
+        );
+
+        addToRequestQueue(request);
+    }
+
+    //region ESQUECEU A PASSWORD
+
+    public interface atualizarPalavraPasseCallback {
+        void onSuccess(String message);
+        void onError(String error);
+    }
+
+    public void atualizarPalavraPasse(
+            String accessToken,
+            String palavraPasseAtual,
+            String palavraPasseNova,
+            final atualizarPalavraPasseCallback callback){
+        String url = buildUrl("profile/password?access-token=" + accessToken);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("current_password", palavraPasseAtual);
+            jsonBody.put("new_password", palavraPasseNova);
+        } catch (JSONException e) {
+            callback.onError("Erro ao preparar dados");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonBody,
+                response -> {
+                    try {
+                        boolean success = response.getBoolean("success");
+                        String message = response.optString("message", "Palavra-passe atualizada com sucesso");
+                        if (success) {
+                            callback.onSuccess(message);
+                        } else {
+                            callback.onError(message);
+                        }
+                    } catch (JSONException e) {
+                        callback.onError("Erro ao processar resposta");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao alterar palavra-passe";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    }
+                    callback.onError(errorMsg);
+                }
+        );
+
+        addToRequestQueue(request);
+    }
     //endregion
 
     //region Gestao de Animais e handler de informação associada
@@ -563,7 +703,7 @@ public class Singleton {
                     animal.setNome(obj.optString("nome", ""));
                     animal.setEspecie(obj.optString("especie", ""));
                     animal.setRaca(obj.optString("raca", ""));
-                    animal.setIdade(obj.optInt("idade", 0));
+                    animal.setIdade(obj.optString("idade", ""));
                     animal.setPeso(obj.optDouble("peso", 0.0));
                     animal.setSexo(obj.optString("sexo", ""));
                     animal.setMicrochip(obj.optInt("microchip", 0));
@@ -1011,7 +1151,5 @@ public class Singleton {
         }
         return null;
     }
-
-
     //endregion
 }

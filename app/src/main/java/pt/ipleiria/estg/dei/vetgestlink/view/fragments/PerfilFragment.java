@@ -1,8 +1,6 @@
-// java
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,6 @@ import java.util.regex.Pattern;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
-import pt.ipleiria.estg.dei.vetgestlink.models.Morada;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.activities.MainActivity;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.PerfilAnimalAdapter;
@@ -45,8 +46,7 @@ public class PerfilFragment extends Fragment {
     private TextView tvCdPostal;
     private TextView tvLocalidade;
 
-    private static final String PREFS_NAME = "VetGestLinkPrefs";
-    private static final String KEY_ACCESS_TOKEN = "access_token";
+    // Removidas as constantes de SharedPreferences locais, pois agora usamos o Singleton
 
     public PerfilFragment() { }
 
@@ -79,8 +79,14 @@ public class PerfilFragment extends Fragment {
         // Botão ver lembretes
         Button btnVerLembretes = view.findViewById(R.id.btnVerLembretes);
         btnVerLembretes.setOnClickListener(v -> {
-            ((MainActivity) requireActivity()).navegarParaLembretes();
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navegarParaLembretes();
+            }
         });
+
+        // Botão Editar Perfil
+        MaterialButton btnEditarPerfil = view.findViewById(R.id.btnEditarPerfil);
+        btnEditarPerfil.setOnClickListener(v -> abrirDialogEdicao());
 
         // Carregar dados
         carregarDados();
@@ -88,13 +94,10 @@ public class PerfilFragment extends Fragment {
         return view;
     }
 
-    private String getAccessToken() {
-        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(KEY_ACCESS_TOKEN, null);
-    }
-
     private void carregarDados() {
-        String token = getAccessToken();
+        // ALTERAÇÃO: Obtém o token diretamente do Singleton
+        String token = Singleton.getInstance(requireContext()).getAccessToken();
+
         if (token == null) {
             if (!isAdded()) return;
             requireActivity().runOnUiThread(() -> {
@@ -149,7 +152,7 @@ public class PerfilFragment extends Fragment {
             return;
         }
 
-        Singleton.getInstance(requireContext()).getProfile(token, new Singleton.ProfileCallback() {
+        Singleton.getInstance(requireContext()).getPerfil(token, new Singleton.ProfileCallback() {
             @Override
             public void onSuccess(String nome, String email, String telefone, String moradaCompleta) {
                 if (!isAdded()) return;
@@ -158,7 +161,6 @@ public class PerfilFragment extends Fragment {
                     tvEmail.setText(email != null ? email : "");
                     tvTelefone.setText(telefone != null ? telefone : "");
 
-                    // Lógica para distribuir a string da morada nos campos corretos
                     distribuirMorada(moradaCompleta);
                 });
             }
@@ -173,71 +175,33 @@ public class PerfilFragment extends Fragment {
         });
     }
 
-    /**
-     * Tenta separar a string completa da morada nos campos individuais.
-     * Assume formato aproximado: "Rua..., Porta CodPostal Localidade"
-     */
     private void distribuirMorada(String moradaCompleta) {
         if (tvRua == null) return;
 
         if (moradaCompleta != null && !moradaCompleta.isEmpty()) {
-            // Regex para encontrar Código Postal no formato XXXX-XXX
             Pattern patternCP = Pattern.compile("(\\d{4}-\\d{3})");
             Matcher matcher = patternCP.matcher(moradaCompleta);
 
             if (matcher.find()) {
-                // 1. Extrair Código Postal
                 String cp = matcher.group(1);
                 tvCdPostal.setText(cp);
-
-                // 2. Extrair Localidade (tudo depois do CP)
                 String depoisCP = moradaCompleta.substring(matcher.end()).trim();
                 tvLocalidade.setText(depoisCP);
-
-                // 3. Extrair Rua e Porta (tudo antes do CP)
                 String antesCP = moradaCompleta.substring(0, matcher.start()).trim();
-
-                // Tenta separar Rua e Porta pela última vírgula, se existir
                 int lastCommaIndex = antesCP.lastIndexOf(",");
                 if (lastCommaIndex != -1) {
                     tvRua.setText(antesCP.substring(0, lastCommaIndex).trim());
                     tvNPorta.setText(antesCP.substring(lastCommaIndex + 1).trim());
                 } else {
-                    // Se não houver vírgula, assume que é tudo Rua e deixa Porta vazia
                     tvRua.setText(antesCP);
                     tvNPorta.setText("");
                 }
             } else {
-                // Fallback: Se não encontrar padrão de CP, coloca tudo na Rua
                 tvRua.setText(moradaCompleta);
                 tvNPorta.setText("");
                 tvCdPostal.setText("");
                 tvLocalidade.setText("");
             }
-        } else {
-            // Morada vazia
-            tvRua.setText("Sem morada");
-            tvNPorta.setText("-");
-            tvCdPostal.setText("-");
-            tvLocalidade.setText("-");
-        }
-    }
-
-    // Mantido caso no futuro o Singleton retorne o objeto Morada diretamente
-    private void preencherMorada(Morada morada) {
-        if (tvRua == null) return;
-
-        if (morada != null) {
-            tvRua.setText(morada.getRua() != null ? morada.getRua() : "N/A");
-
-            String portaInfo = morada.getNporta();
-            if (morada.getAndar() != null && !morada.getAndar().isEmpty()) {
-                portaInfo += " " + morada.getAndar();
-            }
-            tvNPorta.setText(portaInfo != null ? portaInfo : "N/A");
-
-            tvCdPostal.setText(morada.getCdpostal() != null ? morada.getCdpostal() : "N/A");
-            tvLocalidade.setText(morada.getLocalidade() != null ? morada.getLocalidade() : "N/A");
         } else {
             tvRua.setText("Sem morada");
             tvNPorta.setText("-");
@@ -250,7 +214,6 @@ public class PerfilFragment extends Fragment {
         if (tvNomeCompleto != null) tvNomeCompleto.setText("");
         if (tvEmail != null) tvEmail.setText("");
         if (tvTelefone != null) tvTelefone.setText("");
-
         if (tvRua != null) tvRua.setText("");
         if (tvNPorta != null) tvNPorta.setText("");
         if (tvCdPostal != null) tvCdPostal.setText("");
@@ -261,5 +224,94 @@ public class PerfilFragment extends Fragment {
         if (tvAnimalCount == null) return;
         int count = perfilAnimais != null ? perfilAnimais.size() : 0;
         tvAnimalCount.setText(String.valueOf(count) + " animais");
+    }
+
+    // --- Lógica de Edição ---
+
+    private void abrirDialogEdicao() {
+        if (getContext() == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_edit_profile, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
+
+        // Referências do Dialog
+        final TextInputEditText etNome = dialogView.findViewById(R.id.etNomeCompleto);
+        final TextInputEditText etEmail = dialogView.findViewById(R.id.etEmail);
+        final TextInputEditText etTelefone = dialogView.findViewById(R.id.etTelefone);
+        final TextInputEditText etRua = dialogView.findViewById(R.id.etRua);
+        final TextInputEditText etPorta = dialogView.findViewById(R.id.etNPorta);
+        final TextInputEditText etPostal = dialogView.findViewById(R.id.etCdPostal);
+        final TextInputEditText etLocalidade = dialogView.findViewById(R.id.etLocalidade);
+        MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        MaterialButton btnGuardar = dialogView.findViewById(R.id.btnGuardar);
+
+        // Preencher com dados atuais
+        etNome.setText(tvNomeCompleto.getText());
+        etEmail.setText(tvEmail.getText());
+        etTelefone.setText(tvTelefone.getText());
+        etRua.setText(tvRua.getText());
+        etPorta.setText(tvNPorta.getText());
+        etPostal.setText(tvCdPostal.getText());
+        etLocalidade.setText(tvLocalidade.getText());
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnGuardar.setOnClickListener(v -> {
+            // Obtém o token diretamente do Singleton
+            String token = Singleton.getInstance(requireContext()).getAccessToken();
+
+            if (token == null) return;
+
+            // Capturar valores
+            String novoNome = etNome.getText().toString();
+            String novoEmail = etEmail.getText().toString();
+            String novoTelefone = etTelefone.getText().toString();
+            String novaRua = etRua.getText().toString();
+            String novaPorta = etPorta.getText().toString();
+            String novoPostal = etPostal.getText().toString();
+            String novaLocalidade = etLocalidade.getText().toString();
+
+            // Chamar o Singleton
+            Singleton.getInstance(requireContext()).atualizarPerfil(
+                    token,
+                    novoNome,
+                    novoEmail,
+                    novoTelefone,
+                    novaRua,
+                    novaPorta,
+                    novoPostal,
+                    novaLocalidade,
+                    new Singleton.ProfileUpdateCallback() {
+                        @Override
+                        public void onSuccess(String message) {
+                            if (!isAdded()) return;
+
+                            // Atualizar UI do Fragment
+                            tvNomeCompleto.setText(novoNome);
+                            tvEmail.setText(novoEmail);
+                            tvTelefone.setText(novoTelefone);
+                            tvRua.setText(novaRua);
+                            tvNPorta.setText(novaPorta);
+                            tvCdPostal.setText(novoPostal);
+                            tvLocalidade.setText(novaLocalidade);
+
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            if (!isAdded()) return;
+                            Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                        }
+                    }
+            );
+        });
+
+        dialog.show();
     }
 }
