@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">VetGestLink</string>
     <string name="fragment_name"></string>
-    <!-- Navigation -->
+
+    <!-- Navegação -->
     <string name="nav_appointments">Consultas</string>
     <string name="nav_payments">Pagamentos</string>
     <string name="nav_notes">Notas</string>
@@ -16,27 +17,27 @@
     <string name="register_link">Não tem conta? Registre-se</string>
     <string name="forgot_password">Esqueceu a senha?</string>
 
-    <!-- Register -->
+    <!-- Registar -->
     <string name="register_title">Criar Conta</string>
     <string name="name">Nome</string>
     <string name="confirm_password">Confirmar Senha</string>
     <string name="register_button">Registrar</string>
     <string name="have_account">Já tem conta? Entre</string>
 
-    <!-- Main -->
+    <!-- Activity Main -->
     <string name="welcome">Bem-vindo(a)</string>
     <string name="logout">Sair</string>
 
-    <!-- Appointments -->
+    <!-- Marcaces -->
     <string name="appointments_title">Consultas</string>
     <string name="no_appointments">Nenhuma consulta agendada</string>
     <string name="add_appointment">Nova Consulta</string>
 
-    <!-- Payments -->
+    <!-- Pagamentos -->
     <string name="payments_title">Pagamentos</string>
     <string name="no_payments">Nenhum pagamento registrado</string>
 
-    <!-- Notes -->
+    <!-- Notas -->
     <string name="notes_title">Notas</string>
     <string name="no_notes">Nenhuma nota disponível</string>
     <string name="add_note">Nova Nota</string>
@@ -48,7 +49,7 @@
     <string name="no_lembretes">Nenhum lembrete disponível</string>
     <string name="add_lembrete">Novo Lembrete</string>
 
-    <!-- Profile -->
+    <!-- Prefile -->
     <string name="profile_title">Perfil</string>
     <string name="edit_profile">Editar Perfil</string>
     <string name="meus_animais">Meus Animais</string>
@@ -57,14 +58,15 @@
     <string name="tv_nome_profile_title">Nome Completo</string>
     <string name="tv_contacto_emergencia_sub_title">Contacto de Emergência</string>
     <string name="tv_clinica_message_title">Clínica VetGestLink 24h</string>
-    <!-- Settings -->
+
+    <!-- Definições -->
     <string name="settings_title">Configurações</string>
     <string name="notifications">Notificações</string>
     <string name="theme">Tema</string>
     <string name="language">Idioma</string>
     <string name="about">Sobre</string>
 
-    <!-- Common -->
+    <!-- Comuns -->
     <string name="telemovel_vetgest">+351 210 123 456</string>
     <string name="telefone">Telefone</string>
     <string name="morada">Morada</string>
