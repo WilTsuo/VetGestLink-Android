@@ -88,6 +88,7 @@
     <string name="error_email_invalid">Email inválido</string>
     <string name="error_password_mismatch">As senhas não coincidem</string>
     <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
+    <string name="error_api">Não nos conseguimos ligar a API verifique a sua Conexção a internet e API</string>
 
     <string name="campo_obrigatorio">Campo obrigatório</string>
     <string name="nota_guardada">Nota guardada com sucesso</string>
@@ -130,5 +131,7 @@
     <string name="pendente">Pendente</string>
     <string name="pago">Pago</string>
     <string name="todos">Todos</string>
+
+    <string name="warning_icon_description">Ícone de aviso</string>
 </resources>
 

@@ -66,14 +66,47 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.015" />
         <!-- Espaço para carregar os fragments -->
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/top_green_bar"
-            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/warning_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="8dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="#FFCCBC"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintWidth_percent="0.5"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/warning_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/warning_icon_description"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    app:tint="#E92626" />
+
+                <TextView
+                    android:id="@+id/warning_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/error_api"
+                    android:textColor="#D32F2F"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Menu horizontal no fundo da tela -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
