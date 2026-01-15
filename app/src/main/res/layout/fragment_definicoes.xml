@@ -322,7 +322,7 @@
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="4dp"/>
 
                 <LinearLayout
-                    android:id="@+id/btnTerms"
+                    android:id="@+id/btnInformacao"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -333,7 +333,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Termos e Condições"
+                        android:text="Informações Adicionais"
                         android:textSize="16sp"
                         android:textColor="@android:color/black"/>
                     <TextView
@@ -344,28 +344,6 @@
                 </LinearLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="4dp"/>
-
-                <LinearLayout
-                    android:id="@+id/btnPrivacyPolicy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:paddingVertical="12dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Política de Privacidade"
-                        android:textSize="16sp"
-                        android:textColor="@android:color/black"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textColor="@android:color/darker_gray"/>
-                </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

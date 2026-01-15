@@ -635,6 +635,57 @@ public class Singleton {
         addToRequestQueue(request);
     }
 
+    //region ESQUECEU A PASSWORD
+
+    public interface atualizarPalavraPasseCallback {
+        void onSuccess(String message);
+        void onError(String error);
+    }
+
+    public void atualizarPalavraPasse(
+            String accessToken,
+            String palavraPasseAtual,
+            String palavraPasseNova,
+            final atualizarPalavraPasseCallback callback){
+        String url = buildUrl("profile/password?access-token=" + accessToken);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("current_password", palavraPasseAtual);
+            jsonBody.put("new_password", palavraPasseNova);
+        } catch (JSONException e) {
+            callback.onError("Erro ao preparar dados");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonBody,
+                response -> {
+                    try {
+                        boolean success = response.getBoolean("success");
+                        String message = response.optString("message", "Palavra-passe atualizada com sucesso");
+                        if (success) {
+                            callback.onSuccess(message);
+                        } else {
+                            callback.onError(message);
+                        }
+                    } catch (JSONException e) {
+                        callback.onError("Erro ao processar resposta");
+                    }
+                },
+                error -> {
+                    String errorMsg = "Erro ao alterar palavra-passe";
+                    if (error.networkResponse != null) {
+                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
+                    }
+                    callback.onError(errorMsg);
+                }
+        );
+
+        addToRequestQueue(request);
+    }
     //endregion
 
     //region Gestao de Animais e handler de informação associada

@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
+
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -28,13 +32,13 @@ import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.activities.LoginActivity;
 
 public class DefinicoesFragment extends Fragment {
-
     private TextInputEditText etServerUrl;
     private SwitchMaterial switchNotifications;
     private SharedPreferences sharedPreferences;
-
+    private final static String SITE_CONTACTO = "http://172.22.21.220/frontend/web/site/contact";
+    private final static String SITE_LOGIN = "http://172.22.21.220/frontend/web/site/login";
+    private final static String SITE_INFORMACAO = "http://172.22.21.220/frontend/web/site/information";
     private static final String PREFS_NAME = "VetGestLinkPrefs";
-    // KEY_API_URL removida pois o Singleton gere o URL com a chave "main_url"
     private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -47,7 +51,8 @@ public class DefinicoesFragment extends Fragment {
                 }
             });
 
-    public DefinicoesFragment() { /* Required empty public constructor */ }
+    // Construtor vazio obrigatório
+    public DefinicoesFragment() {  }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,15 +120,27 @@ public class DefinicoesFragment extends Fragment {
             });
         });
 
+        // Botão de Alterar Palavra-Passe
+        setupClick(view, R.id.btnChangePassword, v -> abrirDialogNovaPassword());
+
+        // Botão Dados Pessoais
+        setupClick(view, R.id.btnPersonalData, v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_LOGIN));
+            startActivity(browserIntent);
+        });
+
+        // Botão Reportar Problema - Abre link externo
+        setupClick(view, R.id.btnReportProblem, v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_CONTACTO));
+            startActivity(browserIntent);
+        });
+        // Botão Termos e Condições - Abre link externo
+        setupClick(view, R.id.btnInformacao, v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_INFORMACAO));
+            startActivity(browserIntent);
+        });
         // Listener Logout
         setupClick(view, R.id.btnLogout, v -> performLogout());
-
-        // Botões de Navegação
-        setupClick(view, R.id.btnChangePassword, v -> showToast("Funcionalidade: Alterar Senha"));
-        setupClick(view, R.id.btnPersonalData, v -> showToast("Funcionalidade: Dados Pessoais"));
-        setupClick(view, R.id.btnReportProblem, v -> showToast("Funcionalidade: Reportar Problema"));
-        setupClick(view, R.id.btnTerms, v -> showToast("Funcionalidade: Termos e Condições"));
-        setupClick(view, R.id.btnPrivacyPolicy, v -> showToast("Funcionalidade: Política de Privacidade"));
     }
 
     private void performLogout() {
@@ -169,4 +186,62 @@ public class DefinicoesFragment extends Fragment {
     private void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
+
+    private void abrirDialogNovaPassword() {
+        // Verifica se o contexto é nulo
+        if (getContext() == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_esqueceu_pass, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
+
+        // Referências do Dialog
+        final TextInputEditText etPalavraPasseAtual = dialogView.findViewById(R.id.etPalavraPasseAtual);
+        final TextInputEditText etNovaPalavraPasse = dialogView.findViewById(R.id.etNovaPalavraPasse);
+        MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        MaterialButton btnGuardar = dialogView.findViewById(R.id.btnGuardar);
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnGuardar.setOnClickListener(v -> {
+            // Obter o token de acesso
+            String token = Singleton.getInstance(requireContext()).getAccessToken();
+
+            // Verifica se o token é nulo
+            if (token == null) return;
+
+            // Capturar valores
+            String palavraPasseAtual = etPalavraPasseAtual.getText().toString();
+            String palavraPasseNova = etNovaPalavraPasse.getText().toString();
+
+            Singleton.getInstance(requireContext()).atualizarPalavraPasse(
+                    token,
+                    palavraPasseAtual,
+                    palavraPasseNova,
+                    new Singleton.atualizarPalavraPasseCallback() {
+                        @Override
+                        public void onSuccess(String message) {
+                            if (!isAdded()) return;
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            if (!isAdded()) return;
+                            Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                        }
+                    }
+            );
+        });
+
+        dialog.show();
+    }
+
+
+
+
 }
