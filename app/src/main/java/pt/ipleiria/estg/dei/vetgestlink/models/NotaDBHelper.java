@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class NotaDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "vetgestlink.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_NAME = "notas";
     private static final String COL_ID = "id";
