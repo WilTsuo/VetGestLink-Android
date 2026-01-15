@@ -11,19 +11,27 @@ public class Animal {
     private int microchip;
     private String foto_url;
     private String datanascimento;
+    private int userprofiles_id;
+    private String created_at;
+    private String updated_at;
 
     public Animal() {}
 
-    public Animal(String nome, String especie, String raca, String idade, double peso, String sexo, int microchip, String foto_url, String datanascimento) {
+    public Animal(String nome, String especie, String raca, String idade, double peso, String sexo, int microchip, String foto_url, String datanascimento, int userprofiles_id, String created_at, String updated_at) {
+  
+        this.id = id;
         this.nome = nome;
         this.especie = especie;
         this.raca = raca;
         this.idade = idade;
         this.peso = peso;
         this.sexo = sexo;
+        this.datanascimento = datanascimento;
         this.microchip = microchip;
         this.foto_url = foto_url;
-        this.datanascimento = datanascimento;
+        this.userprofiles_id = userprofiles_id;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
     }
 
     public int getId() { return id; }
@@ -57,4 +65,13 @@ public class Animal {
 
     public String getDtanascimento() { return datanascimento; }
     public void setDtanascimento(String datanascimento) { this.datanascimento = datanascimento; }
+
+    public int getUserprofilesId() { return userprofiles_id; }
+    public void setUserprofilesId(int userprofiles_id) { this.userprofiles_id = userprofiles_id; }
+
+    public String getCreatedAt() { return created_at; }
+    public void setCreatedAt(String created_at) { this.created_at = created_at; }
+
+    public String getUpdatedAt() { return updated_at; }
+    public void setUpdatedAt(String updated_at) { this.updated_at = updated_at; }
 }

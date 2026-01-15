@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.vetgestlink.models;
+package pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
+import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
+
 public class MarcacaoDBHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "marcacoes_db";
+    private static final String DB_NAME = "Marcacoes.db";
     private static final int DB_VERSION = 3;
     private static final String TABLE_NAME = "marcacoes";
 
