@@ -1,137 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">VetGestLink</string>
-    <string name="fragment_name"></string>
-
-    <!-- Navegação -->
-    <string name="nav_appointments">Consultas</string>
-    <string name="nav_payments">Pagamentos</string>
-    <string name="nav_notes">Notas</string>
-    <string name="nav_profile">Perfil</string>
-    <string name="nav_settings">Configurações</string>
+    <string name="fragment_name"> </string>
+    <string name="logo_description">Logo VetGestLink</string>
+    <string name="app_subtitle">Gestão Veterinária Completa</string>
 
     <!-- Login -->
-    <string name="login_title">Bem-vindo</string>
-    <string name="password">Senha</string>
+    <string name="username_hint">Nome de utilizador</string>
+    <string name="password_hint">Palavra-passe</string>
+    <string name="remember_me">Lembrar-me</string>
+    <string name="forgot_password">Esqueceu-se da palavra-passe?</string>
     <string name="login_button">Entrar</string>
-    <string name="register_link">Não tem conta? Registre-se</string>
-    <string name="forgot_password">Esqueceu a senha?</string>
-
-    <!-- Registar -->
-    <string name="register_title">Criar Conta</string>
-    <string name="name">Nome</string>
-    <string name="confirm_password">Confirmar Senha</string>
-    <string name="register_button">Registrar</string>
-    <string name="have_account">Já tem conta? Entre</string>
-
-    <!-- Activity Main -->
-    <string name="welcome">Bem-vindo(a)</string>
-    <string name="logout">Sair</string>
-
-    <!-- Marcaces -->
-    <string name="appointments_title">Consultas</string>
-    <string name="no_appointments">Nenhuma consulta agendada</string>
-    <string name="add_appointment">Nova Consulta</string>
-
-    <!-- Pagamentos -->
-    <string name="payments_title">Pagamentos</string>
-    <string name="no_payments">Nenhum pagamento registrado</string>
+    <string name="or">ou</string>
+    <string name="no_account">Não tem conta?</string>
+    <string name="request_access">Solicitar acesso</string>
+    <string name="copyright">Copyright</string>
+    <string name="all_rights_reserved">Todos os direitos reservados</string>
 
     <!-- Notas -->
-    <string name="notes_title">Notas</string>
-    <string name="no_notes">Nenhuma nota disponível</string>
-    <string name="add_note">Nova Nota</string>
     <string name="escolha_animal">Escolha um animal</string>
+    <string name="add_note">Nova Nota</string>
+    <string name="campo_obrigatorio">Campo obrigatório</string>
+    <string name="nota_guardada">Nota guardada com sucesso</string>
 
-    <!-- Lembretes -->
-    <string name="lembretes_title">Lembretes</string>
-    <string name="ver_lembretes">Ver Todos os Lembretes</string>
-    <string name="no_lembretes">Nenhum lembrete disponível</string>
-    <string name="add_lembrete">Novo Lembrete</string>
+    <!-- Marcações/Lembretes -->
+    <string name="add_appointment">Nova Marcação</string>
 
-    <!-- Prefile -->
-    <string name="profile_title">Perfil</string>
-    <string name="edit_profile">Editar Perfil</string>
+    <!-- Definições -->
+    <string name="url_desc">Botão Mudar URL</string>
+
+    <!-- Perfil -->
     <string name="meus_animais">Meus Animais</string>
     <string name="animais_registados">0 animais registados</string>
     <string name="dados_proprietario">Dados do Proprietário</string>
     <string name="tv_nome_profile_title">Nome Completo</string>
     <string name="tv_contacto_emergencia_sub_title">Contacto de Emergência</string>
     <string name="tv_clinica_message_title">Clínica VetGestLink 24h</string>
-
-    <!-- Definições -->
-    <string name="settings_title">Configurações</string>
-    <string name="notifications">Notificações</string>
-    <string name="theme">Tema</string>
-    <string name="language">Idioma</string>
-    <string name="about">Sobre</string>
-
-    <!-- Comuns -->
+    <string name="ver_lembretes">Ver Todos os Lembretes</string>
     <string name="telemovel_vetgest">+351 210 123 456</string>
-    <string name="telefone">Telefone</string>
-    <string name="morada">Morada</string>
-    <string name="email">Email</string>
-    <string name="save">Salvar</string>
-    <string name="cancel">Cancelar</string>
-    <string name="delete">Excluir</string>
-    <string name="edit">Editar</string>
-    <string name="ok">OK</string>
-    <string name="error">Erro</string>
-    <string name="loading">Carregando...</string>
-    <string name="success">Sucesso</string>
 
-
-    <!-- Error messages -->
-    <string name="error_network">Erro de conexão. Verifique sua internet.</string>
-    <string name="error_login">Email ou senha inválidos</string>
-    <string name="error_required_fields">Por favor, preencha todos os campos</string>
-    <string name="error_email_invalid">Email inválido</string>
-    <string name="error_password_mismatch">As senhas não coincidem</string>
-    <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
-    <string name="error_api">Não nos conseguimos ligar a API verifique a sua Conexção a internet e API</string>
-
-    <string name="campo_obrigatorio">Campo obrigatório</string>
-    <string name="nota_guardada">Nota guardada com sucesso</string>
-
-    <string name="logo_description">Logo VetgGestLink</string>
-    <string name="app_subtitle">Gestão Veterinária Completa</string>
-    <string name="username_hint">Nome de usuário</string>
-    <string name="password_hint">Senha</string>
-    <string name="remember_me">Lembrar-me</string>
-    <string name="or">ou</string>
-    <string name="no_account">Não tem conta?</string>
-    <string name="request_access">Solicitar acesso</string>
-    <string name="copyright">Copyright</string>
-    <string name="all_rights_reserved">Todos os direitos reservados</string>
-    <string name="appointments_subtitle">Subtítulo das marcações</string>
-    <string name="search_appointments_hint">Pesquisar marcações</string>
-    <string name="filter_all">Todos</string>
-    <string name="filter_scheduled">Agendados</string>
-    <string name="filter_completed">Concluídos</string>
-    <string name="appointments_list_description">Lista de marcações</string>
-    <string name="editar">Editar</string>
-    <string name="excluir">Excluir</string>
-    <string name="data">Data</string>
-    <string name="url_desc">Botão Mudar URL</string>
-
-    <string name="marcacoes">Consultas</string>
-    <string name="pagamentos">Pagamentos</string>
-    <string name="notas">Notas</string>
-    <string name="perfil">Perfil</string>
-    <string name="definicoes">Definições</string>
+    <!-- Pagamentos -->
     <string name="fatura">Fatura</string>
-    <string name="status">Status</string>
+    <string name="status">Estado</string>
     <string name="descri_o">Descrição</string>
     <string name="preco">€ 0.00</string>
     <string name="m_todo_de_pagamento">Método de pagamento:</string>
     <string name="emitida">Emitida:</string>
     <string name="pagar_agora">Pagar Agora</string>
-    <string name="metodo_pagamento">Metodo pagamento</string>
+    <string name="metodo_pagamento">Método de pagamento</string>
     <string name="resumo_financeiro">$ Resumo Financeiro</string>
     <string name="pendente">Pendente</string>
     <string name="pago">Pago</string>
     <string name="todos">Todos</string>
 
+    <!-- Comuns -->
+    <string name="telefone">Telefone</string>
+    <string name="morada">Morada</string>
+    <string name="email">Email</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="edit">Editar</string>
+    <string name="loading">A carregar…</string>
+    <string name="editar">Editar</string>
+    <string name="excluir">Eliminar</string>
+    <string name="data">Data</string>
+
+    <!-- Error messages -->
+    <string name="error_api">Não foi possível ligar à API. Verifique a sua ligação à Internet.</string>
+
+    <!-- Warning messages -->
     <string name="warning_icon_description">Ícone de aviso</string>
 </resources>
 

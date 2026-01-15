@@ -2,16 +2,23 @@ package pt.ipleiria.estg.dei.vetgestlink.view.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.os.Looper;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import pt.ipleiria.estg.dei.vetgestlink.R;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.DefinicoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.LembretesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.MarcacoesFragment;
@@ -22,8 +29,14 @@ import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PerfilFragment;
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+    private CardView warningBar;
+    private Handler handler;
+    private Runnable apiCheckRunnable;
+    private ConnectivityManager.NetworkCallback networkCallback;
+
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
+    private static final int API_CHECK_INTERVAL = 10000; // 10 segundos
 
     // Metodo onCreate onde tudo começa e tudo é inicializado.
     @Override
@@ -33,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar o menu que fica em baixo "bottomNavigationView"
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        // Inicializar a barra de aviso
+        warningBar = findViewById(R.id.warning_bar);
+
+        // Inicializar Handler para verificações periódicas
+        handler = new Handler(Looper.getMainLooper());
 
         // SharedPreferences (uso local)
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -44,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        // Configurar monitoramento de conectividade
+        setupNetworkCallback();
+
+        // Verificar o estado da API e atualizar a barra de aviso
+        updateApiWarningBar();
+
+        // Iniciar verificações periódicas
+        startPeriodicApiCheck();
 
         //tratamento dos fragments para o bottom navigaton view
         Fragment fragment_marcacoes = new MarcacoesFragment();
@@ -94,6 +122,106 @@ public class MainActivity extends AppCompatActivity {
 
         TextView toolbarSubtitle = findViewById(R.id.toolbar_subtitle);
         toolbarSubtitle.setText("Lembretes");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Atualizar o estado da barra sempre que a activity voltar ao primeiro plano
+        updateApiWarningBar();
+        // Reiniciar verificações periódicas
+        startPeriodicApiCheck();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Parar verificações periódicas quando a activity não está visível
+        stopPeriodicApiCheck();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remover NetworkCallback
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                cm.unregisterNetworkCallback(networkCallback);
+            }
+        }
+        // Parar verificações periódicas
+        stopPeriodicApiCheck();
+    }
+
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // Quando a rede ficar disponível, verificar a API
+                updateApiWarningBar();
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // Quando perder a rede, mostrar a barra imediatamente
+                runOnUiThread(() -> {
+                    if (warningBar != null) {
+                        warningBar.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        cm.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    private void startPeriodicApiCheck() {
+        // Parar qualquer verificação anterior
+        stopPeriodicApiCheck();
+
+        // Criar Runnable para verificação periódica
+        apiCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateApiWarningBar();
+                // Agendar próxima verificação
+                handler.postDelayed(this, API_CHECK_INTERVAL);
+            }
+        };
+
+        // Iniciar verificações periódicas
+        handler.postDelayed(apiCheckRunnable, API_CHECK_INTERVAL);
+    }
+
+    private void stopPeriodicApiCheck() {
+        if (handler != null && apiCheckRunnable != null) {
+            handler.removeCallbacks(apiCheckRunnable);
+        }
+    }
+
+    private void updateApiWarningBar() {
+        // Verificar o estado da API com o Singleton
+        Singleton.getInstance(this).updateApiState(this, responding -> {
+            runOnUiThread(() -> {
+                if (warningBar != null) {
+                    if (responding) {
+                        // API disponível - esconder a barra
+                        warningBar.setVisibility(View.GONE);
+                    } else {
+                        // API indisponível - mostrar a barra
+                        warningBar.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        });
     }
 
 }
