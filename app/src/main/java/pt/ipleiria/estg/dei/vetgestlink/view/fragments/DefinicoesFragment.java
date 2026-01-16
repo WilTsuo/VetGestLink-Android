@@ -227,6 +227,8 @@ public class DefinicoesFragment extends Fragment {
                             if (!isAdded()) return;
                             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
+                            // Efetuar logout após alteração de palavra-passe
+                            performLogout();
                         }
 
                         @Override
