@@ -3,6 +3,10 @@ package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -29,7 +33,7 @@ import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.NotasAdapter;
 
-public class NotasFragment extends Fragment {
+public class NotasFragment extends Fragment implements Singleton.ApiStateChangeListener {
 
     private MaterialAutoCompleteTextView autoCompleteAnimal;
     private RecyclerView recyclerNotas;
@@ -38,6 +42,7 @@ public class NotasFragment extends Fragment {
     private List<Animal> animais = new ArrayList<>();
     private List<Nota> notas = new ArrayList<>();
     private MaterialButton btnAddNota;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_ACCESS_TOKEN = "access_token";
@@ -60,15 +65,16 @@ public class NotasFragment extends Fragment {
         notasAdapter = new NotasAdapter(notas, currentUserId);
         recyclerNotas.setAdapter(notasAdapter);
 
-        updateApiState();
+        // Registrar listener no Singleton para mudanças de estado da API
+        Singleton.getInstance(requireContext()).addApiStateChangeListener(this);
 
-        // verificar disponibilidade de rede/API e aplicar estado
+        // Setup NetworkCallback para reagir instantaneamente a mudanças de rede
+        setupNetworkCallback();
+
+        // Ler estado atual da API (não faz chamada HTTP, apenas lê SharedPreferences)
         boolean apiOk = Singleton.getInstance(requireContext()).getApiAvailable();
-        notasAdapter.setApiAvailable(apiOk);
+        applyApiState(apiOk);
 
-        // aplica estado ao botão do fragment
-        btnAddNota.setEnabled(apiOk);
-        btnAddNota.setAlpha(apiOk ? 1f : 0.5f);
         btnAddNota.setOnClickListener(v -> {
             if (!Singleton.getInstance(requireContext()).getApiAvailable()) {
                 Toast.makeText(requireContext(), "Houve um problema na Ligação a API, verifique a sua conexao a Internet", Toast.LENGTH_SHORT).show();
@@ -104,6 +110,7 @@ public class NotasFragment extends Fragment {
                 loadNotasForAnimal(getAccessToken(), selected.getId());
             }
         });
+
         loadAnimaisAndNotas();
         return root;
     }
@@ -213,12 +220,29 @@ public class NotasFragment extends Fragment {
             carregarNotasCache(finalAnimalName);
             return;
         }
-        ArrayList<Nota> cached = Singleton.getInstance(requireContext())
-                .getNotasByAnimalNome(finalAnimalName);
 
-        notas.clear();
-        if (cached != null) notas.addAll(cached);
-        notasAdapter.updateList(notas);
+        // Busca da API para obter dados atualizados
+        Singleton.getInstance(requireContext()).getTodasNotas(token, new Singleton.NotasCallback() {
+            @Override
+            public void onSuccess(List<Nota> todasNotas) {
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    notas.clear();
+                    for (Nota n : todasNotas) {
+                        if (n.getAnimalNome() != null && n.getAnimalNome().equals(finalAnimalName)) {
+                            notas.add(n);
+                        }
+                    }
+                    notasAdapter.updateList(notas);
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                // Se falhar, carrega do cache
+                carregarNotasCache(finalAnimalName);
+            }
+        });
     }
 
     private void carregarNotasCache(String animalName) {
@@ -286,8 +310,8 @@ public class NotasFragment extends Fragment {
                 public void onSuccess(String message) {
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(requireContext(), getString(R.string.nota_guardada), Toast.LENGTH_SHORT).show();
-                        loadNotasForAnimal(token, animalId); // Recarrega as notas do animal
                         dialog.dismiss();
+                        loadNotasForAnimal(token, animalId); // Recarrega as notas do animal
                     });
                 }
 
@@ -309,10 +333,70 @@ public class NotasFragment extends Fragment {
         }
     }
 
-    private void updateApiState() {
-        Singleton.getInstance(requireContext()).updateApiState(requireContext(), responding -> {
-            if (getActivity() == null) return;
-            requireActivity().runOnUiThread(() -> applyApiState(responding));
-        });
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // Quando a rede ficar disponível, verificar a API rapidamente
+                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> applyApiState(responding));
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // Quando perder a rede, desabilitar imediatamente
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        applyApiState(false);
+                        // Carregar do cache
+                        String selectedName = autoCompleteAnimal.getText() != null ? autoCompleteAnimal.getText().toString() : "";
+                        if (!selectedName.isEmpty() && !animais.isEmpty()) {
+                            for (Animal a : animais) {
+                                if (a.getNome() != null && a.getNome().equals(selectedName)) {
+                                    carregarNotasCache(a.getNome());
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        cm.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    @Override
+    public void onApiStateChanged(boolean available) {
+        // Callback do Singleton quando o estado da API muda
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> applyApiState(available));
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Remover listener do Singleton
+        Singleton.getInstance(requireContext()).removeApiStateChangeListener(this);
+
+        // Remover NetworkCallback
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                cm.unregisterNetworkCallback(networkCallback);
+            }
+        }
     }
 }

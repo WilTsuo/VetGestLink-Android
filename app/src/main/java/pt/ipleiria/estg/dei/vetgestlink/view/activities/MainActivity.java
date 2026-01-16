@@ -209,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateApiWarningBar() {
-        // Verificar o estado da API com o Singleton
-        Singleton.getInstance(this).updateApiState(this, responding -> {
+        // Verificar o estado da API com o Singleton (verificação rápida com cache)
+        Singleton.getInstance(this).quickCheckApiState(this, responding -> {
             runOnUiThread(() -> {
                 if (warningBar != null) {
                     if (responding) {

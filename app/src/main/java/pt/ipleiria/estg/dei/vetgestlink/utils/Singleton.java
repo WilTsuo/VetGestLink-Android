@@ -89,6 +89,12 @@ public class Singleton {
     private LembretesListener LembretesListener;
     private MetodosPagamentoListener MetodosPagamentoListener;
     private SharedPreferences sharedPreferences;
+
+    // Listener para mudanças no estado da API
+    public interface ApiStateChangeListener {
+        void onApiStateChanged(boolean available);
+    }
+    private final List<ApiStateChangeListener> apiStateListeners = new ArrayList<>();
     //endregion
 
     //region Setters Listeners
@@ -126,6 +132,16 @@ public class Singleton {
 
     public void setMetodosPagamentoListener(MetodosPagamentoListener metodosPagamentoListener) {
         MetodosPagamentoListener = metodosPagamentoListener;
+    }
+
+    public void addApiStateChangeListener(ApiStateChangeListener listener) {
+        if (listener != null && !apiStateListeners.contains(listener)) {
+            apiStateListeners.add(listener);
+        }
+    }
+
+    public void removeApiStateChangeListener(ApiStateChangeListener listener) {
+        apiStateListeners.remove(listener);
     }
     //endregion
 
@@ -903,6 +919,7 @@ public class Singleton {
                     } else if (error.getMessage() != null) {
                         errorMsg += ": " + error.getMessage();
                     }
+                    Log.e(TAG_LEMBRETES, errorMsg);
                     if (callback != null) callback.onError(errorMsg);
                 }
         );
@@ -1043,9 +1060,9 @@ public class Singleton {
                     if (callback != null) callback.onResult(false);
                 });
 
-        // timeout curto para considerar a API inacessível rapidamente
+        // timeout super curto para resposta rápida (200ms = imperceptível)
         request.setRetryPolicy(new DefaultRetryPolicy(
-                3000, // timeout em ms
+                200, // timeout em ms (reduzido de 300 para 200)
                 0, // sem retries
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -1055,7 +1072,21 @@ public class Singleton {
     // Guardar o estado da API nas SharedPreferences
     private void setApiAvailable(boolean available) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean wasAvailable = prefs.getBoolean(KEY_API_AVAILABLE, true);
         prefs.edit().putBoolean(KEY_API_AVAILABLE, available).apply();
+
+        // Notificar listeners se o estado mudou
+        if (wasAvailable != available) {
+            notifyApiStateChange(available);
+        }
+    }
+
+    private void notifyApiStateChange(boolean available) {
+        for (ApiStateChangeListener listener : apiStateListeners) {
+            if (listener != null) {
+                listener.onApiStateChanged(available);
+            }
+        }
     }
 
     // Obter o estado da API das SharedPreferences (por defeito é true)
@@ -1074,6 +1105,33 @@ public class Singleton {
         }
 
         // Se houver rede, verifica o endpoint /health
+        isApiResponding(callback);
+    }
+
+    // Verificação rápida: primeiro rede (instantâneo), depois API (se necessário)
+    public void quickCheckApiState(Context context, final ApiHealthCallback callback) {
+        // 1. Verificação instantânea de rede
+        if (!isNetworkAvailable(context)) {
+            // Sem rede = sem API, resposta instantânea
+            setApiAvailable(false);
+            if (callback != null) callback.onResult(false);
+            return;
+        }
+
+        // 2. Tem rede, mas vamos verificar se a última verificação da API foi recente
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        long lastCheck = prefs.getLong("last_api_check", 0);
+        long now = System.currentTimeMillis();
+        boolean cachedState = prefs.getBoolean(KEY_API_AVAILABLE, true);
+
+        // Se verificou há menos de 3 segundos, usa o cache (super rápido)
+        if (now - lastCheck < 3000) {
+            if (callback != null) callback.onResult(cachedState);
+            return;
+        }
+
+        // 3. Faz verificação real da API com timeout curto
+        prefs.edit().putLong("last_api_check", now).apply();
         isApiResponding(callback);
     }
 

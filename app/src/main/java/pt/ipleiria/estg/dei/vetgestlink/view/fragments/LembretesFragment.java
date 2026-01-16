@@ -74,7 +74,7 @@ public class LembretesFragment extends Fragment {
 
             @Override
             public void onError(String error) {
-                Toast.makeText(getContext(), "Erro: " + error, Toast.LENGTH_SHORT).show();
+                android.util.Log.e("Vetgetlink-LembretesService", error);
             }
         });
     }

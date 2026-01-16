@@ -89,18 +89,26 @@ public class Nota {
      * Retorna um título extraído da nota (primeiras palavras ou primeiros 50 caracteres)
      */
     public String getTitulo() {
-        if (titulo != null && !titulo.isEmpty()) return titulo;
+        if (titulo != null && !titulo.isEmpty()) {
+            if (titulo.length() > 50) {
+                int lastSpace = titulo.substring(0, 50).lastIndexOf(' ');
+                if (lastSpace > 0) {
+                    return titulo.substring(0, lastSpace) + "...";
+                }
+                return titulo.substring(0, 50) + "...";
+            }
+            return titulo;
+        }
 
         if (nota != null && !nota.isEmpty()) {
-            int maxLength = Math.min(50, nota.length());
-            String tituloExtraido = nota.substring(0, maxLength);
-
             if (nota.length() > 50) {
-                int lastSpace = tituloExtraido.lastIndexOf(' ');
-                if (lastSpace > 0) tituloExtraido = tituloExtraido.substring(0, lastSpace);
+                int lastSpace = nota.substring(0, 50).lastIndexOf(' ');
+                if (lastSpace > 0) {
+                    return nota.substring(0, lastSpace) + "...";
+                }
+                return nota.substring(0, 50) + "...";
             }
-
-            return tituloExtraido;
+            return nota;
         }
 
         return "";
