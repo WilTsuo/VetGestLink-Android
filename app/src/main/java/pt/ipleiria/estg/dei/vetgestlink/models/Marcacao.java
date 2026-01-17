@@ -6,18 +6,18 @@ public class Marcacao {
     private String data;          // DATE (YYYY-MM-DD)
     private String horaInicio;    // TIME (HH:MM:SS)
     private String horaFim;       // TIME (HH:MM:SS)
-    private String estado;        // enum or varchar
-    private int duracaoMinutos;  // duration in minutes (not in original but could be useful)
+    private String estado;        //varchar
+    private int duracaoMinutos;   // duration in minutes
     private String diagnostico;
     private String servicoNome;
     private String animalNome;
     private String animalEspecie;
+    private String animalRaca;
+    private String animalGenero;
 
-
-
-
-    // Constructor
-    public Marcacao(int id, String data, String horaInicio, String horaFim, String estado, int duracaoMinutos, String diagnostico, String servicoNome, String animalNome, String animalEspecie) {
+    public Marcacao(int id, String data, String horaInicio, String horaFim, String estado,
+                    int duracaoMinutos, String diagnostico, String servicoNome,
+                    String animalNome, String animalEspecie, String animalRaca, String animalGenero) {
         this.id = id;
         this.data = data;
         this.horaInicio = horaInicio;
@@ -28,14 +28,17 @@ public class Marcacao {
         this.servicoNome = servicoNome;
         this.animalNome = animalNome;
         this.animalEspecie = animalEspecie;
+        this.animalRaca = animalRaca;
+        this.animalGenero = animalGenero;
     }
 
-    // Getters
+    // Getters e Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public String getData() { return data; }
     public void setData(String data) { this.data = data; }
+
     public String getHoraInicio() {
         if (horaInicio != null && horaInicio.length() >= 5) {
             return horaInicio.substring(0, 5);
@@ -65,5 +68,9 @@ public class Marcacao {
     public String getAnimalEspecie() { return animalEspecie; }
     public void setAnimalEspecie(String animalEspecie) { this.animalEspecie = animalEspecie; }
 
-}
+    public String getAnimalRaca() { return animalRaca; }
+    public void setAnimalRaca(String animalRaca) { this.animalRaca = animalRaca; }
 
+    public String getAnimalGenero() { return animalGenero; }
+    public void setAnimalGenero(String animalGenero) { this.animalGenero = animalGenero; }
+}

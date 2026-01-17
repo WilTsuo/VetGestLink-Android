@@ -310,7 +310,7 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
             String token = getAccessToken();
             final int animalId = selectedAnimal.getId();
 
-            Singleton.getInstance(requireContext()).criarNota(token, animalId, descricao, new Singleton.MessageCallback() {
+            Singleton.getInstance(requireContext()).criarNota(token, animalId, descricao, new Singleton.CriarNotaCallback() {
                 @Override
                 public void onSuccess(String message) {
                     requireActivity().runOnUiThread(() -> {

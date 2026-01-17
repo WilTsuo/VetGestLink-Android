@@ -122,7 +122,7 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
 
             String token = getAccessToken(context);
             // Certifique-se que no Singleton existe apenas UM método atualizarLembrete
-            Singleton.getInstance(context).atualizarLembrete(token, lembrete.getId(), descricao, new Singleton.MessageCallback() {
+            Singleton.getInstance(context).atualizarLembrete(token, lembrete.getId(), descricao, new Singleton.CriarLembreteCallback() {
                 @Override
                 public void onSuccess(String message) {
                     Toast.makeText(context, "Lembrete atualizado", Toast.LENGTH_SHORT).show();
@@ -154,7 +154,7 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
                     String token = getAccessToken(context);
 
                     // CORREÇÃO: O método no Singleton chama-se 'deletarLembrete', não 'deletarLembreteAPI'
-                    Singleton.getInstance(context).deletarLembrete(token, lembrete.getId(), new Singleton.MessageCallback() {
+                    Singleton.getInstance(context).deletarLembrete(token, lembrete.getId(), new Singleton.EliminarLembreteCallback() {
                         @Override
                         public void onSuccess(String message) {
                             Toast.makeText(context, "Lembrete eliminado", Toast.LENGTH_SHORT).show();

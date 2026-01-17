@@ -9,8 +9,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MqttHandler {
 
+    //Instância do cliente MQTT para aceder aos metodos de publicação e subscrição
     private MqttClient client;
 
+    //Faz a conexão ao broker MQTT
     public void connect(String brokerUrl, String clientId) {
         try {
             MemoryPersistence persistence = new MemoryPersistence();
@@ -24,6 +26,7 @@ public class MqttHandler {
         }
     }
 
+    //Desconecta do broker MQTT
     public void disconnect() {
         try {
             if (client != null && client.isConnected()) {
@@ -34,6 +37,8 @@ public class MqttHandler {
         }
     }
 
+    //Publica uma mensagem num tópico específico (Não foi usado no serviço)
+    //Mas pode ser útil futuramente se caso nossa aplicação queira enviar mensagens no MQTT para o webservice
     public void publish(String topic, String message) {
         try {
             if (client != null && client.isConnected()) {
@@ -45,6 +50,7 @@ public class MqttHandler {
         }
     }
 
+    //Subscreve um tópico específico para receber mensagens
     public void subscribe(String topic) {
         try {
             if (client != null && client.isConnected()) {
@@ -61,6 +67,7 @@ public class MqttHandler {
         }
     }
 
+    //Verifica se o cliente está conectado ao broker MQTT
     public boolean isConnected() {
         return client != null && client.isConnected();
     }

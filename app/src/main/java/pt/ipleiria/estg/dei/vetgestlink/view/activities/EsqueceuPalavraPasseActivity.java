@@ -25,7 +25,7 @@ public class EsqueceuPalavraPasseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_esqueceu_palavra_pass);
 
         // 1. Inicializar as Views com os IDs EXATOS do seu XML
-        etEmail = findViewById(R.id.editTextEmail); // ID corrigido
+        etEmail = findViewById(R.id.editTextEmail);
         Button btnSend = findViewById(R.id.buttonSendReset);
         Button btnBack = findViewById(R.id.buttonBackToLogin);
 

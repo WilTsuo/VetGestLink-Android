@@ -11,9 +11,6 @@ public class Nota {
     private String autor;
     private String titulo;
 
-
-
-    // Constructor
     public Nota(int id, String nota, String createdAt, String updatedAt, String animalNome, String autor, String titulo,Integer userprofileId) {
         this.id = id;
         this.nota = nota;
@@ -82,8 +79,6 @@ public class Nota {
     public void setAutor(String autor) {
         this.autor = autor;
     }
-
-    //region - Helper Methods
 
     /**
      * Retorna um título extraído da nota (primeiras palavras ou primeiros 50 caracteres)

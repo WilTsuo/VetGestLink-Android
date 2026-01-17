@@ -11,9 +11,6 @@ public class MarcacaoJsonParser {
 
     private static final String TAG = "MarcacaoJsonParser";
 
-    /**
-     * Converte um JSONArray de marcações numa lista de objetos Marcacao.
-     */
     public static ArrayList<Marcacao> parseMarcacoes(JSONArray response) {
         ArrayList<Marcacao> marcacoes = new ArrayList<>();
         if (response == null) return marcacoes;
@@ -21,7 +18,7 @@ public class MarcacaoJsonParser {
         for (int i = 0; i < response.length(); i++) {
             try {
                 JSONObject obj = response.getJSONObject(i);
-                Marcacao m = parseMarcacao(obj); // Reutiliza o método auxiliar
+                Marcacao m = parseMarcacao(obj);
                 if (m != null) {
                     marcacoes.add(m);
                 }
@@ -32,10 +29,6 @@ public class MarcacaoJsonParser {
         return marcacoes;
     }
 
-    /**
-     * Método auxiliar para converter um único JSONObject em Marcacao.
-     * Usado tanto pela lista quanto pelos detalhes.
-     */
     public static Marcacao parseMarcacao(JSONObject response) {
         try {
             Marcacao marcacao = new Marcacao(
@@ -47,24 +40,55 @@ public class MarcacaoJsonParser {
                     response.optInt("duracao_minutos", 0),
                     response.optString("diagnostico", ""),
                     response.optString("servico_nome", ""),
-                    "", // Placeholder Animal Nome
-                    ""  // Placeholder Animal Espécie
+                    "", // Placeholder Nome
+                    "", // Placeholder Espécie
+                    "", // Placeholder Raça
+                    ""  // Placeholder Género
             );
 
-            // Parse do objeto Animal aninhado
+            String nome = "";
+            String especie = "";
+            String raca = "";
+            String sexo = "";
+
+            // 1. Tenta obter do objeto aninhado "animal" (comum em view/detalhes)
             JSONObject animalObj = response.optJSONObject("animal");
+
             if (animalObj != null) {
-                marcacao.setAnimalNome(animalObj.optString("nome", "N/A"));
-
-                String especie = animalObj.optString("especie", "");
-                String raca = animalObj.optString("raca", "");
-
-                if (!raca.isEmpty() && !raca.equalsIgnoreCase("null")) {
-                    marcacao.setAnimalEspecie(especie + " (" + raca + ")");
-                } else {
-                    marcacao.setAnimalEspecie(especie);
+                nome = animalObj.optString("nome", "N/A");
+                especie = animalObj.optString("especie", "");
+                raca = animalObj.optString("raca", "");
+                sexo = animalObj.optString("sexo", "");
+            } else {
+                // 2. Se não houver objeto aninhado, tenta ler da raiz (comum em listas)
+                // Verifica chaves comuns para o nome do animal
+                if (response.has("animal_nome")) {
+                    nome = response.optString("animal_nome");
+                } else if (response.has("nome") && !response.has("horainicio")) {
+                    // Cuidado: 'nome' pode ser confuso, mas se não for marcação, assumimos animal
+                    nome = response.optString("nome");
                 }
+
+                // Tenta ler outros campos da raiz se existirem
+                especie = response.optString("animal_especie", response.optString("especie", ""));
+                raca = response.optString("animal_raca", response.optString("raca", ""));
+                sexo = response.optString("animal_sexo", response.optString("sexo", ""));
             }
+
+            // Define os valores no objeto
+            marcacao.setAnimalNome(nome != null && !nome.isEmpty() ? nome : "Sem Nome");
+            marcacao.setAnimalEspecie(especie);
+            marcacao.setAnimalRaca(raca != null && !raca.equals("null") ? raca : "-");
+
+            // Lógica de Género
+            if ("M".equalsIgnoreCase(sexo)) {
+                marcacao.setAnimalGenero("Macho");
+            } else if ("F".equalsIgnoreCase(sexo)) {
+                marcacao.setAnimalGenero("Fêmea");
+            } else {
+                marcacao.setAnimalGenero(sexo);
+            }
+
             return marcacao;
 
         } catch (Exception e) {

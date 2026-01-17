@@ -1,10 +1,6 @@
 package pt.ipleiria.estg.dei.vetgestlink.models;
 
 
-/**
- * Model para Perfil do Usuário
- * Baseado na tabela 'userprofiles' do banco de dados
- */
 public class UserProfile {
     
     private int id;
@@ -39,7 +35,6 @@ public class UserProfile {
      *   }
      * }
     **/
-
 
     // Construtor vazio
     public UserProfile() {}
@@ -154,7 +149,6 @@ public class UserProfile {
         }
         return "??";
     }
-
 
     @Override
     public String toString() {

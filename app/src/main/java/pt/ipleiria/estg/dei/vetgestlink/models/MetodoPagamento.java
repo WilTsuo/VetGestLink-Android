@@ -7,8 +7,6 @@ public class MetodoPagamento {
     private String nome;
     private int vigor;
 
-    // Constructor
-
     public MetodoPagamento(int id, String nome, int vigor) {
         this.id = id;
         this.nome = nome;

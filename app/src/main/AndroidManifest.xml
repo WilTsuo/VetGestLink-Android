@@ -11,9 +11,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- Adicione esta permissão específica para Android 14+ -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
+    <!-- Adicione esta permissão específica para Android  -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Forgot Password -->
+        <!-- EsqueceuPalvraPassAcitivity  -->
         <activity
             android:name=".view.activities.EsqueceuPalavraPasseActivity"
             android:exported="false" />
@@ -45,7 +45,7 @@
             android:name=".view.activities.MainActivity"
             android:exported="false" />
 
-        <!-- ATUALIZAÇÃO AQUI: Adicionado foregroundServiceType -->
+        <!-- MqttNotificationService -->
         <service
             android:name=".services.MqttNotificationService"
             android:enabled="true"

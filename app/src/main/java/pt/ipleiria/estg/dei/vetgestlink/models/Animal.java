@@ -46,9 +46,7 @@ public class Animal {
     public String getRaca() { return raca; }
     public void setRaca(String raca) { this.raca = raca; }
 
-    // Getter atualizado
     public String getIdade() { return idade; }
-    // Setter atualizado
     public void setIdade(String idade) { this.idade = idade; }
 
     public double getPeso() { return peso; }
