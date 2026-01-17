@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/consultas"
-        android:title="@string/nav_pagamentos"
+        android:title="@string/nav_marcacoes"
         android:icon="@drawable/ic_consultas_nav"/>
     <item
         android:id="@+id/pagamentos"
@@ -18,6 +18,6 @@
         android:icon="@drawable/ic_perfil_nav"/>
     <item
         android:id="@+id/definicoes"
-        android:title="nav_definicoes"
+        android:title="@string/nav_definicoes"
         android:icon="@drawable/ic_definicoes_nav"/>
 </menu>

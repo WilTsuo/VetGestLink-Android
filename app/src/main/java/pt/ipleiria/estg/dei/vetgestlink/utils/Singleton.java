@@ -45,31 +45,31 @@ import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.AnimalDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.MarcacaoDBHelper;
 
 public class Singleton {
-
-    // region Variáveis, Constantes e Tags
-
-    // Listas em Memória (Cache)
+    //region Listas em Memória (Cache)
     private ArrayList<Marcacao> marcacoes;
     private ArrayList<Nota> notas;
     private ArrayList<Fatura> faturas;
     private ArrayList<Lembrete> lembretes;
     private ArrayList<Animal> animais;
+    // endregion
 
-    // Helpers de Base de Dados (SQLite)
+    //region Helpers de Base de Dados (SQLite)
     private LembreteDBHelper lembretesDB = null;
     private AnimalDBHelper animaisDB = null;
     private NotaDBHelper notasDB = null;
     private MarcacaoDBHelper marcacoesDB = null;
     private FaturaDBHelper faturasDB = null;
+    // endregion
 
-    // Constantes de Preferências e API
+    //region Constantes de Preferências e API
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_MAIN_URL = "main_url";
     private static final String KEY_ACCESS_TOKEN = "access_token";
     private static final String KEY_API_AVAILABLE = "api_available";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
+    // endregion
 
-    // Tags para o Volley (Debugging e Cancelamento)
+    //region Tags para o Volley
     private static final String TAG = "VetGestLink";
     private static final String TAG_ANIMAIS = "Vetgetlink-AnimaisService";
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
@@ -81,18 +81,14 @@ public class Singleton {
     private static final String TAG_MARCACOES = "Vetgetlink-MarcacoesService";
     private static final String TAG_FATURAS = "Vetgetlink-FaturasService";
     private static final String TAG_METODOS_PAGAMENTO = "Vetgetlink-MetodosPagamentoService";
-
     private static Singleton instance;
     private final Context context;
     private RequestQueue requestQueue;
     private String mainUrl;
     private SharedPreferences sharedPreferences;
-
     // endregion
 
-    // region Listeners e Interfaces
-
-    // Listeners da UI
+    //region Listeners da UI
     private AuthListener authListener;
     private NotasListener NotasListener;
     private NotaListener NotaListener;
@@ -102,14 +98,16 @@ public class Singleton {
     private MarcacoesListener MarcacoesListener;
     private LembretesListener LembretesListener;
     private MetodosPagamentoListener MetodosPagamentoListener;
+    //endregion
 
-    // Listener para estado da API
+    //region Listener para estado da API
     public interface ApiStateChangeListener {
         void onApiStateChanged(boolean available);
     }
     private final List<ApiStateChangeListener> apiStateListeners = new ArrayList<>();
+    // endregion
 
-    // Setters para Listeners
+    //region Setters para Listeners
     public void setNotasListener(NotasListener notasListener) { NotasListener = notasListener; }
     public void setAuthListener(AuthListener authListener) { this.authListener = authListener; }
     public void setNotaListener(NotaListener notaListener) { NotaListener = notaListener; }
@@ -124,8 +122,9 @@ public class Singleton {
         if (listener != null && !apiStateListeners.contains(listener)) apiStateListeners.add(listener);
     }
     public void removeApiStateChangeListener(ApiStateChangeListener listener) { apiStateListeners.remove(listener); }
+    // endregion
 
-    // Callbacks para comunicação assíncrona
+    //region Callbacks para comunicação assíncrona
     public interface MarcacoesCallback { void onSuccess(ArrayList<Marcacao> marcacoes); void onError(String error); }
     public interface LembretesCallback { void onSuccess(List<Lembrete> lembretes); void onError(String error); }
     public interface MessageCallback { void onSuccess(String message); void onError(String error); }
@@ -139,11 +138,9 @@ public class Singleton {
     public interface ProfileUpdateCallback { void onSuccess(String message); void onError(String error); }
     public interface ApiHealthCallback { void onResult(boolean responding); }
     public interface atualizarPalavraPasseCallback { void onSuccess(String message); void onError(String error); }
-
     // endregion
 
     // region Construtor e Instanciação
-
     private Singleton(Context context) {
         this.context = context.getApplicationContext();
         this.sharedPreferences = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -171,7 +168,6 @@ public class Singleton {
         }
         return instance;
     }
-
     // endregion
 
     // region Volley e Utilitários de Rede
@@ -243,7 +239,7 @@ public class Singleton {
     }
 
     /**
-     * NOVO MÉTODO: Converte a URL da API (backend) para a URL do Frontend (imagens/site).
+     * NOVO MÉTODO: Converte a URL da API (backend) para a URL do Frontend (imagens/site) tava a dar pau aqui, ta solved.
      * Ex: http://192.168.1.10/backend/web/api -> http://192.168.1.10/frontend/web
      */
     public String getUrlFrontend() {
@@ -295,7 +291,6 @@ public class Singleton {
         );
         addToRequestQueue(request,TAG_LOGIN);
     }
-
     // endregion
 
     // region Esqueceu a Palavra-Passe(Login)
@@ -337,13 +332,13 @@ public class Singleton {
                     if (callback != null) callback.onError(errorMsg);
                 }
         );
-        // Usa a nova TAG para permitir cancelamento se necessário
         addToRequestQueue(request, TAG_ESQUECEU_PASS);
     }
-    // region Notas
+    //endregion
 
+    // region Notas
     public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
-        // 1. Verificação Offline Imediata
+        // Verificação Offline Imediata
         if (!isNetworkAvailable(context)) {
             ArrayList<Nota> local = getNotasBD();
             if (animalId != null) {
@@ -451,7 +446,6 @@ public class Singleton {
     // endregion
 
     // region Perfil de Utilizador
-
     public void getPerfil(String token, ProfileCallback callback) {
         String url = buildUrl("profile?access-token=" + token);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -517,7 +511,6 @@ public class Singleton {
     // endregion
 
     // region Animais
-
     public void getAnimais(String accessToken, AnimaisCallback callback) {
         if (!isNetworkAvailable(context)) {
             ArrayList<Animal> local = getAnimaisBD();
@@ -566,7 +559,6 @@ public class Singleton {
     // endregion
 
     // region Marcações
-
     public void getMarcacoes(String accessToken, final MarcacoesCallback callback) {
         if (!isNetworkAvailable(context)) {
             ArrayList<Marcacao> local = getMarcacoesBD();
@@ -605,7 +597,7 @@ public class Singleton {
                         MarcacoesListener.onMarcacaoDetalhesLoaded(marcacao);
                     }
                 },
-                error -> Toast.makeText(context, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
+                error -> Toast.makeText(context, "Modo Offline: Conecte-se a API para obter informações detalhadas", Toast.LENGTH_LONG).show()
         );
         addToRequestQueue(request, TAG_MARCACOES);
     }
@@ -620,7 +612,6 @@ public class Singleton {
     // endregion
 
     // region Lembretes
-
     public void getLembretes(String accessToken, LembretesCallback callback) {
         if (!isNetworkAvailable(context)) {
             ArrayList<Lembrete> local = getLembretesBD();
@@ -703,7 +694,6 @@ public class Singleton {
     // endregion
 
     // region Faturas
-
     public void getFaturas(String accessToken, final FaturasCallback callback) {
         if (!isNetworkAvailable(context)) {
             ArrayList<Fatura> local = getFaturasBD();
@@ -753,7 +743,7 @@ public class Singleton {
                         Toast.makeText(context, "Erro ao processar detalhes", Toast.LENGTH_SHORT).show();
                     }
                 },
-                error -> Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT).show()
+                error -> Toast.makeText(context, "Modo Offline: Conecte-se a API para obter informações detalhadas", Toast.LENGTH_LONG).show()
         );
         addToRequestQueue(request, TAG_FATURAS);
     }
@@ -796,7 +786,6 @@ public class Singleton {
     // endregion
 
     // region Métodos de Pagamento
-
     public void getMetodosPagamento(String token, final MetodosPagamentoCallback callback) {
         String url = buildUrl("fatura/paymentmethods?access-token=" + token);
         JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,
@@ -813,7 +802,6 @@ public class Singleton {
     // endregion
 
     // region Verificação de Estado da API (Health Check)
-
     public void isApiResponding(final ApiHealthCallback callback) {
         String url = buildUrl("health");
         StringRequest request = new StringRequest(Request.Method.GET, url,

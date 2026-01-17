@@ -219,11 +219,11 @@ public class FaturasFragment extends Fragment implements FaturasListener, OnPaga
 
     private void resetBotao(Button btn) {
         btn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.white));
-        btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_700));
+        btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_green));
     }
 
     private void destacarBotao(Button btn) {
-        btn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.green_700));
+        btn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_green));
         btn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
     }
 }

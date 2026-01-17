@@ -85,7 +85,7 @@ public class PagamentoBottomSheetAdapter extends BaseAdapter {
 
         // Opcional: Mudar a cor da borda se estiver selecionado para dar destaque extra
         if (isSelected) {
-            card.setStrokeColor(ContextCompat.getColor(context, R.color.green_700)); // Use a sua cor principal
+            card.setStrokeColor(ContextCompat.getColor(context, R.color.primary_green)); // Use a sua cor principal
             card.setStrokeWidth(4); // Borda mais grossa
         } else {
             card.setStrokeColor(ContextCompat.getColor(context, android.R.color.darker_gray));

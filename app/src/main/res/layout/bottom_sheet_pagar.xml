@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/green_700"
+        app:cardBackgroundColor="@color/primary_green"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp">
 
@@ -41,6 +41,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
 
             <TextView
                 android:layout_height="match_parent"
@@ -88,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:text="@string/btn_confirmar_pagamento"
-        android:backgroundTint="@color/green_700"
+        android:backgroundTint="@color/primary_green"
         android:textColor="@color/white"/>
 
     <Button

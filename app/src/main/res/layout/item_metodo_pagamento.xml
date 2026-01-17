@@ -39,7 +39,7 @@
             android:focusable="false"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:buttonTint="@color/green_700" />
+            android:buttonTint="@color/primary_green" />
 
     </LinearLayout>
 

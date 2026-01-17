@@ -86,7 +86,7 @@
                 android:backgroundTint="@color/white"
                 android:text="@string/pendente"
                 android:textAllCaps="false"
-                android:textColor="@color/green_700" />
+                android:textColor="@color/primary_green" />
 
             <Button
                 android:id="@+id/btnFiltrarCancelada"
@@ -96,7 +96,7 @@
                 android:backgroundTint="@color/white"
                 android:text="@string/filter_cancelada"
                 android:textAllCaps="false"
-                android:textColor="@color/green_700" />
+                android:textColor="@color/primary_green" />
 
             <Button
                 android:id="@+id/btnFiltrarRealizada"
@@ -105,7 +105,7 @@
                 android:backgroundTint="@color/white"
                 android:text="@string/filter_realizada"
                 android:textAllCaps="false"
-                android:textColor="@color/green_700" />
+                android:textColor="@color/primary_green" />
 
         </LinearLayout>
     </HorizontalScrollView>

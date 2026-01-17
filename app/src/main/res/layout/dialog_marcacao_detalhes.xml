@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status"
-                android:textColor="@color/green_700"
+                android:textColor="@color/primary_green"
                 android:textStyle="bold"/>
         </LinearLayout>
 
@@ -156,7 +156,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_fechar"
             android:layout_marginTop="24dp"
-            android:backgroundTint="@color/green_700"
+            android:backgroundTint="@color/primary_green"
             android:textColor="@color/white"/>
 
     </LinearLayout>
