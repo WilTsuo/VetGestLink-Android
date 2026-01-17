@@ -12,11 +12,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Cabeçalho Verde -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#1B9E4F"
+            android:background="@color/secondary_green"
             android:padding="20dp">
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -28,8 +27,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent"
-                android:background="#4CAF50"
-                app:strokeColor="#FFFFFF"
+                android:background="@color/primary_green_lighter"
+                app:strokeColor="@color/white"
                 app:strokeWidth="2dp" />
 
             <TextView
@@ -38,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="Nome"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/white"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@id/ivAnimal"
@@ -54,7 +53,6 @@
                 app:layout_constraintStart_toStartOf="@id/tvAnimalName"
                 app:layout_constraintTop_toBottomOf="@id/tvAnimalName" />
 
-            <!-- Grelha de Idade e Peso no cabeçalho -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -72,7 +70,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Idade"
+                        android:text="@string/idade"
                         android:textColor="#B2DFDB"
                         android:textSize="12sp" />
                     <TextView
@@ -80,7 +78,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 anos"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -92,7 +90,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Peso"
+                        android:text="@string/peso"
                         android:textColor="#B2DFDB"
                         android:textSize="12sp" />
                     <TextView
@@ -100,13 +98,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 kg"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Detalhes Brancos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,7 +123,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Espécie"
+                        android:text="@string/tv_species_label"
                         android:textColor="#78909C"
                         android:textSize="14sp" />
                     <TextView
@@ -147,7 +144,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Género"
+                        android:text="@string/tv_gender_label"
                         android:textColor="#78909C"
                         android:textSize="14sp" />
                     <TextView
@@ -169,7 +166,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Possui Microchip?"
+                    android:text="@string/possui_microchip"
                     android:textColor="#78909C"
                     android:textSize="14sp" />
                 <TextView

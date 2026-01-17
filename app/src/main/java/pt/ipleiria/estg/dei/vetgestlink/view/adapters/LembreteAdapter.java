@@ -1,4 +1,3 @@
-
 package pt.ipleiria.estg.dei.vetgestlink.view.adapters;
 
 import android.app.AlertDialog;
@@ -95,6 +94,7 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
             }
 
             String token = getAccessToken(context);
+            // Certifique-se que no Singleton existe apenas UM método atualizarLembrete
             Singleton.getInstance(context).atualizarLembrete(token, lembrete.getId(), descricao, new Singleton.MessageCallback() {
                 @Override
                 public void onSuccess(String message) {
@@ -119,6 +119,8 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
                 .setMessage("Tem certeza que deseja eliminar este lembrete?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     String token = getAccessToken(context);
+
+                    // CORREÇÃO: O método no Singleton chama-se 'deletarLembrete', não 'deletarLembreteAPI'
                     Singleton.getInstance(context).deletarLembrete(token, lembrete.getId(), new Singleton.MessageCallback() {
                         @Override
                         public void onSuccess(String message) {

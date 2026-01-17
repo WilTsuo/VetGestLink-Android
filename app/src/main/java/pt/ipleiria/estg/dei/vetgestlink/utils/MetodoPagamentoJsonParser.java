@@ -1,72 +1,42 @@
 package pt.ipleiria.estg.dei.vetgestlink.utils;
 
+import android.util.Log;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
-
 import pt.ipleiria.estg.dei.vetgestlink.models.MetodoPagamento;
 
 public class MetodoPagamentoJsonParser {
 
-    //Parse list
-    public static ArrayList<MetodoPagamento> parserJsonMetodosPagamento(JSONArray resposta) {
+    private static final String TAG = "MetodoPagamentoParser";
 
+    /**
+     * Converte um JSONArray em lista de Métodos de Pagamento.
+     * Filtra apenas os métodos ativos (vigor == 1).
+     */
+    public static ArrayList<MetodoPagamento> parseMetodosPagamento(JSONArray resposta) {
         ArrayList<MetodoPagamento> metodos = new ArrayList<>();
+        if (resposta == null) return metodos;
 
         for (int i = 0; i < resposta.length(); i++) {
             try {
                 JSONObject jsonMetodo = resposta.getJSONObject(i);
 
-                int id = jsonMetodo.getInt("id");
-                String nome = jsonMetodo.getString("nome");
+                int id = jsonMetodo.optInt("id", 0);
+                String nome = jsonMetodo.optString("nome", "Desconhecido");
                 int vigor = jsonMetodo.optInt("vigor", 0);
-                boolean eliminado = jsonMetodo.optInt("eliminado", 0) == 1;
 
-                // ⚠ Only add valid (active) methods
-                if (vigor == 1 && !eliminado) {
-                    MetodoPagamento metodo = new MetodoPagamento(
-                            id,
-                            nome,
-                            vigor,
-                            eliminado
-                    );
+                // Apenas adiciona métodos ativos
+                if (vigor == 1) {
+                    MetodoPagamento metodo = new MetodoPagamento(id, nome, vigor);
                     metodos.add(metodo);
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (JSONException e) {
+                Log.e(TAG, "Erro ao processar método de pagamento: " + e.getMessage());
             }
         }
-
         return metodos;
-    }
-
-    //Parse
-    public static MetodoPagamento parserJsonMetodoPagamento(String resposta) {
-
-        MetodoPagamento metodo = null;
-
-        try {
-            JSONObject jsonMetodo = new JSONObject(resposta);
-
-            int id = jsonMetodo.getInt("id");
-            String nome = jsonMetodo.getString("nome");
-            int vigor = jsonMetodo.optInt("vigor", 0);
-            boolean eliminado = jsonMetodo.optInt("eliminado", 0) == 1;
-
-            metodo = new MetodoPagamento(
-                    id,
-                    nome,
-                    vigor,
-                    eliminado
-            );
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return metodo;
     }
 }

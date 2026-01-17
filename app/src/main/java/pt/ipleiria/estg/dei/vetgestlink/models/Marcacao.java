@@ -13,6 +13,9 @@ public class Marcacao {
     private String animalNome;
     private String animalEspecie;
 
+
+
+
     // Constructor
     public Marcacao(int id, String data, String horaInicio, String horaFim, String estado, int duracaoMinutos, String diagnostico, String servicoNome, String animalNome, String animalEspecie) {
         this.id = id;
@@ -29,14 +32,38 @@ public class Marcacao {
 
     // Getters
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
     public String getData() { return data; }
-    public String getHoraInicio() { return horaInicio; }
+    public void setData(String data) { this.data = data; }
+    public String getHoraInicio() {
+        if (horaInicio != null && horaInicio.length() >= 5) {
+            return horaInicio.substring(0, 5);
+        }
+        return horaInicio;
+    }
+    public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }
+
     public String getHoraFim() { return horaFim; }
+    public void setHoraFim(String horaFim) { this.horaFim = horaFim; }
+
     public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+
     public int getDuracaoMinutos() { return duracaoMinutos; }
+    public void setDuracaoMinutos(int duracaoMinutos) { this.duracaoMinutos = duracaoMinutos; }
+
     public String getDiagnostico() { return diagnostico; }
+    public void setDiagnostico(String diagnostico) { this.diagnostico = diagnostico; }
+
     public String getServicoNome() { return servicoNome; }
+    public void setServicoNome(String servicoNome) { this.servicoNome = servicoNome; }
+
     public String getAnimalNome() { return animalNome; }
+    public void setAnimalNome(String animalNome) { this.animalNome = animalNome; }
+
     public String getAnimalEspecie() { return animalEspecie; }
+    public void setAnimalEspecie(String animalEspecie) { this.animalEspecie = animalEspecie; }
+
 }
 

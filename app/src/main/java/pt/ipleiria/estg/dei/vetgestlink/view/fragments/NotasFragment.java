@@ -59,7 +59,7 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
 
         autoCompleteAnimal = root.findViewById(R.id.autoCompleteAnimal);
         recyclerNotas = root.findViewById(R.id.recyclerNotas);
-        btnAddNota = root.findViewById(R.id.btnAddNota);
+        btnAddNota = root.findViewById(R.id.btnAdicionarNota);
 
         recyclerNotas.setLayoutManager(new LinearLayoutManager(requireContext()));
         notasAdapter = new NotasAdapter(notas, currentUserId);
@@ -137,7 +137,8 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
                     atualizarDropdown();
 
                     // CARREGA TODAS AS NOTAS
-                    Singleton.getInstance(requireContext()).getTodasNotas(token, new Singleton.NotasCallback() {
+                    // CORREÇÃO: Adicionado 'null' como segundo argumento (animalId) para buscar todas
+                    Singleton.getInstance(requireContext()).getNotas(token, null, new Singleton.NotasCallback() {
                         @Override
                         public void onSuccess(List<Nota> todasNotas) {
                             // Filtra pelo primeiro animal
@@ -165,6 +166,7 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
             }
         });
     }
+
     private void carregarCache() {
         if (!isAdded()) return;
         requireActivity().runOnUiThread(() -> {
@@ -192,6 +194,7 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
             Log.d("Vetgestlin-NotasFragment", "Carregou dados do cache");
         });
     }
+
     private void atualizarDropdown() {
         List<String> nomes = new ArrayList<>();
         for (Animal a : animais) nomes.add(a.getNome());
@@ -222,12 +225,14 @@ public class NotasFragment extends Fragment implements Singleton.ApiStateChangeL
         }
 
         // Busca da API para obter dados atualizados
-        Singleton.getInstance(requireContext()).getTodasNotas(token, new Singleton.NotasCallback() {
+        // CORREÇÃO: Substituído getTodasNotas por getNotas e passado null no ID para buscar todas
+        Singleton.getInstance(requireContext()).getNotas(token, null, new Singleton.NotasCallback() {
             @Override
             public void onSuccess(List<Nota> todasNotas) {
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     notas.clear();
+                    // Filtra manualmente conforme a lógica original
                     for (Nota n : todasNotas) {
                         if (n.getAnimalNome() != null && n.getAnimalNome().equals(finalAnimalName)) {
                             notas.add(n);

@@ -11,7 +11,6 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <!-- Dropdown (Material AutoComplete) com ícone e subtítulo -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilAnimal"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -28,23 +27,21 @@
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botão grande horizontal para adicionar nota -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddNota"
+            android:id="@+id/btnAdicionarNota"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             app:icon="@drawable/ic_add"
-            app:iconTint="@android:color/white"
+            app:iconTint="@color/white"
             app:iconPadding="8dp"
             android:text="@string/add_note"
             android:textAllCaps="false"
-            android:textColor="@android:color/white"
+            android:textColor="@color/white"
             app:cornerRadius="8dp"
             android:backgroundTint="@color/primary_green" />
 
-        <!-- Lista de notas (usa RecyclerView para cartões de nota) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerNotas"
             android:layout_width="match_parent"

@@ -42,7 +42,7 @@ public class LembretesFragment extends Fragment {
         rvLembretes = view.findViewById(R.id.rvLembretes);
         rvLembretes.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        fabAdd = view.findViewById(R.id.fab_add_lembrete);
+        fabAdd = view.findViewById(R.id.fab_AdicionarLembretes);
 
         listaLembretes = new ArrayList<>();
 

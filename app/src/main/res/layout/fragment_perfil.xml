@@ -33,8 +33,6 @@
                 android:textColor="#777777" />
         </LinearLayout>
 
-        <!-- Dados do Proprietário -->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvAnimais"
             android:layout_width="match_parent"
@@ -98,7 +96,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/email"
+                    android:text="E-mail"
                     android:textColor="#555555" />
 
                 <TextView
@@ -113,7 +111,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/telefone"
+                    android:text="Telefone"
                     android:textColor="#555555" />
 
                 <TextView
@@ -128,7 +126,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/morada"
+                    android:text="Morada"
                     android:textColor="#555555" />
 
                 <LinearLayout
@@ -184,7 +182,7 @@
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-        <!-- Lembretes -->
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVerLembretes"
             android:layout_width="match_parent"
@@ -192,12 +190,10 @@
             android:layout_marginTop="12dp"
             android:text="@string/ver_lembretes"
             android:textAllCaps="false"
-            android:textColor="@android:color/white"
+            android:textColor="@color/white"
             app:cornerRadius="8dp"
             android:backgroundTint="@color/primary_green" />
 
-
-        <!-- Contacto de Emergência -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -235,7 +231,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/telemovel_vetgest"
-                    android:textColor="#2E7D32"
+                    android:textColor="@color/green_700"
                     android:textSize="18sp"
                     android:textStyle="bold" />
             </LinearLayout>

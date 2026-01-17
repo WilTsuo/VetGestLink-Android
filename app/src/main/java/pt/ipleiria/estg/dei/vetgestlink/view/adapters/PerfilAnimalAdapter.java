@@ -1,4 +1,3 @@
-// java
 package pt.ipleiria.estg.dei.vetgestlink.view.adapters;
 
 import android.view.LayoutInflater;
@@ -14,10 +13,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
+
 public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapter.ViewHolderAnimal> {
 
     private List<Animal> animais;
-    private static final String BASE_URL_IMAGENS = "http://172.22.21.220/frontend/web";
 
     public PerfilAnimalAdapter(List<Animal> animais) {
         this.animais = animais;
@@ -36,21 +36,42 @@ public class PerfilAnimalAdapter extends RecyclerView.Adapter<PerfilAnimalAdapte
 
         Animal animal = animais.get(position);
 
-        holder.tvNome.setText(animal.getNome() != null ? animal.getNome() : "");
-        holder.tvRacaHeader.setText((animal.getEspecie() != null ? animal.getEspecie() : "") + " - " + (animal.getRaca() != null ? animal.getRaca() : ""));
-        holder.tvIdade.setText(String.valueOf(animal.getIdade()));
-        holder.tvPeso.setText(String.valueOf(animal.getPeso()) + " kg");
-        holder.tvEspecie.setText(animal.getEspecie() != null ? animal.getEspecie() : "");
-        holder.tvGenero.setText(animal.getSexo() != null ? animal.getSexo() : "");
+        holder.tvNome.setText(animal.getNome() != null ? animal.getNome() : "Sem Nome");
+
+        String racaTexto = (animal.getEspecie() != null ? animal.getEspecie() : "") +
+                " - " +
+                (animal.getRaca() != null ? animal.getRaca() : "");
+        holder.tvRacaHeader.setText(racaTexto);
+
+        holder.tvIdade.setText(animal.getIdade() != null ? animal.getIdade() : "-");
+        holder.tvPeso.setText(String.format("%.1f kg", animal.getPeso()));
+        holder.tvEspecie.setText(animal.getEspecie() != null ? animal.getEspecie() : "-");
+
+        String sexo = "N/A";
+        if (animal.getSexo() != null) {
+            sexo = animal.getSexo().equalsIgnoreCase("M") ? "Macho" : "Fêmea";
+        }
+        holder.tvGenero.setText(sexo);
+
         String temMicrochip = (animal.getMicrochip() == 1) ? "Sim" : "Não";
         holder.tvMicrochip.setText(temMicrochip);
 
-        String urlImagem = BASE_URL_IMAGENS + (animal.getFotoUrl() != null ? animal.getFotoUrl() : "");
+        // CORREÇÃO: Obter URL base do Singleton em vez de hardcoded
+        String baseUrl = Singleton.getInstance(holder.itemView.getContext()).getUrlFrontend();
+        String caminhoFoto = (animal.getFotoUrl() != null) ? animal.getFotoUrl() : "";
+
+        // Garante que não ficamos com barras duplas ou sem barra
+        if (!caminhoFoto.startsWith("/") && !baseUrl.endsWith("/")) {
+            caminhoFoto = "/" + caminhoFoto;
+        }
+
+        String urlCompleta = baseUrl + caminhoFoto;
+
         Glide.with(holder.itemView.getContext())
-                .load(urlImagem)
+                .load(urlCompleta)
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_report_image)
-                .diskCacheStrategy(DiskCacheStrategy.ALL) // Não guarda em disco
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.ivFoto);
     }
 

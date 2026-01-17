@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -24,6 +23,17 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
 
     private Context context;
     private ArrayList<Marcacao> marcacoes;
+    private OnItemClickListener listener;
+
+    // 1. Interface para gerir o clique
+    public interface OnItemClickListener {
+        void onItemClick(Marcacao marcacao);
+    }
+
+    // 2. Método Setter para o Listener (chamado no Fragment)
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public MarcacoesAdapter(Context context, ArrayList<Marcacao> marcacoes) {
         this.context = context;
@@ -41,25 +51,37 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
     public void onBindViewHolder(@NonNull MarcacaoViewHolder holder, int position) {
         Marcacao marcacao = marcacoes.get(position);
 
-        // 1. Dados Básicos
-        holder.tvConsultaTitulo.setText(marcacao.getServicoNome());
+        // --- Configuração dos Dados ---
+        holder.tvConsultaTitulo.setText(marcacao.getServicoNome() != null ? marcacao.getServicoNome() : "Serviço");
 
-        // Usamos o campo do "Veterinário" para mostrar o Animal, já que a API traz o nome do animal
-        holder.tvVeterinario.setText("Animal: " + marcacao.getAnimalNome());
+        // Exibe o nome do animal
+        String animalInfo = marcacao.getAnimalNome() != null ? marcacao.getAnimalNome() : "N/A";
+        holder.tvVeterinario.setText("Paciente: " + animalInfo);
 
-        String dataHora = marcacao.getData() + " às " + marcacao.getHoraInicio();
+        // Formatação Data/Hora
+        String dataHora = marcacao.getData() + " | " + marcacao.getHoraInicio();
         holder.tvDataHora.setText(dataHora);
 
-        // 2. Lógica de Observações/Diagnóstico
-        if (marcacao.getDiagnostico() != null && !marcacao.getDiagnostico().isEmpty() && !marcacao.getDiagnostico().equals("null")) {
+        // --- Lógica de Observações ---
+        String diag = marcacao.getDiagnostico();
+        if (diag != null && !diag.isEmpty() && !diag.equals("null")) {
             holder.observacoesContainer.setVisibility(View.VISIBLE);
-            holder.tvObservacoes.setText(marcacao.getDiagnostico());
+            if (holder.tvObservacoes != null) {
+                holder.tvObservacoes.setText(diag);
+            }
         } else {
             holder.observacoesContainer.setVisibility(View.GONE);
         }
 
-        // 3. Configuração Visual do Estado (Pendente, Cancelada, Realizada)
+        // --- Configuração Visual do Estado ---
         configurarEstadoVisual(holder, marcacao.getEstado());
+
+        // --- EVENTO DE CLIQUE (CRUCIAL) ---
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(marcacao);
+            }
+        });
     }
 
     private void configurarEstadoVisual(MarcacaoViewHolder holder, String estado) {
@@ -76,15 +98,14 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
                 corFundo = Color.parseColor("#DEF7EC"); // Verde Claro
                 corTextoIcone = Color.parseColor("#03543F"); // Verde Escuro
                 textoEstado = "Realizada";
-                // Certifique-se de ter um ic_check ou use android.R.drawable.checkbox_on_background
-                iconResId = R.drawable.ic_check;
+                iconResId = R.drawable.ic_check; // Certifique-se que este ícone existe
                 break;
 
             case "cancelada":
                 corFundo = Color.parseColor("#FDE8E8"); // Vermelho Claro
                 corTextoIcone = Color.parseColor("#9B1C1C"); // Vermelho Escuro
                 textoEstado = "Cancelada";
-                iconResId = R.drawable.ic_uncheck; // Ícone padrão de delete/fechar
+                iconResId = R.drawable.ic_uncheck; // Certifique-se que este ícone existe
                 break;
 
             case "pendente":
@@ -92,8 +113,7 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
                 corFundo = Color.parseColor("#FEF3C7"); // Amarelo/Laranja Claro
                 corTextoIcone = Color.parseColor("#92400E"); // Castanho
                 textoEstado = "Pendente";
-                // Ícone de relógio (use o seu @drawable/ic_clock se tiver, senão um padrão)
-                iconResId = R.drawable.ic_clock;
+                iconResId = R.drawable.ic_clock; // Certifique-se que este ícone existe
                 break;
         }
 
@@ -101,17 +121,20 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
         holder.tvBadgeStatus.setText(textoEstado);
         holder.tvBadgeStatus.setTextColor(corTextoIcone);
 
-        // Tenta carregar o ícone (se tiver os seus drawables específicos, troque os IDs acima)
-        // Se tiver o @drawable/ic_clock no projeto, use R.drawable.ic_clock no switch
-        holder.ivBadgeIcon.setImageResource(iconResId);
-        holder.ivBadgeIcon.setColorFilter(corTextoIcone, PorterDuff.Mode.SRC_IN);
+        // Configurar Ícone
+        try {
+            holder.ivBadgeIcon.setImageResource(iconResId);
+            holder.ivBadgeIcon.setColorFilter(corTextoIcone, PorterDuff.Mode.SRC_IN);
+        } catch (Exception e) {
+            // Fallback caso o ícone não exista
+            holder.ivBadgeIcon.setVisibility(View.GONE);
+        }
 
         // Aplicar Cor de Fundo (Shape)
         Drawable background = holder.badgeStatusContainer.getBackground();
         if (background instanceof GradientDrawable) {
             ((GradientDrawable) background).setColor(corFundo);
         } else {
-            // Fallback caso o background não seja um shape editável
             holder.badgeStatusContainer.setBackgroundColor(corFundo);
         }
     }
@@ -142,17 +165,16 @@ public class MarcacoesAdapter extends RecyclerView.Adapter<MarcacoesAdapter.Marc
             tvBadgeStatus = itemView.findViewById(R.id.tvBadgeStatus);
             ivBadgeIcon = itemView.findViewById(R.id.ivBadgeIcon);
 
-            // Observações (Assumindo que adicionou IDs dentro do include ou layout)
+            // Observações
             observacoesContainer = itemView.findViewById(R.id.observacoesContainer);
-            // Nota: O XML fornecido cortou a parte de dentro do observacoesContainer,
-            // assumi que existe um TextView lá dentro. Se não tiver ID, adicione no XML.
-            // Exemplo: android:id="@+id/tvObservacoesTexto"
             tvObservacoes = itemView.findViewById(R.id.tvObservacoes);
+
+            // Fallback simples se o ID tvObservacoes não for encontrado diretamente
             if (tvObservacoes == null && observacoesContainer instanceof ViewGroup) {
-                // Tenta encontrar qualquer TextView dentro do container se o ID não for exato
-                for(int i=0; i<((ViewGroup)observacoesContainer).getChildCount(); i++){
-                    View v = ((ViewGroup)observacoesContainer).getChildAt(i);
-                    if(v instanceof TextView && !((TextView)v).getText().toString().contains("Observações")) {
+                ViewGroup group = (ViewGroup) observacoesContainer;
+                for (int i = 0; i < group.getChildCount(); i++) {
+                    View v = group.getChildAt(i);
+                    if (v instanceof TextView) {
                         tvObservacoes = (TextView) v;
                         break;
                     }

@@ -37,7 +37,7 @@
 
         <!-- Forgot Password -->
         <activity
-            android:name=".view.activities.ForgotPasswordActivity"
+            android:name=".view.activities.EsqueceuPalavraPasseActivity"
             android:exported="false" />
 
         <!-- Main Activity (NOTAS) -->

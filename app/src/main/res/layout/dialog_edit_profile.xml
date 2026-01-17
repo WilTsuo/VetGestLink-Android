@@ -13,17 +13,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Editar Perfil"
+            android:text="@string/title_editar_perfil"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#333333"/>
+            android:textColor="@color/text_primary"/>
 
-        <!-- Nome -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="Nome Completo">
+            android:hint="@string/hint_nome_completo">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNomeCompleto"
                 android:layout_width="match_parent"
@@ -31,12 +30,11 @@
                 android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="Email">
+            android:hint="@string/hint_email">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
@@ -44,7 +42,6 @@
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Telefone -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,12 +62,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Rua -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:hint="Rua">
+            android:hint="@string/hint_rua">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etRua"
                 android:layout_width="match_parent"
@@ -81,24 +77,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <!-- Porta -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:hint="Nº Porta">
+                android:hint="@string/hint_porta">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNPorta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
-            <!-- CP -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Cód. Postal">
+                android:hint="@string/hint_cod_postal">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCdPostal"
                     android:layout_width="match_parent"
@@ -106,20 +100,18 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Localidade -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="24dp"
-            android:hint="Localidade">
+            android:hint="@string/hint_localidade">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLocalidade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botões -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,14 +122,14 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancelar"
-                android:textColor="#555555"/>
+                android:text="@string/btn_cancelar"
+                android:textColor="@color/text_secondary"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGuardar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Guardar"
+                android:text="@string/btn_guardar"
                 android:backgroundTint="@color/primary_green"/>
         </LinearLayout>
     </LinearLayout>

@@ -24,7 +24,7 @@ import pt.ipleiria.estg.dei.vetgestlink.view.fragments.DefinicoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.LembretesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.MarcacoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.NotasFragment;
-import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PagamentosFragment;
+import pt.ipleiria.estg.dei.vetgestlink.view.fragments.FaturasFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.PerfilFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         //tratamento dos fragments para o bottom navigaton view
         Fragment fragment_marcacoes = new MarcacoesFragment();
-        Fragment fragment_pagamentos = new PagamentosFragment();
+        Fragment fragment_pagamentos = new FaturasFragment();
         Fragment fragment_notas = new NotasFragment();
         Fragment fragment_perfil = new PerfilFragment();
         Fragment fragment_definicoes = new DefinicoesFragment();

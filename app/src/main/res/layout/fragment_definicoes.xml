@@ -13,23 +13,23 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Cabeçalho -->
+        <!-- Título e Descrição -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Definições"
+            android:text="@string/title_definicoes"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/text_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gerir preferências da conta"
+            android:text="@string/desc_definicoes"
             android:layout_marginBottom="16dp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@color/text_tertiary" />
 
-        <!-- Card Configuração Servidor -->
+        <!-- CARD 1: Configuração do Servidor -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,12 +52,12 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@android:drawable/ic_menu_manage"
-                        app:tint="#4CAF50"
+                        app:tint="@color/primary_green"
                         android:layout_marginEnd="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Configuração do Servidor"
+                        android:text="@string/title_config_servidor"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -66,10 +66,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="URL do Servidor">
+                    android:hint="@string/hint_url_servidor">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etServerUrl"
+                        android:id="@+id/etServidorUrl"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textUri"
@@ -83,20 +83,20 @@
                     android:layout_marginTop="8dp">
 
                     <Button
-                        android:id="@+id/btnTestConnection"
+                        android:id="@+id/btnTestarConexao"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Testar Conexão"
+                        android:text="@string/btn_testar_conexao"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/btnSaveServer"
+                        android:id="@+id/btnSalvarServer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Guardar"
+                        android:text="@string/btn_guardar"
                         android:layout_marginStart="4dp"/>
                 </LinearLayout>
 
@@ -117,14 +117,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dica: Contacte o administrador da clínica se precisar alterar o servidor."
+                        android:text="@string/tip_mudar_servidor"
                         android:textColor="#1565C0"
                         android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card Notificações (SIMPLIFICADO) -->
+        <!-- CARD 2: Notificações -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -153,29 +153,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Notificações"
+                        android:text="@string/lbl_notificacoes"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
 
-                <!-- Switch Único: Marcações -->
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchNotifications"
+                    android:id="@+id/switchNotificacao"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Notificações de Marcações"
+                    android:text="@string/lbl_notificacoes_marcacoes"
                     android:checked="true" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Receber alertas sobre as suas consultas"
+                    android:text="@string/lbl_notificacoes_receber"
                     android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:textColor="@color/text_tertiary"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card Privacidade e Segurança -->
+        <!-- CARD 3: Segurança -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -199,18 +198,18 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@android:drawable/ic_lock_lock"
-                        app:tint="#4CAF50"
+                        app:tint="@color/primary_green"
                         android:layout_marginEnd="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Privacidade e Segurança"
+                        android:text="@string/lbl_seguranca"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/btnChangePassword"
+                    android:id="@+id/btnMudarPalavraPass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -223,21 +222,21 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Alterar Senha"
+                        android:text="@string/btn_alterar_pass"
                         android:textSize="16sp"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@color/text_primary"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textSize="18sp"
-                        android:textColor="@android:color/darker_gray"/>
+                        android:textColor="@color/text_tertiary"/>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="4dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" android:layout_marginVertical="4dp"/>
 
                 <LinearLayout
-                    android:id="@+id/btnPersonalData"
+                    android:id="@+id/btnDadosPessoais"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -250,20 +249,20 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Dados Pessoais"
+                        android:text="@string/btn_dados_pessoais"
                         android:textSize="16sp"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@color/text_primary"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
                         android:textSize="18sp"
-                        android:textColor="@android:color/darker_gray"/>
+                        android:textColor="@color/text_tertiary"/>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card Ajuda e Suporte -->
+        <!-- CARD 4: Suporte e Ajuda (RESTAURADO) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -287,40 +286,45 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@android:drawable/ic_menu_help"
-                        app:tint="#FF9800"
+                        app:tint="@color/primary_green"
                         android:layout_marginEnd="8dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ajuda e Suporte"
+                        android:text="@string/lbl_suporte"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
                 </LinearLayout>
 
+                <!-- Botão Reportar Problema -->
                 <LinearLayout
-                    android:id="@+id/btnReportProblem"
+                    android:id="@+id/btnReportarProblema"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
-                    android:paddingVertical="12dp">
+                    android:focusable="true"
+                    android:paddingVertical="12dp"
+                    android:gravity="center_vertical">
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Reportar Problema"
+                        android:text="@string/btn_reportar_problema"
                         android:textSize="16sp"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@color/text_primary"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="@android:color/darker_gray"/>
+                        android:textSize="18sp"
+                        android:textColor="@color/text_tertiary"/>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="4dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border_light" android:layout_marginVertical="4dp"/>
 
+                <!-- Botão Informação / Termos -->
                 <LinearLayout
                     android:id="@+id/btnInformacao"
                     android:layout_width="match_parent"
@@ -328,27 +332,27 @@
                     android:orientation="horizontal"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
-                    android:paddingVertical="12dp">
+                    android:focusable="true"
+                    android:paddingVertical="12dp"
+                    android:gravity="center_vertical">
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Informações Adicionais"
+                        android:text="@string/btn_termos_condicoes"
                         android:textSize="16sp"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@color/text_primary"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="@android:color/darker_gray"/>
+                        android:textSize="18sp"
+                        android:textColor="@color/text_tertiary"/>
                 </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginVertical="4dp"/>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sobre a Aplicação -->
+        <!-- Secção Sobre a App -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -358,33 +362,37 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sobre a Aplicação"
+                android:text="@string/lbl_sobre_app"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="VetGestLink Cliente v1.0.0"
-                android:textColor="@android:color/darker_gray"/>
+                android:text="@string/lbl_versao_app"
+                android:textColor="@color/text_tertiary"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="© 2025 VetGestLink"
-                android:textColor="@android:color/darker_gray"/>
+                android:text="@string/lbl_copyright"
+                android:textColor="@color/text_tertiary"/>
         </LinearLayout>
 
         <!-- Botão Logout -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Terminar Sessão"
-            android:textColor="@android:color/holo_red_dark"
+            android:layout_height="56dp"
+            android:text="@string/btn_logout"
+            android:textColor="@color/status_error"
+            android:textSize="16sp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:strokeColor="@android:color/holo_red_dark"
-            app:icon="@android:drawable/ic_lock_power_off"
-            app:iconTint="@android:color/holo_red_dark"
+            app:strokeColor="@color/status_error"
+            app:strokeWidth="2dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_logout"
+            app:iconTint="@color/status_error"
             app:iconGravity="textStart"
+            app:iconPadding="12dp"
             android:layout_marginBottom="24dp"/>
 
     </LinearLayout>

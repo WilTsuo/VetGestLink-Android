@@ -3,14 +3,14 @@
     <!-- App -->
     <string name="app_name">VetGestLink</string>
     <string name="fragment_name"> </string>
-    <string name="logo_description">Logo VetGestLink</string>
+    <string name="logo_description">Logótipo VetGestLink</string>
     <string name="app_subtitle">Gestão Veterinária Completa</string>
 
     <!-- Login -->
     <string name="username_hint">Nome de utilizador</string>
-    <string name="password_hint">Palavra-passe</string>
-    <string name="remember_me">Lembrar-me</string>
-    <string name="forgot_password">Esqueceu-se da palavra-passe?</string>
+    <string name="password_hint">Palavra‑passe</string>
+    <string name="remember_me">Lembrar‑me</string>
+    <string name="forgot_password">Esqueceu‑se da palavra‑passe?</string>
     <string name="login_button">Entrar</string>
     <string name="or">ou</string>
     <string name="no_account">Não tem conta?</string>
@@ -18,17 +18,71 @@
     <string name="copyright">Copyright</string>
     <string name="all_rights_reserved">Todos os direitos reservados</string>
 
-    <!-- Notas -->
+    <!-- Recuperação de palavra‑passe -->
+    <string name="title_recuperar_pass">Recuperar Palavra‑passe</string>
+    <string name="desc_recuperar_pass">Insira o seu e‑mail para receber um link de recuperação</string>
+    <string name="hint_email">seu@email.com</string>
+    <string name="btn_enviar_link_recuperacao">Enviar Link de Recuperação</string>
+    <string name="btn_enviar_email">Enviar E‑mail</string>
+    <string name="btn_voltar_login">Voltar ao Login</string>
+    <string name="success_email_sent_title">E‑mail Enviado!</string>
+    <string name="success_email_sent_desc">Verifique a sua caixa de entrada</string>
+    <string name="success_email_sent_info">Enviámos um link de recuperação para</string>
+    <string name="spam_warning_email">📧 Não recebeu o e‑mail?\n\nVerifique a pasta de spam ou lixo eletrónico. O link é válido por 1 hora.</string>
+    <string name="btn_reenviar_email">Reenviar E‑mail</string>
+
+    <!-- Notas / Lembretes -->
     <string name="escolha_animal">Escolha um animal</string>
     <string name="add_note">Nova Nota</string>
+    <string name="desc_add_lembrete">Adicionar Lembrete</string>
     <string name="campo_obrigatorio">Campo obrigatório</string>
     <string name="nota_guardada">Nota guardada com sucesso</string>
+    <string name="hint_titulo">Título</string>
+    <string name="hint_descricao">Descrição</string>
+    <string name="hint_selecionar_animal">Selecionar Animal</string>
 
-    <!-- Marcações/Lembretes -->
+    <!-- Marcações / Marcacões -->
     <string name="add_appointment">Nova Marcação</string>
+    <string name="marcacoes_titulo">Todas as Consultas</string>
+    <string name="marcacoes_subtitulo">Histórico e agendamentos</string>
+    <string name="empty_marcacoes">Sem marcações encontradas.</string>
+    <string name="hint_filtrar_animal">Filtrar por animal</string>
+    <string name="filter_cancelada">Cancelada</string>
+    <string name="filter_realizada">Realizada</string>
+    <string name="lbl_motivo">Motivo:</string>
+    <string name="lbl_veterinario">Veterinário:</string>
+    <string name="lbl_data_hora">Data e Hora:</string>
+    <string name="idade">Idade</string>
+    <string name="peso">Peso</string>
+    <string name="genero">Género</string>
+    <string name="possui_microchip">Possui Microchip?</string>
+    <string name="observacoes_label">Observações:</string>
+    <string name="observacoes_default">Levar cartão de vacinação</string>
 
     <!-- Definições -->
+    <string name="title_definicoes">Definições</string>
+    <string name="desc_definicoes">Gerir preferências da conta</string>
     <string name="url_desc">Botão Mudar URL</string>
+    <string name="title_config_servidor">Configuração do Servidor</string>
+    <string name="hint_url_servidor">URL do Servidor (IP)</string>
+    <string name="btn_testar_conexao">Testar Conexão</string>
+    <string name="tip_mudar_servidor">Dica: Contacte o administrador da clínica se precisar alterar o servidor.</string>
+    <string name="lbl_notificacoes">Notificações</string>
+    <string name="lbl_notificacoes_marcacoes">Notificações de Marcações</string>
+    <string name="lbl_notificacoes_receber">Receber alertas sobre as suas consultas</string>
+    <string name="lbl_seguranca">Privacidade e Segurança</string>
+    <string name="btn_alterar_pass">Alterar Palavra‑passe</string>
+    <string name="btn_dados_pessoais">Dados Pessoais</string>
+    <string name="lbl_ajuda">Ajuda e Suporte</string>
+    <string name="btn_reportar_problema">Reportar Problema</string>
+    <string name="btn_informacoes">Informações Adicionais</string>
+    <string name="lbl_sobre_app">Sobre a Aplicação</string>
+    <string name="lbl_versao_app">VetGestLink Cliente v1.0.0</string>
+    <string name="lbl_copyright">© 2025 VetGestLink</string>
+    <string name="btn_logout">Terminar Sessão</string>
+    <!-- secção de Suporte -->
+    <string name="lbl_suporte">Suporte e Ajuda</string>
+    <string name="btn_termos_condicoes">Termos e Condições</string>
 
     <!-- Perfil -->
     <string name="meus_animais">Meus Animais</string>
@@ -39,8 +93,20 @@
     <string name="tv_clinica_message_title">Clínica VetGestLink 24h</string>
     <string name="ver_lembretes">Ver Todos os Lembretes</string>
     <string name="telemovel_vetgest">+351 210 123 456</string>
+    <string name="hint_nome_completo">Nome Completo</string>
+    <string name="hint_rua">Rua / Morada</string>
+    <string name="hint_porta">Nº Porta</string>
+    <string name="hint_cod_postal">Código Postal</string>
+    <string name="hint_localidade">Localidade</string>
+    <string name="edit">Editar</string>
 
-    <!-- Pagamentos -->
+    <!-- Pagamentos / Faturas -->
+    <string name="title_realizar_pagamento">Realizar Pagamento</string>
+    <string name="label_total_a_pagar">Total a pagar</string>
+    <string name="tvTotal_placeholder">€ 85.00</string>
+    <string name="choose_payment_method">Escolha o método de pagamento</string>
+    <string name="btn_confirmar_pagamento">Confirmar Pagamento</string>
+    <string name="btn_cancelar">Cancelar</string>
     <string name="fatura">Fatura</string>
     <string name="status">Estado</string>
     <string name="descri_o">Descrição</string>
@@ -49,27 +115,64 @@
     <string name="emitida">Emitida:</string>
     <string name="pagar_agora">Pagar Agora</string>
     <string name="metodo_pagamento">Método de pagamento</string>
-    <string name="resumo_financeiro">$ Resumo Financeiro</string>
+    <string name="resumo_financeiro">Resumo Financeiro</string>
     <string name="pendente">Pendente</string>
     <string name="pago">Pago</string>
     <string name="todos">Todos</string>
+    <string name="total_label">TOTAL:</string>
+    <string name="servico">Serviço</string>
+    <string name="m_todo_de_pagamento_label">Método de Pagamento</string>
+    <string name="emitida_label">Emitida</string>
 
-    <!-- Comuns -->
-    <string name="telefone">Telefone</string>
-    <string name="morada">Morada</string>
-    <string name="email">Email</string>
-    <string name="save">Guardar</string>
-    <string name="cancel">Cancelar</string>
-    <string name="edit">Editar</string>
-    <string name="loading">A carregar…</string>
+    <!-- Listas / Itens -->
+    <string name="add_payment_method">Escolha o método de pagamento</string>
+    <string name="cartao_credito">Cartão de Crédito</string>
+    <string name="tvInvoiceNumber_prefix">Fatura</string>
+
+    <!-- Dialogs / Formulários -->
+    <string name="title_editar_perfil">Editar Perfil</string>
+    <string name="title_nova_palavra_passe">Nova Palavra‑passe</string>
+    <string name="dialog_nova_pass_title">Nova Palavra Passe</string>
+    <string name="dialog_editar_perfil_title">Editar Perfil</string>
+
+    <!-- Comuns / Botões -->
+    <string name="btn_confirmar">Confirmar</string>
+    <string name="btn_voltar">Voltar</string>
+    <string name="btn_fechar">Fechar</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_testar">Testar</string>
+
+    <!-- Itens e labels de diálogos -->
+    <string name="detalhes">Detalhes</string>
+    <string name="label_cliente">Cliente:</string>
+    <string name="label_nif">NIF:</string>
+
+    <!-- Item animal / perfil específico -->
+    <string name="tv_species_label">Espécie</string>
+    <string name="tv_gender_label">Género</string>
+
+    <!-- Notificações / Erros -->
+    <string name="error_api">Não foi possível ligar à API. Verifique a sua ligação à Internet.</string>
+    <string name="warning_icon_description">Ícone de aviso</string>
+    <string name="warning_icon_description_short">Aviso</string>
+
+    <!-- Menu Navegação (Bottom Nav) -->
+    <string name="nav_perfil">Perfil</string>
+    <string name="nav_marcacoes">Marcações</string>
+    <string name="nav_pagamentos">Faturas</string>
+    <string name="nav_notas">Notas</string>
+    <string name="nav_definicoes">Definições</string>
+
+    <!-- Itens de nota / lembrete -->
     <string name="editar">Editar</string>
     <string name="excluir">Eliminar</string>
     <string name="data">Data</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <!-- Placeholders / estados -->
+    <string name="loading">A carregar…</string>
 
-    <!-- Error messages -->
-    <string name="error_api">Não foi possível ligar à API. Verifique a sua ligação à Internet.</string>
-
-    <!-- Warning messages -->
-    <string name="warning_icon_description">Ícone de aviso</string>
+    <!-- Extras usados em layouts diversos -->
+    <string name="add_appointment_label">Adicionar Marcação</string>
+    <string name="btn_confirmar_pagamento_label">Confirmar Pagamento</string>
 </resources>
-

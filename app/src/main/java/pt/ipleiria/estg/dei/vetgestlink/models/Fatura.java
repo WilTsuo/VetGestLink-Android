@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.vetgestlink.models;
 
 
+import java.util.ArrayList;
+
 public class Fatura {
 
     private int id;
@@ -10,6 +12,12 @@ public class Fatura {
     private boolean eliminado;
     private String metodoPagamento;
     private int numeroItens;
+
+
+    // Informações do Cliente para exibição na Fatura
+    private String clienteNome;
+    private String clienteNif;
+    private ArrayList<LinhaFatura> linhas;
 
     //Constructor
 
@@ -81,5 +89,23 @@ public class Fatura {
 
     public void setNumeroItens(int numeroItens) {
         this.numeroItens = numeroItens;
+    }
+
+
+    public void setClienteNome(String clienteNome) { this.clienteNome = clienteNome; }
+    public String getClienteNome() { return clienteNome; }
+
+    public void setClienteNif(String clienteNif) { this.clienteNif = clienteNif; }
+    public String getClienteNif() { return clienteNif; }
+
+    public void setLinhas(ArrayList<LinhaFatura> linhas) { this.linhas = linhas; }
+    public ArrayList<LinhaFatura> getLinhas() { return linhas; }
+
+    // Método auxiliar para inicializar a lista se necessário
+    public void adicionarLinha(LinhaFatura linha) {
+        if (this.linhas == null) {
+            this.linhas = new ArrayList<>();
+        }
+        this.linhas.add(linha);
     }
 }

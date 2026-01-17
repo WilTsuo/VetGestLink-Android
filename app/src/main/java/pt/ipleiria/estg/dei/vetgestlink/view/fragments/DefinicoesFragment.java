@@ -35,9 +35,9 @@ public class DefinicoesFragment extends Fragment {
     private TextInputEditText etServerUrl;
     private SwitchMaterial switchNotifications;
     private SharedPreferences sharedPreferences;
-    private final static String SITE_CONTACTO = "http://172.22.21.220/frontend/web/site/contact";
-    private final static String SITE_LOGIN = "http://172.22.21.220/frontend/web/site/login";
-    private final static String SITE_INFORMACAO = "http://172.22.21.220/frontend/web/site/information";
+
+    // Constantes removidas. Agora usamos o Singleton.getUrlFrontend()
+
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
@@ -65,8 +65,8 @@ public class DefinicoesFragment extends Fragment {
 
         sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        etServerUrl = view.findViewById(R.id.etServerUrl);
-        switchNotifications = view.findViewById(R.id.switchNotifications);
+        etServerUrl = view.findViewById(R.id.etServidorUrl);
+        switchNotifications = view.findViewById(R.id.switchNotificacao);
 
         // 1. Carregar URL diretamente do Singleton (Garante que é o mesmo do Login)
         String currentUrl = Singleton.getInstance(requireContext()).getMainUrl();
@@ -88,7 +88,7 @@ public class DefinicoesFragment extends Fragment {
         });
 
         // Listener Guardar Servidor
-        setupClick(view, R.id.btnSaveServer, v -> {
+        setupClick(view, R.id.btnSalvarServer, v -> {
             String newUrl = etServerUrl.getText().toString().trim();
             if (!newUrl.isEmpty()) {
                 // Atualiza o Singleton (que guarda automaticamente nas SharedPreferences corretas)
@@ -100,7 +100,7 @@ public class DefinicoesFragment extends Fragment {
         });
 
         // Listener Testar Conexão
-        setupClick(view, R.id.btnTestConnection, v -> {
+        setupClick(view, R.id.btnTestarConexao, v -> {
             String inputUrl = etServerUrl.getText().toString().trim();
             if (inputUrl.isEmpty()) {
                 etServerUrl.setError("O URL não pode estar vazio");
@@ -121,24 +121,32 @@ public class DefinicoesFragment extends Fragment {
         });
 
         // Botão de Alterar Palavra-Passe
-        setupClick(view, R.id.btnChangePassword, v -> abrirDialogNovaPassword());
+        setupClick(view, R.id.btnMudarPalavraPass, v -> abrirDialogNovaPassword());
 
         // Botão Dados Pessoais
-        setupClick(view, R.id.btnPersonalData, v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_LOGIN));
+        setupClick(view, R.id.btnDadosPessoais, v -> {
+            String baseUrl = Singleton.getInstance(requireContext()).getUrlFrontend();
+            String url = baseUrl + "/site/login";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
             startActivity(browserIntent);
         });
 
         // Botão Reportar Problema - Abre link externo
-        setupClick(view, R.id.btnReportProblem, v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_CONTACTO));
+        setupClick(view, R.id.btnReportarProblema, v -> {
+            String baseUrl = Singleton.getInstance(requireContext()).getUrlFrontend();
+            String url = baseUrl + "/site/contact";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
             startActivity(browserIntent);
         });
+
         // Botão Termos e Condições - Abre link externo
         setupClick(view, R.id.btnInformacao, v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(SITE_INFORMACAO));
+            String baseUrl = Singleton.getInstance(requireContext()).getUrlFrontend();
+            String url = baseUrl + "/site/information";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
             startActivity(browserIntent);
         });
+
         // Listener Logout
         setupClick(view, R.id.btnLogout, v -> performLogout());
     }
@@ -242,8 +250,4 @@ public class DefinicoesFragment extends Fragment {
 
         dialog.show();
     }
-
-
-
-
 }

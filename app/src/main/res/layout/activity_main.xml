@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="top"
-            android:background="#15803d"
+            android:background="@color/primary_green"
             android:contentDescription=""
             android:elevation="-1dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.015" />
-        <!-- Espaço para carregar os fragments -->
+
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="0dp"
@@ -74,6 +74,7 @@
             app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/warning_bar"
             android:layout_width="match_parent"
@@ -101,7 +102,7 @@
                     android:layout_height="24dp"
                     android:contentDescription="@string/warning_icon_description"
                     android:src="@android:drawable/ic_dialog_alert"
-                    app:tint="#E92626" />
+                    app:tint="@color/status_error" />
 
                 <TextView
                     android:id="@+id/warning_message"
@@ -110,15 +111,12 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:text="@string/error_api"
-                    android:textColor="#D32F2F"
+                    android:textColor="@color/status_error"
                     android:textSize="14sp" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-
-
-        <!-- Menu horizontal no fundo da tela -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"

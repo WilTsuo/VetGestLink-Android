@@ -25,12 +25,12 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
-import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.models.MqttHandler;
+import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 public class MqttNotificationService extends Service {
 
-    private static final String TAG = "Vetgetlink-MqttDebug"; // Tag para filtrar no Logcat
+    private static final String TAG = "Vetgetlink-MqttDebug";
     private MqttHandler mqttHandler;
 
     private static final String CLIENT_ID = "VetGestLink_Android";
@@ -38,9 +38,8 @@ public class MqttNotificationService extends Service {
     private static final String FOREGROUND_CHANNEL_ID = "vetgestlink_foreground";
     private static final int NOTIFICATION_ID = 1;
 
-    private static final String PREFS_NAME = "VetGestLinkPrefs";
-    private static final String KEY_USER_ID = "user_id";
-    private static final String KEY_API_URL = "api_url"; // Chave usada no DefinicoesFragment
+    // Removido acesso direto às SharedPreferences para URL
+    // private static final String KEY_API_URL = "api_url"; <-- ISTO ESTAVA ERRADO
 
     private int userId = -1;
     private String brokerUrl;
@@ -50,29 +49,20 @@ public class MqttNotificationService extends Service {
         super.onCreate();
         createNotificationChannels();
 
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        userId = prefs.getInt(KEY_USER_ID, -1);
+        // O User ID pode vir das prefs diretamente ou do Singleton (via UserProfile),
+        // mas como o Singleton pode não ter o perfil carregado se a app foi morta,
+        // manter a leitura do ID nas prefs é aceitável para persistência.
+        SharedPreferences prefs = getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE);
+        // Nota: Certifique-se que guarda o "user_id" no LoginActivity ou Singleton ao fazer login
+        userId = prefs.getInt("user_id", -1);
 
-        //apanha o url do shared prefferences
-        String savedApiUrl = prefs.getString(KEY_API_URL, "http://172.22.21.220");
-        brokerUrl = convertApiUrlToMqttUrl(savedApiUrl);
+        // CORREÇÃO: Obter URL através do Singleton
+        brokerUrl = Singleton.getInstance(getApplicationContext()).getMqttBrokerUrl();
 
         Log.d(TAG, "Serviço criado. UserID: " + userId + " | Broker: " + brokerUrl);
     }
 
-    // Converte http:// para tcp://
-    private String convertApiUrlToMqttUrl(String apiUrl) {
-        String url = apiUrl.replace("http://", "tcp://").replace("https://", "tcp://");
-        // Remove barras no final se houver para n ficar "solto"
-        if (url.endsWith("/")) {
-            url = url.substring(0, url.length() - 1);
-        }
-        // Adiciona a porta 1883 se não estiver presente (mais vale prevenir que remediaar), nao é presiso pq usamos a porta default do mqqt mas é sempreuma boa pratica
-        if (!url.contains(":1883")) {
-            url += ":1883";
-        }
-        return url;
-    }
+    // O método convertApiUrlToMqttUrl foi removido pois agora está no Singleton
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -107,6 +97,9 @@ public class MqttNotificationService extends Service {
     private void startMqtt() {
         mqttHandler = new MqttHandler();
         new Thread(() -> {
+            // Recarrega URL caso tenha mudado entretanto
+            brokerUrl = Singleton.getInstance(getApplicationContext()).getMqttBrokerUrl();
+
             String fullClientId = CLIENT_ID + "_" + userId + "_" + System.currentTimeMillis();
             Log.d(TAG, "A tentar conectar a: " + brokerUrl);
 
@@ -119,6 +112,7 @@ public class MqttNotificationService extends Service {
                     @Override
                     public void connectionLost(Throwable cause) {
                         Log.e(TAG, "Conexão perdida: " + (cause != null ? cause.getMessage() : "Desconhecido"));
+                        // Opcional: Tentar reconectar ou deixar o serviço reiniciar
                     }
 
                     @Override
@@ -132,7 +126,6 @@ public class MqttNotificationService extends Service {
                     public void deliveryComplete(IMqttDeliveryToken token) {}
                 });
 
-                // subscrevce aos topicos especificos do user logado
                 mqttHandler.subscribe("INSERT_" + userId + "_MARCACAO");
                 mqttHandler.subscribe("UPDATE_" + userId + "_MARCACAO");
                 mqttHandler.subscribe("DELETE_" + userId + "_MARCACAO");
@@ -145,7 +138,6 @@ public class MqttNotificationService extends Service {
 
     private void handleMessage(String topic, String payload) {
         try {
-            // Filtro de segurança: Se a mensagem não for para este user, ignora
             if (!topic.contains("_" + userId + "_") && !topic.equals("test")) {
                 return;
             }

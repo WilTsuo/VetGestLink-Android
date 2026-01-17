@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,13 +12,12 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
-        <!-- Logo Circle -->
         <androidx.cardview.widget.CardView
             android:id="@+id/logoCircle"
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_marginTop="40dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="48dp"
             app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,29 +29,27 @@
                 android:layout_height="match_parent"
                 android:padding="8dp"
                 android:src="@drawable/ic_user"
-                app:tint="#15803D" />
+                app:tint="@color/primary_green" />
         </androidx.cardview.widget.CardView>
 
-        <!-- App Name -->
         <TextView
             android:id="@+id/textViewAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="VetGestLink"
-            android:textColor="#15803D"
+            android:text="@string/app_name"
+            android:textColor="@color/primary_green"
             android:textSize="28sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/logoCircle" />
 
-        <!-- Main Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/mainCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,43 +61,39 @@
                 android:layout_height="wrap_content"
                 android:padding="24dp">
 
-                <!-- Title -->
                 <TextView
                     android:id="@+id/textViewTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recuperar Senha"
-                    android:textColor="#111827"
+                    android:text="@string/title_recuperar_pass"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Description -->
                 <TextView
                     android:id="@+id/textViewDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Insira o seu e-mail para receber um link de recuperação"
-                    android:textColor="#6B7280"
+                    android:text="@string/desc_recuperar_pass"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewTitle" />
 
-                <!-- Email Label -->
                 <TextView
                     android:id="@+id/labelEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="E-mail"
-                    android:textColor="#374151"
+                    android:text="@string/btn_enviar_email"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewDescription" />
 
-                <!-- Email Input Container -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/emailInputCard"
                     android:layout_width="0dp"
@@ -124,7 +116,7 @@
                             android:layout_height="16dp"
                             android:layout_marginStart="12dp"
                             android:src="@drawable/ic_email"
-                            app:tint="#9CA3AF"
+                            app:tint="@color/icon_gray"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -136,10 +128,10 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="12dp"
                             android:background="@android:color/transparent"
-                            android:hint="seu@email.com"
+                            android:hint="@string/hint_email"
                             android:inputType="textEmailAddress"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_light"
                             android:textSize="14sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -148,35 +140,33 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Send Button -->
                 <Button
                     android:id="@+id/buttonSendReset"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginTop="24dp"
-                    android:backgroundTint="#15803D"
-                    android:text="Enviar Link de Recuperação"
-                    android:textColor="#FFFFFF"
+                    android:backgroundTint="@color/primary_green"
+                    android:text="@string/btn_enviar_link_recuperacao"
+                    android:textColor="@color/white"
                     android:textSize="14sp"
                     app:cornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/emailInputCard" />
 
-                <!-- Back to Login Button -->
                 <Button
                     android:id="@+id/buttonBackToLogin"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginTop="12dp"
-                    android:text="Voltar ao Login"
-                    android:textColor="#6B7280"
+                    android:text="@string/btn_voltar_login"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="14sp"
                     app:cornerRadius="8dp"
                     app:icon="@drawable/ic_logout"
                     app:iconGravity="start"
-                    app:iconTint="#6B7280"
+                    app:iconTint="@color/text_tertiary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/buttonSendReset" />
@@ -184,14 +174,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Success State Card (initially hidden) -->
+        <!-- Success Card (Mantido cores específicas de fundo pois não estão no colors.xml) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/successCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:visibility="gone"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -204,7 +194,6 @@
                 android:layout_height="wrap_content"
                 android:padding="24dp">
 
-                <!-- Success Icon -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/successIconBg"
                     android:layout_width="64dp"
@@ -221,37 +210,34 @@
                         android:layout_height="32dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_consultas_nav"
-                        app:tint="#15803D" />
+                        app:tint="@color/primary_green" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- Success Title -->
                 <TextView
                     android:id="@+id/textViewSuccessTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="E-mail Enviado!"
-                    android:textColor="#111827"
+                    android:text="@string/success_email_sent_title"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/successIconBg" />
 
-                <!-- Success Description -->
                 <TextView
                     android:id="@+id/textViewSuccessDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="Verifique a sua caixa de entrada"
-                    android:textColor="#6B7280"
+                    android:text="@string/success_email_sent_desc"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewSuccessTitle" />
 
-                <!-- Success Info Card -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/successInfoCard"
                     android:layout_width="0dp"
@@ -260,7 +246,7 @@
                     app:cardBackgroundColor="#E0F2E9"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#15803D33"
+                    app:strokeColor="#3315803D"
                     app:strokeWidth="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -272,25 +258,23 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="16dp"
-                        android:text="Enviámos um link de recuperação para"
-                        android:textColor="#374151"
+                        android:text="@string/success_email_sent_info"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- Email Display -->
                 <TextView
                     android:id="@+id/textViewEmailDisplay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textColor="#15803D"
+                    android:textColor="@color/primary_green"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/successInfoCard"
                     tools:text="seu@email.com" />
 
-                <!-- Spam Warning Card -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/spamWarningCard"
                     android:layout_width="0dp"
@@ -309,38 +293,36 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
-                        android:text="📧 Não recebeu o e-mail?\n\nVerifique a pasta de spam ou lixo eletrónico. O link é válido por 1 hora."
+                        android:text="@string/spam_warning_email"
                         android:textColor="#1E40AF"
                         android:textSize="12sp" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- Back to Login (Success) -->
                 <Button
                     android:id="@+id/buttonBackToLoginSuccess"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginTop="24dp"
-                    android:backgroundTint="#15803D"
-                    android:text="Voltar ao Login"
-                    android:textColor="#FFFFFF"
+                    android:backgroundTint="@color/primary_green"
+                    android:text="@string/btn_voltar_login"
+                    android:textColor="@color/white"
                     android:textSize="14sp"
                     app:cornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/spamWarningCard" />
 
-                <!-- Resend Email Button -->
                 <Button
                     android:id="@+id/buttonResendEmail"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginTop="12dp"
-                    android:text="Reenviar E-mail"
-                    android:textColor="#15803D"
+                    android:text="@string/btn_reenviar_email"
+                    android:textColor="@color/primary_green"
                     android:textSize="14sp"
                     app:cornerRadius="8dp"
-                    app:strokeColor="#15803D"
+                    app:strokeColor="@color/primary_green"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/buttonBackToLoginSuccess" />
@@ -348,14 +330,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Copyright -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
-            android:text="© 2025 VetGestLink. Todos os direitos reservados."
-            android:textColor="#6B7280"
+            android:text="@string/copyright"
+            android:textColor="@color/text_tertiary"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

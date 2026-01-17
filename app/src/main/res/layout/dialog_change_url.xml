@@ -9,5 +9,5 @@
         android:id="@+id/etMainUrl"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:hint="Main URL"/>
+        android:hint="@string/hint_url_servidor"/>
 </LinearLayout>

@@ -13,16 +13,14 @@
         android:padding="8dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_lembrete"
+        android:id="@+id/fab_AdicionarLembretes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:background="@color/primary_green_light"
         android:contentDescription="@string/add_appointment"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="@color/primary_green_light"
-        app:backgroundTintMode="screen"
-        app:tint="@android:color/white" />
+        app:tint="@color/white" />
 
 </FrameLayout>

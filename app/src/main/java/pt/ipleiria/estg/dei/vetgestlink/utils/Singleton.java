@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.vetgestlink.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -12,14 +12,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//Listeners
+// Listeners
 import pt.ipleiria.estg.dei.vetgestlink.listeners.AnimaisListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.AuthListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.FaturasListener;
@@ -29,7 +28,7 @@ import pt.ipleiria.estg.dei.vetgestlink.listeners.NotaListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.NotasListener;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.MetodosPagamentoListener;
 
-//Modelos
+// Modelos
 import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
 import pt.ipleiria.estg.dei.vetgestlink.models.Nota;
@@ -38,47 +37,62 @@ import pt.ipleiria.estg.dei.vetgestlink.models.UserProfile;
 import pt.ipleiria.estg.dei.vetgestlink.models.Fatura;
 import pt.ipleiria.estg.dei.vetgestlink.models.Lembrete;
 
-//dbhelpers
+// DBHelpers
+import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.FaturaDBHelper;
+import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.LembreteDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.NotaDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.AnimalDBHelper;
 import pt.ipleiria.estg.dei.vetgestlink.models.dbhelpers.MarcacaoDBHelper;
 
 public class Singleton {
-    // region variaveis e constantes do singleton e as tags para o volley
 
-    //Variaveis
+    // region Variáveis, Constantes e Tags
+
+    // Listas em Memória (Cache)
     private ArrayList<Marcacao> marcacoes;
-    private MarcacaoDBHelper marcacoesDB = null;
     private ArrayList<Nota> notas;
-    private NotaDBHelper notasDB=null;
+    private ArrayList<Fatura> faturas;
+    private ArrayList<Lembrete> lembretes;
     private ArrayList<Animal> animais;
-    private AnimalDBHelper animaisDB = null;
 
-    //Constantes
+    // Helpers de Base de Dados (SQLite)
+    private LembreteDBHelper lembretesDB = null;
+    private AnimalDBHelper animaisDB = null;
+    private NotaDBHelper notasDB = null;
+    private MarcacaoDBHelper marcacoesDB = null;
+    private FaturaDBHelper faturasDB = null;
+
+    // Constantes de Preferências e API
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_MAIN_URL = "main_url";
     private static final String KEY_ACCESS_TOKEN = "access_token";
     private static final String KEY_API_AVAILABLE = "api_available";
     private static final String DEFAULT_MAIN_URL = "http://172.22.21.220/backend/web/api";
 
-    // TAGS VOLLEY
+    // Tags para o Volley (Debugging e Cancelamento)
     private static final String TAG = "VetGestLink";
     private static final String TAG_ANIMAIS = "Vetgetlink-AnimaisService";
     private static final String TAG_NOTAS = "Vetgetlink-NotasService";
     private static final String TAG_LOGIN = "Vetgetlink-AuthService";
-    private static final String TAG_HEAlTH = "Vetgetlink-HealthService";
+    private static final String TAG_ESQUECEU_PASS = "Vetgetlink-EsqueceuPassService";
+    private static final String TAG_HEALTH = "Vetgetlink-HealthService";
     private static final String TAG_PROFILE = "Vetgetlink-ProfileService";
     private static final String TAG_LEMBRETES = "Vetgetlink-LembretesService";
     private static final String TAG_MARCACOES = "Vetgetlink-MarcacoesService";
     private static final String TAG_FATURAS = "Vetgetlink-FaturasService";
     private static final String TAG_METODOS_PAGAMENTO = "Vetgetlink-MetodosPagamentoService";
-    private static Singleton instance;
-    //endregion
-    private final Context context;
-    private RequestQueue requestQueue; //queue do volley
-    private String mainUrl;
 
-    //region Listeners
+    private static Singleton instance;
+    private final Context context;
+    private RequestQueue requestQueue;
+    private String mainUrl;
+    private SharedPreferences sharedPreferences;
+
+    // endregion
+
+    // region Listeners e Interfaces
+
+    // Listeners da UI
     private AuthListener authListener;
     private NotasListener NotasListener;
     private NotaListener NotaListener;
@@ -88,142 +102,80 @@ public class Singleton {
     private MarcacoesListener MarcacoesListener;
     private LembretesListener LembretesListener;
     private MetodosPagamentoListener MetodosPagamentoListener;
-    private SharedPreferences sharedPreferences;
 
-    // Listener para mudanças no estado da API
+    // Listener para estado da API
     public interface ApiStateChangeListener {
         void onApiStateChanged(boolean available);
     }
     private final List<ApiStateChangeListener> apiStateListeners = new ArrayList<>();
-    //endregion
 
-    //region Setters Listeners
-    public void setNotasListener(NotasListener notasListener) {
-        NotasListener = notasListener;
-    }
-
-    public void setAuthListener(AuthListener authListener) {
-        this.authListener = authListener;
-    }
-
-    public void setNotaListener(NotaListener notaListener) {
-        NotaListener = notaListener;
-    }
-
-    public void setAuthlistener(AuthListener authlistener) {
-        Authlistener = authlistener;
-    }
-
-    public void setAnimaisListener(AnimaisListener animaisListener) {
-        AnimaisListener = animaisListener;
-    }
-
-    public void setFaturasListener(FaturasListener faturasListener) {
-        FaturasListener = faturasListener;
-    }
-
-    public void setMarcacoesListener(MarcacoesListener marcacoesListener) {
-        MarcacoesListener = marcacoesListener;
-    }
-
-    public void setLembretesListener(LembretesListener lembretesListener) {
-        LembretesListener = lembretesListener;
-    }
-
-    public void setMetodosPagamentoListener(MetodosPagamentoListener metodosPagamentoListener) {
-        MetodosPagamentoListener = metodosPagamentoListener;
-    }
+    // Setters para Listeners
+    public void setNotasListener(NotasListener notasListener) { NotasListener = notasListener; }
+    public void setAuthListener(AuthListener authListener) { this.authListener = authListener; }
+    public void setNotaListener(NotaListener notaListener) { NotaListener = notaListener; }
+    public void setAuthlistener(AuthListener authlistener) { Authlistener = authlistener; }
+    public void setAnimaisListener(AnimaisListener animaisListener) { AnimaisListener = animaisListener; }
+    public void setFaturasListener(FaturasListener faturasListener) { FaturasListener = faturasListener; }
+    public void setMarcacoesListener(MarcacoesListener marcacoesListener) { MarcacoesListener = marcacoesListener; }
+    public void setLembretesListener(LembretesListener lembretesListener) { LembretesListener = lembretesListener; }
+    public void setMetodosPagamentoListener(MetodosPagamentoListener metodosPagamentoListener) { MetodosPagamentoListener = metodosPagamentoListener; }
 
     public void addApiStateChangeListener(ApiStateChangeListener listener) {
-        if (listener != null && !apiStateListeners.contains(listener)) {
-            apiStateListeners.add(listener);
-        }
+        if (listener != null && !apiStateListeners.contains(listener)) apiStateListeners.add(listener);
     }
+    public void removeApiStateChangeListener(ApiStateChangeListener listener) { apiStateListeners.remove(listener); }
 
-    public void removeApiStateChangeListener(ApiStateChangeListener listener) {
-        apiStateListeners.remove(listener);
-    }
-    //endregion
+    // Callbacks para comunicação assíncrona
+    public interface MarcacoesCallback { void onSuccess(ArrayList<Marcacao> marcacoes); void onError(String error); }
+    public interface LembretesCallback { void onSuccess(List<Lembrete> lembretes); void onError(String error); }
+    public interface MessageCallback { void onSuccess(String message); void onError(String error); }
+    public interface FaturasCallback { void onSuccess(ArrayList<Fatura> faturas); void onError(String error); }
+    public interface MetodosPagamentoCallback { void onSuccess(ArrayList<MetodoPagamento> metodos); void onError(String error); }
+    public interface LoginCallback { void onSuccess(String token, UserProfile userProfile); void onError(String error); }
+    public interface EsqueceuPassCallback { void onSuccess(String message); void onError(String error); }
+    public interface NotasCallback { void onSuccess(List<Nota> notas); void onError(String error); }
+    public interface AnimaisCallback { void onSuccess(List<Animal> animais); void onError(String error); }
+    public interface ProfileCallback { void onSuccess(String nome, String email, String telefone, String moradaCompleta); void onError(String error); }
+    public interface ProfileUpdateCallback { void onSuccess(String message); void onError(String error); }
+    public interface ApiHealthCallback { void onResult(boolean responding); }
+    public interface atualizarPalavraPasseCallback { void onSuccess(String message); void onError(String error); }
 
-    //region defenicao de Callbacks (message, login, notas ,userprofile)
-    public interface MarcacoesCallback {
-        void onSuccess(ArrayList<Marcacao> marcacoes);
-        void onError(String error);
-    }
-
-    public interface LembretesCallback {
-        void onSuccess(List<Lembrete> lembretes);
-        void onError(String error);
-    }
-
-    public interface MessageCallback {
-        void onSuccess(String message);
-        void onError(String error);
-    }
-
-    public interface LoginCallback {
-        void onSuccess(String token, UserProfile userProfile);
-        void onError(String error);
-    }
-    public interface NotasCallback {
-        void onSuccess(List<Nota> notas);
-        void onError(String error);
-    }
-
-    public interface AnimaisCallback {
-        void onSuccess(List<Animal> animais);
-        void onError(String error);
-    }
-    public interface UserProfileCallback {
-        void onSuccess(UserProfile userProfile, List<Animal> animais);
-        void onError(String error);
-    }
-    public interface ProfileCallback {
-        void onSuccess(String nome, String email, String telefone, String moradaCompleta);
-        void onError(String error);
-    }
-
-    public interface ProfileUpdateCallback {
-        void onSuccess(String message);
-        void onError(String error);
-    }
-
-    public interface ApiHealthCallback {
-        void onResult(boolean responding);
-    }
     // endregion
 
-    // region Construtor e Instanciação do Singleton
+    // region Construtor e Instanciação
+
     private Singleton(Context context) {
         this.context = context.getApplicationContext();
-
-        this.sharedPreferences =
-                this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
+        this.sharedPreferences = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.mainUrl = sharedPreferences.getString(KEY_MAIN_URL, DEFAULT_MAIN_URL);
-
         this.requestQueue = Volley.newRequestQueue(this.context);
 
+        // Inicializa DBHelpers
+        notasDB = new NotaDBHelper(this.context);
+        marcacoesDB = new MarcacaoDBHelper(this.context);
+        animaisDB = new AnimalDBHelper(this.context);
+        lembretesDB = new LembreteDBHelper(this.context);
+        faturasDB = new FaturaDBHelper(this.context);
+
+        // Inicializa Listas em Memória
         notas = new ArrayList<>();
         marcacoes = new ArrayList<>();
         animais = new ArrayList<>();
-        notasDB = new NotaDBHelper(context);
-        marcacoesDB = new MarcacaoDBHelper(context);
-        animaisDB = new AnimalDBHelper(context);
+        lembretes = new ArrayList<>();
+        faturas = new ArrayList<>();
     }
 
-
-    //ponto de acceco ao singleton para n haver asneiras (chamamos, enviamos o context e ele devolve a instancia do singleton)
     public static synchronized Singleton getInstance(Context context) {
         if (instance == null) {
             instance = new Singleton(context);
         }
         return instance;
     }
+
     // endregion
 
-    // region Métodos do Volley Request Queue
-    //inicializa a request queue do volley se n estiver inicializada e devolve-a
+    // region Volley e Utilitários de Rede
+
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context);
@@ -231,59 +183,87 @@ public class Singleton {
         return requestQueue;
     }
 
-    // adiciona requests à queue do volley de forma simplificada (tipo em vez de estar sempre a chamar getRequestQueue().add(req) chamamos so isto)
-    // addToRequestQueue(req): adiciona com a TAG padrão (útil para cancelar em bloco)
     public <T> void addToRequestQueue(Request<T> req) {
         req.setTag(TAG);
         getRequestQueue().add(req);
     }
 
-    // addToRequestQueue(req, tag): permite tag customizada para poder cancelar por grupos e
-    // manipular dados em blocos mais facilmente, ou só para indentificar mais facilmente blocos de pedidos na queue (debugging)
     public <T> void addToRequestQueue(Request<T> req, Object tag) {
         req.setTag(tag != null ? tag : TAG);
         getRequestQueue().add(req);
     }
 
-    // cancela pedidos pendentes com a tag especificada (útil para cancelar grupos de pedidos relacionados como mencionado la atraz) bom para debugging também
     public void cancelPendingRequests(Object tag) {
         if (requestQueue != null) {
             requestQueue.cancelAll(tag);
         }
     }
-    // endregion
 
-    // region Gestão da URL da API
-    //devolve o url principal guardado
-    public String getMainUrl() {
-        return mainUrl;
-    }
+    public String getMainUrl() { return mainUrl; }
 
-    //guarda o novo url na SharedPreferences
     public void setMainUrl(String url) {
         this.mainUrl = url;
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putString(KEY_MAIN_URL, url).apply();
     }
 
-    //construtor simples dos endpoints
     public String buildUrl(String endpoint) {
         String base = getMainUrl();
-        if (endpoint.startsWith("/")) {
-            return base + endpoint;
-        } else {
-            return base + "/" + endpoint;
-        }
+        return endpoint.startsWith("/") ? base + endpoint : base + "/" + endpoint;
     }
+
+    // Adicione este método na região "Volley e Utilitários de Rede" do Singleton.java
+
+    /**
+     * Converte a URL da API (HTTP) para a URL do Broker MQTT (TCP).
+     * Ex: http://192.168.1.10/backend/web/api -> tcp://192.168.1.10:1883
+     */
+    public String getMqttBrokerUrl() {
+        String url = getMainUrl(); // Obtém a URL centralizada (ex: http://192.168.1.10/backend/web/api)
+
+        // Remove a parte do caminho da API para ficar apenas com o domínio/IP
+        if (url.contains("/backend/web/api")) {
+            url = url.replace("/backend/web/api", "");
+        }
+
+        // Remove barras finais
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 1);
+        }
+
+        // Substitui protocolo
+        url = url.replace("http://", "tcp://").replace("https://", "tcp://");
+
+        // Adiciona porta se não existir
+        if (!url.contains(":1883")) {
+            url += ":1883";
+        }
+
+        return url;
+    }
+
+    /**
+     * NOVO MÉTODO: Converte a URL da API (backend) para a URL do Frontend (imagens/site).
+     * Ex: http://192.168.1.10/backend/web/api -> http://192.168.1.10/frontend/web
+     */
+    public String getUrlFrontend() {
+        if (mainUrl != null && mainUrl.contains("/backend/web/api")) {
+            return mainUrl.replace("/backend/web/api", "/frontend/web");
+        }
+        // Fallback caso a URL não siga o padrão esperado, retorna a base
+        return mainUrl;
+    }
+
     public String getAccessToken() {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
     }
+
     // endregion
 
-    // region Gestao do Login e Auth Handler
+    // region Autenticação (Login)
+
     public void login(String username, String password, LoginCallback callback) {
         String url = buildUrl("auth/login");
-
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("username", username);
@@ -293,141 +273,116 @@ public class Singleton {
             return;
         }
 
-        Log.d(TAG_LOGIN, "A tentar login em: " + url);
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                jsonBody,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
                 response -> {
-                    Log.d(TAG_LOGIN, "Resposta JSON: " + response.toString());
+                    boolean success = response.optBoolean("success", false);
+                    if (success) {
+                        String token = LoginJsonParser.parseToken(response);
+                        UserProfile userProfile = LoginJsonParser.parseUserProfile(response);
 
-                    try {
-                        // verifica se deu
-                        boolean success = response.optBoolean("success", false);
-
-                        if (success) {
-                            String token = response.optString("token");
-
-                            // faz parsing do user
-                            if (response.has("user")) {
-                                JSONObject userJson = response.getJSONObject("user");
-
-                                int id = userJson.optInt("id", -1);
-                                String email = userJson.optString("email");
-                                String userUsername = userJson.optString("username");
-
-                                // Validação extra
-                                if (id > 0) {
-                                    UserProfile userProfile = new UserProfile();
-                                    userProfile.setId(id);
-                                    userProfile.setUsername(userUsername);
-                                    userProfile.setEmail(email);
-
-                                    callback.onSuccess(token, userProfile);
-                                } else {
-                                    callback.onError("Erro Crítico: ID inválido recebido do servidor (" + id + ")");
-                                }
-                            } else {
-                                callback.onError("Erro: Resposta do servidor não contém objeto 'user'");
-                            }
+                        if (token != null && userProfile != null) {
+                            callback.onSuccess(token, userProfile);
                         } else {
-                            String msg = response.optString("message", "Credenciais inválidas");
-                            callback.onError(msg);
+                            callback.onError("Erro ao processar dados do utilizador.");
                         }
-                    } catch (JSONException e) {
-                        Log.e(TAG_LOGIN, "Erro JSON", e);
-                        callback.onError("Erro ao ler dados: " + e.getMessage());
+                    } else {
+                        callback.onError(response.optString("message", "Credenciais inválidas"));
                     }
                 },
                 error -> {
-                    String err = "Erro de conexão";
-                    if (error.networkResponse != null) {
-                        err = "Erro " + error.networkResponse.statusCode;
-                    }
+                    String err = (error.networkResponse != null) ? "Erro " + error.networkResponse.statusCode : "Erro de conexão";
                     callback.onError(err);
                 }
         );
-
         getRequestQueue().add(request);
     }
+
     // endregion
 
-    //region CRUD Notas e funcoes relacionadas
-    //Create e Read bd local NOTAS
-    public ArrayList<Nota> getNotasBD() {
+    // region Esqueceu a Palavra-Passe(Login)
+    public void recuperarPalavraPasse(String email, final EsqueceuPassCallback callback) {
+        String url = buildUrl("auth/forgot");
 
-        notas = notasDB.getAllNotasBD();
-        return new ArrayList<>(notas);
-    }
-
-    public void adicionarNotaBD(Nota nota){
-        notasDB.adicionarNotaBD(nota);
-    }
-    public void adicionarNotasBD(ArrayList<Nota> notas){
-        notasDB.removerAllNotasBD();
-        for(Nota l:notas) {
-            adicionarNotaBD(l);
-        }
-    }
-
-
-    // obetem um nota atravez do id da nota
-    public Nota getNota(int id){
-        for(Nota n:notas)
-            if(n.getId()==id)
-                return n;
-        return null;
-    }
-
-    //obter lista de notas de um animal, se nenhum animal for especificado retorna a lista completa realacionada a este user
-    public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
-        String url;
-        if (animalId != null) {
-            url = buildUrl("animal/"+animalId+"/notas?access-token=" + accessToken);
-        } else {
-            url = buildUrl("nota/all?access-token=" + accessToken);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("email", email);
+        } catch (JSONException e) {
+            if (callback != null) callback.onError("Erro ao processar o email.");
+            return;
         }
 
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
                 response -> {
-                    List<Nota> notasList = NotaJsonParser.parserJsonNotas(response);
-                    if (notasList == null) notasList = new ArrayList<>();
+                    // A API retorna { "success": true/false, "message": "..." }
+                    boolean success = response.optBoolean("success", false);
+                    String message = response.optString("message", "Operação realizada.");
 
-                    // Guarda localmente (limpa e insere)
-                    adicionarNotasBD(new ArrayList<>(notasList));
-
-                    // Atualiza cache em memória
-                    this.notas = new ArrayList<>(notasList);
-
-                    if (callback != null) {
-                        callback.onSuccess(notasList);
+                    if (success) {
+                        if (callback != null) callback.onSuccess(message);
+                    } else {
+                        if (callback != null) callback.onError(message);
                     }
                 },
                 error -> {
-                    // Ao falhar a API, tenta carregar da BD local
-                    ArrayList<Nota> local = getNotasBD();
-                    if (callback != null) {
-                        if (local != null && !local.isEmpty()) {
-                            callback.onSuccess(local);
-                        } else {
-                            String errorMsg = "Erro ao carregar notas";
-                            if (error.networkResponse != null) {
-                                errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                            } else if (error.getMessage() != null) {
-                                errorMsg += ": " + error.getMessage();
-                            }
-                            callback.onError(errorMsg);
+                    String errorMsg = "Erro de conexão ou email não encontrado.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        // Tenta ler a mensagem de erro do servidor se existir
+                        try {
+                            String jsonString = new String(error.networkResponse.data);
+                            JSONObject jsonObject = new JSONObject(jsonString);
+                            errorMsg = jsonObject.optString("message", errorMsg);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
+                    if (callback != null) callback.onError(errorMsg);
                 }
         );
-        addToRequestQueue(request,TAG_NOTAS);
+        // Usa a nova TAG para permitir cancelamento se necessário
+        addToRequestQueue(request, TAG_ESQUECEU_PASS);
     }
-    //criar nota
+    // region Notas
+
+    public void getNotas(String accessToken, Integer animalId, NotasCallback callback) {
+        // 1. Verificação Offline Imediata
+        if (!isNetworkAvailable(context)) {
+            ArrayList<Nota> local = getNotasBD();
+            if (animalId != null) {
+                ArrayList<Nota> filtradas = new ArrayList<>();
+                for (Nota n : local) {
+                    filtradas.add(n);
+                }
+                if (callback != null) callback.onSuccess(filtradas);
+            } else {
+                if (callback != null) callback.onSuccess(local);
+            }
+            return;
+        }
+
+        String url = (animalId != null) ?
+                buildUrl("animal/" + animalId + "/notas?access-token=" + accessToken) :
+                buildUrl("nota/all?access-token=" + accessToken);
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    ArrayList<Nota> notasList = NotaJsonParser.parseNotas(response);
+                    if (animalId == null) {
+                        adicionarNotasBD(notasList);
+                        this.notas = notasList;
+                    } else {
+                        for (Nota n : notasList) adicionarNotaBD(n);
+                        this.notas = notasList;
+                    }
+                    if (callback != null) callback.onSuccess(notasList);
+                },
+                error -> {
+                    ArrayList<Nota> local = getNotasBD();
+                    if (callback != null) callback.onSuccess(local);
+                }
+        );
+        addToRequestQueue(request, TAG_NOTAS);
+    }
+
     public void criarNota(String accessToken, int animalId, String nota, MessageCallback callback) {
         String url = buildUrl("nota/create?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
@@ -435,710 +390,491 @@ public class Singleton {
             jsonBody.put("animais_id", animalId);
             jsonBody.put("nota", nota);
         } catch (JSONException e) {
-            callback.onError("Erro ao preparar dados");
+            if (callback != null) callback.onError("Erro ao preparar dados");
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                jsonBody,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
                 response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.getString("message");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Erro ao processar resposta");
-                    }
+                    boolean success = response.optBoolean("success", false);
+                    String message = response.optString("message", "Operação concluída");
+                    if (success && callback != null) callback.onSuccess(message);
+                    else if (callback != null) callback.onError(message);
                 },
-                error -> {
-                    String errorMsg = "Erro ao criar nota";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    }
-                    callback.onError(errorMsg);
-                }
+                error -> { if (callback != null) callback.onError("Erro ao criar nota"); }
         );
-
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    //update de notas
     public void atualizarNota(String accessToken, int notaId, String nota, MessageCallback callback) {
         String url = buildUrl("nota/" + notaId + "?access-token=" + accessToken);
-
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("nota", nota);
-        } catch (JSONException e) {
-            callback.onError("Erro ao preparar dados");
-            return;
-        }
+        } catch (JSONException e) { return; }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                jsonBody,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,
                 response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.getString("message");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Erro ao processar resposta");
-                    }
+                    if (response.optBoolean("success", false) && callback != null)
+                        callback.onSuccess(response.optString("message"));
+                    else if (callback != null)
+                        callback.onError(response.optString("message"));
                 },
-                error -> {
-                    String errorMsg = "Erro ao atualizar nota";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    }
-                    callback.onError(errorMsg);
-                }
+                error -> { if (callback != null) callback.onError("Erro ao atualizar nota"); }
         );
-
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    //delete de notas atravez de softdelete
     public void deletarNota(String accessToken, int notaId, MessageCallback callback) {
         String url = buildUrl("nota/" + notaId + "?access-token=" + accessToken);
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.DELETE,
-                url,
-                null,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.getString("message");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Erro ao processar resposta");
-                    }
+                    if (response.optBoolean("success", false) && callback != null) {
+                        notasDB.removerNotaBD(notaId);
+                        callback.onSuccess(response.optString("message"));
+                    } else if (callback != null)
+                        callback.onError(response.optString("message"));
                 },
-                error -> {
-                    String errorMsg = "Erro ao deletar nota";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    }
-                    callback.onError(errorMsg);
-                }
-        );
-
-        addToRequestQueue(request, TAG_NOTAS);
-    }
-
-    public void getTodasNotas(String accessToken, NotasCallback callback) {
-        String url = buildUrl("nota/all?access-token=" + accessToken);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    List<Nota> notasList = NotaJsonParser.parserJsonNotas(response);
-                    if (notasList == null) notasList = new ArrayList<>();
-
-                    // LIMPA BD antes de guardar
-                    notasDB.removerAllNotasBD();
-
-                    // Guarda TODAS as notas
-                    for (Nota n : notasList) {
-                        adicionarNotaBD(n);
-                    }
-
-                    this.notas = new ArrayList<>(notasList);
-
-                    if (callback != null) {
-                        callback.onSuccess(notasList);
-                    }
-                },
-                error -> {
-                    if (callback != null) {
-                        callback.onError("Erro ao carregar notas");
-                    }
-                }
+                error -> { if (callback != null) callback.onError("Erro ao eliminar nota"); }
         );
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    public ArrayList<Nota> getNotasByAnimalNome(String animalNome) {
-        return notasDB.getNotasByAnimalNome(animalNome);
+    // Métodos BD Notas
+    public ArrayList<Nota> getNotasByAnimalNome(String animalNome) { return notasDB.getNotasByAnimalNome(animalNome); }
+    public ArrayList<Nota> getNotasBD() { notas = notasDB.getAllNotasBD(); return new ArrayList<>(notas); }
+    public void adicionarNotaBD(Nota nota) { notasDB.adicionarNotaBD(nota); }
+    public void adicionarNotasBD(ArrayList<Nota> lista) {
+        notasDB.removerAllNotasBD();
+        for (Nota n : lista) adicionarNotaBD(n);
     }
+
     // endregion
 
-    //region Gestao do userProfile e handler de informação associada
-    //GET PERFIL
+    // region Perfil de Utilizador
+
     public void getPerfil(String token, ProfileCallback callback) {
         String url = buildUrl("profile?access-token=" + token);
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
-                    try {
-                        JSONObject user = response.getJSONObject("user");
-                        JSONObject profile = response.getJSONObject("profile");
-                        JSONObject morada = response.getJSONObject("morada");
-
-                        String nome = profile.getString("nomecompleto");
-                        String email = user.getString("email");
-                        String telefone = profile.getString("telemovel");
-                        String moradaCompleta = morada.getString("rua") + ", " +
-                                morada.getString("nporta") + "\n" +
-                                morada.getString("cdpostal") + " " +
-                                morada.getString("localidade");
-
-                        if (callback != null) {
-                            callback.onSuccess(nome, email, telefone, moradaCompleta);
-                        }
-                    } catch (JSONException e) {
-                        if (callback != null) callback.onError("Erro ao processar dados do perfil");
+                    PerfilJsonParser.ProfileDetails details = PerfilJsonParser.parseProfile(response);
+                    if (details != null && callback != null) {
+                        callback.onSuccess(details.nome, details.email, details.telefone, details.moradaCompleta);
+                    } else if (callback != null) {
+                        callback.onError("Erro ao processar perfil");
                     }
                 },
-                error -> {
-                    if (callback != null) callback.onError("Erro na rede: " + error.getMessage());
-                }
+                error -> { if (callback != null) callback.onError("Erro na rede"); }
         );
         addToRequestQueue(request, TAG_PROFILE);
     }
-    //UPDATE PERFIL
-    public void atualizarPerfil(String accessToken, final String nome, final String email,
-                                final String telefone, final String rua, final String porta,
-                                final String postal, final String localidade,
-                                final ProfileUpdateCallback callback) {
 
+    public void atualizarPerfil(String accessToken, String nome, String email, String telefone,
+                                String rua, String porta, String postal, String localidade,
+                                ProfileUpdateCallback callback) {
         String url = buildUrl("profile/update?access-token=" + accessToken);
-
         JSONObject jsonBody = new JSONObject();
         try {
-            // saca os campos principais
             jsonBody.put("nomecompleto", nome);
             jsonBody.put("email", email);
             jsonBody.put("telemovel", telefone);
-
-            // cria o objeto para a morada
             JSONObject jsonMorada = new JSONObject();
             jsonMorada.put("rua", rua);
             jsonMorada.put("nporta", porta);
             jsonMorada.put("cdpostal", postal);
             jsonMorada.put("localidade", localidade);
-
-            // 3. Adicionar o objeto morada ao corpo principal
             jsonBody.put("morada", jsonMorada);
+        } catch (JSONException e) { return; }
 
-            //EXEMPLO DE JSON GERADO(OLHAR BEM OS ENDPOINTS NA API PFFF )
-            /*
-            {
-                "nomecompleto": "Carlos Mendes",
-                "email": "carlos.mendes@email.com",
-                "telemovel": "912 345 678",
-                "morada": {
-                  "rua": "Rua das Acácias",
-                  "nporta": "45",
-                  "cdpostal": "1000-100",
-                  "localidade": "Lisboa"
-                }
-            }
-            * */
-        } catch (JSONException e) {
-            if (callback != null) {
-                callback.onError("Erro ao preparar dados para envio.");
-            }
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                jsonBody,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,
                 response -> {
-                    try {
-                        String message = response.optString("message", "Perfil atualizado com sucesso!");
-                        if (callback != null) {
-                            callback.onSuccess(message);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) callback.onError("Erro ao ler resposta do servidor.");
-                    }
+                    if (callback != null) callback.onSuccess(response.optString("message", "Perfil atualizado!"));
                 },
-                error -> {
-                    String errorMsg = "Erro ao atualizar perfil";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    if (callback != null) {
-                        callback.onError(errorMsg);
-                    }
-                }
+                error -> { if (callback != null) callback.onError("Erro ao atualizar perfil"); }
         );
-
         addToRequestQueue(request, TAG_PROFILE);
     }
-    // ESQUECEU PASS
-    public interface atualizarPalavraPasseCallback {
-        void onSuccess(String message);
-        void onError(String error);
-    }
 
-    public void atualizarPalavraPasse(
-            String accessToken,
-            String palavraPasseAtual,
-            String palavraPasseNova,
-            final atualizarPalavraPasseCallback callback){
+    public void atualizarPalavraPasse(String accessToken, String atual, String nova, atualizarPalavraPasseCallback callback) {
         String url = buildUrl("profile/password?access-token=" + accessToken);
-
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("current_password", palavraPasseAtual);
-            jsonBody.put("new_password", palavraPasseNova);
-        } catch (JSONException e) {
-            callback.onError("Erro ao preparar dados");
+            jsonBody.put("current_password", atual);
+            jsonBody.put("new_password", nova);
+        } catch (JSONException e) { return; }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String msg = response.optString("message");
+                    if (success) callback.onSuccess(msg);
+                    else callback.onError(msg);
+                },
+                error -> callback.onError("Erro ao alterar palavra-passe")
+        );
+        addToRequestQueue(request, TAG_PROFILE);
+    }
+
+    // endregion
+
+    // region Animais
+
+    public void getAnimais(String accessToken, AnimaisCallback callback) {
+        if (!isNetworkAvailable(context)) {
+            ArrayList<Animal> local = getAnimaisBD();
+            this.animais = local;
+            if (callback != null) callback.onSuccess(local);
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                jsonBody,
-                response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.optString("message", "Palavra-passe atualizada com sucesso");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Erro ao processar resposta");
-                    }
-                },
-                error -> {
-                    String errorMsg = "Erro ao alterar palavra-passe";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    }
-                    callback.onError(errorMsg);
-                }
-        );
-
-        addToRequestQueue(request, TAG_PROFILE);
-    }
-    //endregion
-
-    //region Gestao de Animais e handler de informação associada
-    //CRUD bd local NOTAS
-    public ArrayList<Animal> getAnimaisBD() {
-
-        animais = animaisDB.getAllAnimaisBD();
-        return new ArrayList<>(animais);
-    }
-
-    public void adicionarAnimalBD(Animal animal){
-        animaisDB.adicionarAnimalBD(animal);
-    }
-    public void adicionarAnimaisBD(ArrayList<Animal> animais){
-        animaisDB.removerAllAnimaisBD();
-        for(Animal l:animais) {
-            adicionarAnimalBD(l);
-        }
-    }
-    public void getAnimais(String accessToken, AnimaisCallback callback) {
         String url = buildUrl("animal/all?access-token=" + accessToken);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    List<Animal> animaisList = AnimalJsonParser.parseAnimais(response);
-                    if (animaisList == null) animaisList = new ArrayList<>();
-
-                    // Guarda localmente (limpa e insere)
-                    adicionarAnimaisBD(new ArrayList<>(animaisList));
-
-                    // Atualiza cache em memória
-                    this.animais = new ArrayList<>(animaisList);
-
-                    if (callback != null) {
-                        callback.onSuccess(animaisList);
-                    }
-                },
-                error -> {
-                    // Ao falhar a API, tenta carregar da BD local
-                    ArrayList<Animal> local = getAnimaisBD();
-                    if (callback != null) {
-                        if (local != null && !local.isEmpty()) {
-                            callback.onSuccess(local);
-                        } else {
-                            String errorMsg = "Erro ao carregar animais";
-                            if (error.networkResponse != null) {
-                                errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                            } else if (error.getMessage() != null) {
-                                errorMsg += ": " + error.getMessage();
-                            }
-                            callback.onError(errorMsg);
-                        }
-                    }
-                }
-        );
-        addToRequestQueue(request, TAG_ANIMAIS);
-    }
-    public void getNomesAnimais(String accessToken, AnimaisCallback callback) {
-        String url = buildUrl("animal/nomes?access-token=" + accessToken);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    List<Animal> animais = AnimalJsonParser.parseAnimaisNome(response);
-                    if (callback != null) {
-                        callback.onSuccess(animais);
-                    }
-                },
-                error -> {
-                    String errorMsg = "Erro ao carregar nomes dos animais";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    if (callback != null) {
-                        callback.onError(errorMsg);
-                    }
-                }
-        );
-        addToRequestQueue(request, TAG_ANIMAIS);
-    }
-    //endregion
-
-    //region Gestao de Marcacoes e handler de informação associada
-    public ArrayList<Marcacao> getMarcacoesLocal() {
-        return marcacoes;
-    }
-    public void getMarcacoesAPI(String accessToken, final MarcacoesCallback callback) {
-        String url = buildUrl("marcacao/all?access-token=" + accessToken);
-
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {
-                    try {
-                        ArrayList<Marcacao> lista = MarcacaoJsonParser.parserJsonMarcacoes(response.toString());
-
-                        // Guarda localmente para uso offline
-                        adicionarMarcacoesBD(lista);
-                        this.marcacoes = lista;
-
-                        if (callback != null) callback.onSuccess(lista);
-                        if (MarcacoesListener != null) MarcacoesListener.onRefreshListaMarcacoes(lista);
-
-                    } catch (Exception e) {
-                        if (callback != null) callback.onError("Erro ao processar dados");
-                    }
-                },
-                error -> {
-                    // Se falhar (offline), tenta carregar da BD local
-                    ArrayList<Marcacao> localData = getMarcacoesBD();
-                    if (callback != null) {
-                        if (!localData.isEmpty()) {
-                            callback.onSuccess(localData);
-                        } else {
-                            callback.onError("Sem ligação e sem dados locais");
-                        }
-                    }
-                });
-        addToRequestQueue(request, TAG_MARCACOES);
-    }
-    public ArrayList<Marcacao> getMarcacoesBD() {
-        marcacoes = marcacoesDB.getAllMarcacoesBD();
-        return new ArrayList<>(this.marcacoes);
-    }
-    public void adicionarMarcacoesBD(ArrayList<Marcacao> lista) {
-        marcacoesDB.removerAllMarcacoesBD();
-        for (Marcacao m : lista) {
-            marcacoesDB.adicionarMarcacaoBD(m);
-        }
-    }
-    //endregion
-
-    // region Gestão de Lembretes
-    private List<Lembrete> parseLembretes(JSONArray jsonArray) {
-        List<Lembrete> lista = new ArrayList<>();
-        if (jsonArray == null) return lista;
-
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                int id = obj.optInt("id", 0);
-                String descricao = obj.optString("descricao", "");
-                String createdAt = obj.optString("created_at", "");
-                String updatedAt = obj.optString("updated_at", "");
-                int userprofilesId = obj.optInt("userprofiles_id", 0);
-
-                Lembrete l =
-                        new Lembrete(id, descricao, createdAt, updatedAt, userprofilesId);
-
-                lista.add(l);
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "Erro no parseLembretes: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    public void getLembretes(String accessToken, LembretesCallback callback) {
-        String url = buildUrl("lembrete/all?access-token=" + accessToken);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    List<pt.ipleiria.estg.dei.vetgestlink.models.Lembrete> lista = parseLembretes(response);
+                    List<Animal> lista = AnimalJsonParser.parseAnimais(response);
+                    adicionarAnimaisBD(new ArrayList<>(lista));
+                    this.animais = new ArrayList<>(lista);
                     if (callback != null) callback.onSuccess(lista);
                 },
                 error -> {
-                    String errorMsg = "Erro ao carregar lembretes";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    Log.e(TAG_LEMBRETES, errorMsg);
-                    if (callback != null) callback.onError(errorMsg);
+                    ArrayList<Animal> local = getAnimaisBD();
+                    this.animais = local;
+                    if (callback != null) callback.onSuccess(local);
                 }
         );
-        addToRequestQueue(request, TAG_LEMBRETES);
+        addToRequestQueue(request, TAG_ANIMAIS);
     }
 
-    public void deletarLembrete(String accessToken, int lembreteId, MessageCallback callback) {
-        String url = buildUrl("lembrete/delete/" + lembreteId + "?access-token=" + accessToken);
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.DELETE,
-                url,
-                null,
+    public void getNomesAnimais(String accessToken, AnimaisCallback callback) {
+        String url = buildUrl("animal/nomes?access-token=" + accessToken);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {
-                    try {
-                        boolean success = response.optBoolean("success", false);
-                        String message = response.optString("message", "");
-                        if (success) {
-                            if (callback != null) callback.onSuccess(message);
-                        } else {
-                            if (callback != null) callback.onError(message);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) callback.onError("Erro ao processar resposta");
-                    }
+                    List<Animal> lista = AnimalJsonParser.parseAnimaisNome(response);
+                    if (callback != null) callback.onSuccess(lista);
                 },
-                error -> {
-                    String errorMsg = "Erro ao eliminar lembrete";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    if (callback != null) callback.onError(errorMsg);
-                }
+                error -> { if (callback != null) callback.onError("Erro ao carregar nomes"); }
         );
-
-        addToRequestQueue(request, TAG_LEMBRETES);
+        addToRequestQueue(request, TAG_ANIMAIS);
     }
 
-    public void atualizarLembrete(String accessToken, int lembreteId, String descricao, MessageCallback callback) {
-        String url = buildUrl("lembrete/update/" + lembreteId + "?access-token=" + accessToken);
+    // Métodos BD Animais
+    public ArrayList<Animal> getAnimaisBD() { animais = animaisDB.getAllAnimaisBD(); return new ArrayList<>(animais); }
+    public void adicionarAnimalBD(Animal animal) { animaisDB.adicionarAnimalBD(animal); }
+    public void adicionarAnimaisBD(ArrayList<Animal> lista) {
+        animaisDB.removerAllAnimaisBD();
+        for (Animal a : lista) adicionarAnimalBD(a);
+    }
 
-        JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("descricao", descricao);
-        } catch (JSONException e) {
-            if (callback != null) callback.onError("Erro ao preparar dados");
+    // endregion
+
+    // region Marcações
+
+    public void getMarcacoes(String accessToken, final MarcacoesCallback callback) {
+        if (!isNetworkAvailable(context)) {
+            ArrayList<Marcacao> local = getMarcacoesBD();
+            this.marcacoes = local;
+            if (callback != null) callback.onSuccess(local);
+            if (MarcacoesListener != null) MarcacoesListener.onRefreshListaMarcacoes(local);
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                jsonBody,
+        String url = buildUrl("marcacao/all?access-token=" + accessToken);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {
-                    try {
-                        boolean success = response.optBoolean("success", false);
-                        String message = response.optString("message", "");
-                        if (success) {
-                            if (callback != null) callback.onSuccess(message);
-                        } else {
-                            if (callback != null) callback.onError(message);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) callback.onError("Erro ao processar resposta");
-                    }
+                    ArrayList<Marcacao> lista = MarcacaoJsonParser.parseMarcacoes(response);
+                    adicionarMarcacoesBD(lista);
+                    this.marcacoes = lista;
+                    if (callback != null) callback.onSuccess(lista);
+                    if (MarcacoesListener != null) MarcacoesListener.onRefreshListaMarcacoes(lista);
                 },
                 error -> {
-                    String errorMsg = "Erro ao atualizar lembrete";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    if (callback != null) callback.onError(errorMsg);
+                    ArrayList<Marcacao> local = getMarcacoesBD();
+                    this.marcacoes = local;
+                    if (callback != null) callback.onSuccess(local);
                 }
         );
+        addToRequestQueue(request, TAG_MARCACOES);
+    }
 
+    public void getMarcacaoDetalhesAPI(int marcacaoId, Context context) {
+        String token = getAccessToken();
+        String url = buildUrl("marcacao/view/" + marcacaoId + "?access-token=" + token);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    Marcacao marcacao = MarcacaoJsonParser.parseMarcacao(response);
+                    if (marcacao != null && MarcacoesListener != null) {
+                        MarcacoesListener.onMarcacaoDetalhesLoaded(marcacao);
+                    }
+                },
+                error -> Toast.makeText(context, "Erro ao carregar detalhes", Toast.LENGTH_SHORT).show()
+        );
+        addToRequestQueue(request, TAG_MARCACOES);
+    }
+
+    // Métodos BD Marcações
+    public ArrayList<Marcacao> getMarcacoesBD() { marcacoes = marcacoesDB.getAllMarcacoesBD(); return new ArrayList<>(marcacoes); }
+    public void adicionarMarcacoesBD(ArrayList<Marcacao> lista) {
+        marcacoesDB.removerAllMarcacoesBD();
+        for (Marcacao m : lista) marcacoesDB.adicionarMarcacaoBD(m);
+    }
+
+    // endregion
+
+    // region Lembretes
+
+    public void getLembretes(String accessToken, LembretesCallback callback) {
+        if (!isNetworkAvailable(context)) {
+            ArrayList<Lembrete> local = getLembretesBD();
+            this.lembretes = local;
+            if (callback != null) callback.onSuccess(local);
+            return;
+        }
+
+        String url = buildUrl("lembrete/all?access-token=" + accessToken);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    List<Lembrete> lista = LembreteJsonParser.parseLembretes(response);
+                    adicionarLembretesBD(lista);
+                    this.lembretes = new ArrayList<>(lista);
+                    if (callback != null) callback.onSuccess(lista);
+                },
+                error -> {
+                    ArrayList<Lembrete> local = getLembretesBD();
+                    this.lembretes = local;
+                    if (callback != null) callback.onSuccess(local);
+                }
+        );
         addToRequestQueue(request, TAG_LEMBRETES);
     }
 
     public void criarLembrete(String accessToken, String descricao, MessageCallback callback) {
         String url = buildUrl("lembrete/create?access-token=" + accessToken);
-
         JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("descricao", descricao);
-        } catch (JSONException e) {
-            if (callback != null) callback.onError("Erro ao preparar dados");
+        try { jsonBody.put("descricao", descricao); } catch (JSONException e) { return; }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                response -> {
+                    if (response.optBoolean("success", false) && callback != null)
+                        callback.onSuccess(response.optString("message"));
+                    else if (callback != null) callback.onError(response.optString("message"));
+                },
+                error -> { if (callback != null) callback.onError("Erro ao criar lembrete"); }
+        );
+        addToRequestQueue(request, TAG_LEMBRETES);
+    }
+
+    public void atualizarLembrete(String accessToken, int id, String descricao, MessageCallback callback) {
+        String url = buildUrl("lembrete/update/" + id + "?access-token=" + accessToken);
+        JSONObject jsonBody = new JSONObject();
+        try { jsonBody.put("descricao", descricao); } catch (JSONException e) { return; }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,
+                response -> {
+                    if (response.optBoolean("success", false) && callback != null)
+                        callback.onSuccess(response.optString("message"));
+                    else if (callback != null) callback.onError(response.optString("message"));
+                },
+                error -> { if (callback != null) callback.onError("Erro ao atualizar lembrete"); }
+        );
+        addToRequestQueue(request, TAG_LEMBRETES);
+    }
+
+    public void deletarLembrete(String accessToken, int id, MessageCallback callback) {
+        String url = buildUrl("lembrete/delete/" + id + "?access-token=" + accessToken);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
+                response -> {
+                    if (response.optBoolean("success", false) && callback != null) {
+                        lembretesDB.removerLembreteBD(id); // Remove localmente
+                        callback.onSuccess(response.optString("message"));
+                    } else if (callback != null) callback.onError(response.optString("message"));
+                },
+                error -> { if (callback != null) callback.onError("Erro ao eliminar lembrete"); }
+        );
+        addToRequestQueue(request, TAG_LEMBRETES);
+    }
+
+    // Métodos BD Lembretes
+    public ArrayList<Lembrete> getLembretesBD() { lembretes = lembretesDB.getAllLembretesBD(); return new ArrayList<>(lembretes); }
+    public void adicionarLembreteBD(Lembrete l) { lembretesDB.adicionarLembreteBD(l); }
+    public void adicionarLembretesBD(List<Lembrete> lista) {
+        lembretesDB.removerAllLembretesBD();
+        for (Lembrete l : lista) adicionarLembreteBD(l);
+    }
+
+    // endregion
+
+    // region Faturas
+
+    public void getFaturas(String accessToken, final FaturasCallback callback) {
+        if (!isNetworkAvailable(context)) {
+            ArrayList<Fatura> local = getFaturasBD();
+            this.faturas = local;
+            if (callback != null) callback.onSuccess(local);
+            if (FaturasListener != null) FaturasListener.onRefreshListaFaturas(local);
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                jsonBody,
+        String url = buildUrl("fatura/all?access-token=" + accessToken);
+        JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {
-                    try {
-                        boolean success = response.optBoolean("success", false);
-                        String message = response.optString("message", "");
-                        if (success) {
-                            if (callback != null) callback.onSuccess(message);
-                        } else {
-                            if (callback != null) callback.onError(message);
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) callback.onError("Erro ao processar resposta");
-                    }
+                    ArrayList<Fatura> lista = FaturaJsonParser.parseFaturas(response);
+                    adicionarFaturasBD(lista);
+                    this.faturas = lista;
+                    if (callback != null) callback.onSuccess(lista);
+                    if (FaturasListener != null) FaturasListener.onRefreshListaFaturas(lista);
                 },
                 error -> {
-                    String errorMsg = "Erro ao criar lembrete";
-                    if (error.networkResponse != null) {
-                        errorMsg += " (Código: " + error.networkResponse.statusCode + ")";
-                    } else if (error.getMessage() != null) {
-                        errorMsg += ": " + error.getMessage();
-                    }
-                    if (callback != null) callback.onError(errorMsg);
+                    ArrayList<Fatura> local = getFaturasBD();
+                    this.faturas = local;
+                    if (callback != null) callback.onSuccess(local);
+                    if (FaturasListener != null) FaturasListener.onRefreshListaFaturas(local);
                 }
         );
-
-        addToRequestQueue(request, TAG_LEMBRETES);
+        addToRequestQueue(req, TAG_FATURAS);
     }
+
+    public void getFaturaDetalhesAPI(int faturaId, Context context) {
+        String token = getAccessToken();
+        String url = buildUrl("fatura/view/" + faturaId + "?access-token=" + token);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    Fatura faturaDetalhada = FaturaJsonParser.parseFaturaDetalhes(response);
+                    if (faturaDetalhada != null) {
+                        Fatura existente = getFatura(faturaId);
+                        if (existente != null) {
+                            existente.setLinhas(faturaDetalhada.getLinhas());
+                            existente.setClienteNome(faturaDetalhada.getClienteNome());
+                            existente.setClienteNif(faturaDetalhada.getClienteNif());
+                            if (FaturasListener != null) FaturasListener.onFaturaDetalhesLoaded(existente);
+                        } else {
+                            if (FaturasListener != null) FaturasListener.onFaturaDetalhesLoaded(faturaDetalhada);
+                        }
+                    } else {
+                        Toast.makeText(context, "Erro ao processar detalhes", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT).show()
+        );
+        addToRequestQueue(request, TAG_FATURAS);
+    }
+
+    public void pagarFatura(int faturaId, int metodoId, Context context, final MessageCallback callback) {
+        String token = getAccessToken();
+        String url = buildUrl("fatura/pay/" + faturaId + "?access-token=" + token);
+        JSONObject body = new JSONObject();
+        try { body.put("metodospagamentos_id", metodoId); } catch (JSONException e) { return; }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, body,
+                response -> {
+                    if (response.optBoolean("success", false)) {
+                        if (callback != null) callback.onSuccess(response.optString("message"));
+                        getFaturas(token, null); // Atualiza lista
+                    } else {
+                        if (callback != null) callback.onError(response.optString("message"));
+                    }
+                },
+                error -> { if (callback != null) callback.onError("Erro ao pagar fatura"); }
+        );
+        addToRequestQueue(request, TAG_FATURAS);
+    }
+
+    public Fatura getFatura(int id) {
+        if (faturas != null) {
+            for (Fatura f : faturas) if (f.getId() == id) return f;
+        }
+        return null;
+    }
+
+    // Métodos BD Faturas
+    public ArrayList<Fatura> getFaturasBD() { faturas = faturasDB.getAllFaturasBD(); return new ArrayList<>(faturas); }
+    public void adicionarFaturaBD(Fatura f) { faturasDB.adicionarFaturaBD(f); }
+    public void adicionarFaturasBD(ArrayList<Fatura> lista) {
+        faturasDB.removerAllFaturasBD();
+        for (Fatura f : lista) adicionarFaturaBD(f);
+    }
+
     // endregion
 
-    // region Verificação do estado da API
+    // region Métodos de Pagamento
+
+    public void getMetodosPagamento(String token, final MetodosPagamentoCallback callback) {
+        String url = buildUrl("fatura/paymentmethods?access-token=" + token);
+        JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    ArrayList<MetodoPagamento> metodos = MetodoPagamentoJsonParser.parseMetodosPagamento(response);
+                    if (callback != null) callback.onSuccess(metodos);
+                    if (MetodosPagamentoListener != null) MetodosPagamentoListener.onRefreshMetodosPagamento(metodos);
+                },
+                error -> { if (callback != null) callback.onError("Erro ao obter métodos de pagamento"); }
+        );
+        addToRequestQueue(req, TAG_METODOS_PAGAMENTO);
+    }
+
+    // endregion
+
+    // region Verificação de Estado da API (Health Check)
+
     public void isApiResponding(final ApiHealthCallback callback) {
         String url = buildUrl("health");
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 response -> {
-                    // qualquer resposta significa que a API respondeu
                     setApiAvailable(true);
                     if (callback != null) callback.onResult(true);
                 },
                 error -> {
-                    Log.d(TAG, "Health check failed: " + (error != null ? error.toString() : "null"));
                     setApiAvailable(false);
                     if (callback != null) callback.onResult(false);
                 });
-
-        // timeout super curto para resposta rápida (200ms = imperceptível)
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                200, // timeout em ms (reduzido de 300 para 200)
-                0, // sem retries
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        addToRequestQueue(request, TAG_HEAlTH);
+        request.setRetryPolicy(new DefaultRetryPolicy(200, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        addToRequestQueue(request, TAG_HEALTH);
     }
 
-    // Guardar o estado da API nas SharedPreferences
     private void setApiAvailable(boolean available) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean wasAvailable = prefs.getBoolean(KEY_API_AVAILABLE, true);
         prefs.edit().putBoolean(KEY_API_AVAILABLE, available).apply();
-
-        // Notificar listeners se o estado mudou
-        if (wasAvailable != available) {
-            notifyApiStateChange(available);
-        }
+        if (wasAvailable != available) notifyApiStateChange(available);
     }
 
     private void notifyApiStateChange(boolean available) {
         for (ApiStateChangeListener listener : apiStateListeners) {
-            if (listener != null) {
-                listener.onApiStateChanged(available);
-            }
+            if (listener != null) listener.onApiStateChanged(available);
         }
     }
 
-    // Obter o estado da API das SharedPreferences (por defeito é true)
     public boolean getApiAvailable() {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getBoolean(KEY_API_AVAILABLE, true);
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(KEY_API_AVAILABLE, true);
     }
 
-    // Atualizar o estado da API com verificação de rede e callback
     public void updateApiState(Context context, final ApiHealthCallback callback) {
-        // Primeiro verifica se há rede local
         if (!isNetworkAvailable(context)) {
             setApiAvailable(false);
             if (callback != null) callback.onResult(false);
             return;
         }
-
-        // Se houver rede, verifica o endpoint /health
         isApiResponding(callback);
     }
 
-    // Verificação rápida: primeiro rede (instantâneo), depois API (se necessário)
     public void quickCheckApiState(Context context, final ApiHealthCallback callback) {
-        // 1. Verificação instantânea de rede
         if (!isNetworkAvailable(context)) {
-            // Sem rede = sem API, resposta instantânea
             setApiAvailable(false);
             if (callback != null) callback.onResult(false);
             return;
         }
-
-        // 2. Tem rede, mas vamos verificar se a última verificação da API foi recente
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         long lastCheck = prefs.getLong("last_api_check", 0);
         long now = System.currentTimeMillis();
-        boolean cachedState = prefs.getBoolean(KEY_API_AVAILABLE, true);
-
-        // Se verificou há menos de 3 segundos, usa o cache (super rápido)
         if (now - lastCheck < 3000) {
-            if (callback != null) callback.onResult(cachedState);
+            if (callback != null) callback.onResult(prefs.getBoolean(KEY_API_AVAILABLE, true));
             return;
         }
-
-        // 3. Faz verificação real da API com timeout curto
         prefs.edit().putLong("last_api_check", now).apply();
         isApiResponding(callback);
     }
 
-    // Verificar se há rede disponível
     private boolean isNetworkAvailable(Context context) {
-        android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return false;
         android.net.Network network = cm.getActiveNetwork();
         if (network == null) return false;
@@ -1147,121 +883,6 @@ public class Singleton {
                 caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) ||
                 caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET));
     }
+
     // endregion
-
-    //region Faturas
-    public void getFaturas(String accessToken) {
-
-        String url = buildUrl("fatura/all?access-token=" + accessToken);
-
-        Log.d("API_FATURAS_URL", url);
-
-        JsonArrayRequest req = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    ArrayList<Fatura> faturas =
-                            FaturaJsonParser.parserJsonFaturas(response);
-
-                    if (FaturasListener != null) {
-                        FaturasListener.onRefreshListaFaturas(faturas);
-                    }
-                },
-                error -> {
-                    Log.e("API_FATURAS", "Erro", error);
-                }
-        );
-
-        addToRequestQueue(req, TAG_FATURAS);
-    }
-
-    private ArrayList<Fatura> faturas = new ArrayList<>();
-
-    public Fatura getFatura(int id) {
-        if (faturas == null) return null;
-
-        for (Fatura f : faturas) {
-            if (f.getId() == id) {
-                return f;
-            }
-        }
-        return null;
-    }
-
-    public void pagarFatura(
-            int faturaId,
-            int metodoPagamentoId,
-            Context context
-    ) {
-
-        String token = context
-                .getSharedPreferences("VetGestLinkPrefs", Context.MODE_PRIVATE)
-                .getString("access_token", "");
-
-        String url = buildUrl(
-                "fatura/pay/" + faturaId + "?access-token=" + token
-        );
-
-        JSONObject body = new JSONObject();
-        try {
-            body.put("metodospagamentos_id", metodoPagamentoId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                body,
-                response -> {
-                    Log.d("PAGAR_FATURA", "Pagamento efetuado: " + response);
-                    if (FaturasListener != null) {
-                        FaturasListener.onRefreshListaFaturas(faturas);
-                    }
-                    getFaturas(token);
-
-                },
-                error -> {
-                    Log.e("PAGAR_FATURA", "Erro ao pagar fatura", error);
-                }
-        );
-
-        requestQueue.add(request);
-    }
-    //endregion
-
-    //region Metodos de pagamento
-    public void getMetodosPagamento(String token) {
-
-        String url = buildUrl("fatura/paymentmethods?access-token=" + token);
-
-        JsonArrayRequest req = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    ArrayList<MetodoPagamento> metodos =
-                            MetodoPagamentoJsonParser.parserJsonMetodosPagamento(response);
-
-                    if (MetodosPagamentoListener != null)
-                        MetodosPagamentoListener.onRefreshMetodosPagamento(metodos);
-                },
-                error -> Log.e(TAG, "Erro ao obter métodos de pagamento", error)
-        );
-
-        addToRequestQueue(req, TAG_METODOS_PAGAMENTO);
-    }
-
-    private ArrayList<MetodoPagamento> metodos = new ArrayList<>();
-
-    public MetodoPagamento getMetodoPagamento(int id) {
-        for (MetodoPagamento m : metodos) {
-            if (m.getId() == id) {
-                return m;
-            }
-        }
-        return null;
-    }
-    //endregion
 }

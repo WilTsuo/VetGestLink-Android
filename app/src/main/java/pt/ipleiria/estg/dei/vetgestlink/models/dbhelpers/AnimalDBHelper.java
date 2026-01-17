@@ -12,10 +12,11 @@ import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 
 public class AnimalDBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "Animais.db";
-    private static final int DATABASE_VERSION = 3;
-
+    private static final String DB_NAME = "Animais.db";
+    private static final int DB_VERSION = 3;
     private static final String TABLE_NAME = "animal";
+
+    // Colunas da Tabela
     private static final String COL_ID = "id";
     private static final String COL_NOME = "nome";
     private static final String COL_ESPECIE = "especie";
@@ -26,15 +27,12 @@ public class AnimalDBHelper extends SQLiteOpenHelper {
     private static final String COL_DATANASCIMENTO = "datanascimento";
     private static final String COL_MICROCHIP = "microchip";
     private static final String COL_FOTO_URL = "foto_url";
-
-
-    //salvamos porque sim (sou preguisoso)
     private static final String COL_USERPROFILES_ID = "userprofiles_id";
     private static final String COL_CREATED_AT = "created_at";
     private static final String COL_UPDATED_AT = "updated_at";
 
     public AnimalDBHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -63,71 +61,81 @@ public class AnimalDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public ArrayList<Animal> getAllAnimaisBD() {
-        ArrayList<Animal> lista = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null);
-        if (c != null) {
-            try {
-                while (c.moveToNext()) {
-                    int id = c.getInt(c.getColumnIndexOrThrow(COL_ID));
-                    String nome = c.getString(c.getColumnIndexOrThrow(COL_NOME));
-                    String especie = c.getString(c.getColumnIndexOrThrow(COL_ESPECIE));
-                    String raca = c.getString(c.getColumnIndexOrThrow(COL_RACA));
-                    String idade = c.getString(c.getColumnIndexOrThrow(COL_IDADE));
-                    double peso = c.getDouble(c.getColumnIndexOrThrow(COL_PESO));
-                    String sexo = c.getString(c.getColumnIndexOrThrow(COL_SEXO));
-                    String dataNascimento = c.getString(c.getColumnIndexOrThrow(COL_DATANASCIMENTO));
-                    int microchip = c.getInt(c.getColumnIndexOrThrow(COL_MICROCHIP));
-                    String fotoUrl = c.getString(c.getColumnIndexOrThrow(COL_FOTO_URL));
-                    int userprofilesId = c.getInt(c.getColumnIndexOrThrow(COL_USERPROFILES_ID));
-                    String createdAt = c.getString(c.getColumnIndexOrThrow(COL_CREATED_AT));
-                    String updatedAt = c.getString(c.getColumnIndexOrThrow(COL_UPDATED_AT));
-
-                    Animal animal = new Animal(id, nome, especie, raca, idade, peso, sexo,
-                            microchip, fotoUrl,dataNascimento, userprofilesId, createdAt, updatedAt);
-                    lista.add(animal);
-                }
-            } finally {
-                c.close();
-            }
-        }
-        db.close();
-        return lista;
-    }
-
+    // --- MÉTODOS CRUD ---
 
     public void adicionarAnimalBD(Animal animal) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_ID, animal.getId());
-        values.put(COL_NOME, animal.getNome());
-        values.put(COL_ESPECIE, animal.getEspecie());
-        values.put(COL_RACA, animal.getRaca());
-        values.put(COL_IDADE, animal.getIdade());
-        values.put(COL_PESO, animal.getPeso());
-        values.put(COL_SEXO, animal.getSexo());
-        values.put(COL_DATANASCIMENTO, animal.getDtanascimento());
-        values.put(COL_MICROCHIP, animal.getMicrochip());
-        values.put(COL_FOTO_URL, animal.getFotoUrl());
-        values.put(COL_USERPROFILES_ID, animal.getUserprofilesId());
-        values.put(COL_CREATED_AT, animal.getCreatedAt());
-        values.put(COL_UPDATED_AT, animal.getUpdatedAt());
+        try {
+            ContentValues values = new ContentValues();
+            values.put(COL_ID, animal.getId());
+            values.put(COL_NOME, animal.getNome());
+            values.put(COL_ESPECIE, animal.getEspecie());
+            values.put(COL_RACA, animal.getRaca());
+            values.put(COL_IDADE, animal.getIdade());
+            values.put(COL_PESO, animal.getPeso());
+            values.put(COL_SEXO, animal.getSexo());
+            values.put(COL_DATANASCIMENTO, animal.getDtanascimento());
+            values.put(COL_MICROCHIP, animal.getMicrochip());
+            values.put(COL_FOTO_URL, animal.getFotoUrl());
+            values.put(COL_USERPROFILES_ID, animal.getUserprofilesId());
+            values.put(COL_CREATED_AT, animal.getCreatedAt());
+            values.put(COL_UPDATED_AT, animal.getUpdatedAt());
 
-        db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
+            db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        } finally {
+            db.close();
+        }
     }
 
+    public ArrayList<Animal> getAllAnimaisBD() {
+        ArrayList<Animal> lista = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = null;
+
+        try {
+            c = db.query(TABLE_NAME, null, null, null, null, null, null);
+            if (c != null && c.moveToFirst()) {
+                do {
+                    Animal animal = new Animal(
+                            c.getInt(c.getColumnIndexOrThrow(COL_ID)),
+                            c.getString(c.getColumnIndexOrThrow(COL_NOME)),
+                            c.getString(c.getColumnIndexOrThrow(COL_ESPECIE)),
+                            c.getString(c.getColumnIndexOrThrow(COL_RACA)),
+                            c.getString(c.getColumnIndexOrThrow(COL_IDADE)),
+                            c.getDouble(c.getColumnIndexOrThrow(COL_PESO)),
+                            c.getString(c.getColumnIndexOrThrow(COL_SEXO)),
+                            c.getInt(c.getColumnIndexOrThrow(COL_MICROCHIP)),
+                            c.getString(c.getColumnIndexOrThrow(COL_FOTO_URL)),
+                            c.getString(c.getColumnIndexOrThrow(COL_DATANASCIMENTO)),
+                            c.getInt(c.getColumnIndexOrThrow(COL_USERPROFILES_ID)),
+                            c.getString(c.getColumnIndexOrThrow(COL_CREATED_AT)),
+                            c.getString(c.getColumnIndexOrThrow(COL_UPDATED_AT))
+                    );
+                    lista.add(animal);
+                } while (c.moveToNext());
+            }
+        } finally {
+            if (c != null) c.close();
+            db.close();
+        }
+        return lista;
+    }
 
     public void removerAllAnimaisBD() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, null, null);
-        db.close();
+        try {
+            db.delete(TABLE_NAME, null, null);
+        } finally {
+            db.close();
+        }
     }
 
     public void removerAnimalBD(int idAnimal) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(idAnimal)});
-        db.close();
+        try {
+            db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(idAnimal)});
+        } finally {
+            db.close();
+        }
     }
 }
