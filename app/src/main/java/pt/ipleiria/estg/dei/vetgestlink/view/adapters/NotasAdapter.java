@@ -81,6 +81,12 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
         } catch (Exception e) {
             holder.tvData.setText("");
         }
+        try {
+            String autor = n.getAutor() != null ? n.getAutor() : "";
+            holder.tvAutor.setText("Autor: " + autor);
+        } catch (Exception e) {
+            holder.tvAutor.setText("Autor: ");
+        }
 
         boolean isOwner = n.getUserprofileId() == currentUserId;
         holder.btnEditar.setVisibility(isOwner ? View.VISIBLE : View.GONE);
@@ -204,6 +210,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
         TextView tvTitulo;
         TextView tvDescricao;
         TextView tvData;
+        TextView tvAutor;
         ImageButton btnEditar;
         ImageButton btnExcluir;
 
@@ -212,6 +219,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
             tvTitulo = itemView.findViewById(R.id.tv_titulo);
             tvDescricao = itemView.findViewById(R.id.tv_descricao);
             tvData = itemView.findViewById(R.id.tv_data);
+            tvAutor = itemView.findViewById(R.id.tv_autor);
             btnEditar = itemView.findViewById(R.id.btn_editar);
             btnExcluir = itemView.findViewById(R.id.btn_excluir);
         }

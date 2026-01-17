@@ -28,6 +28,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Botão de exemplo - BottomNavigationView suporta máximo 5 itens
+        <ImageButton
+            android:id="@+id/btn_menu_exemplos"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/menu_button"
+            android:elevation="10dp"
+            android:padding="15dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_check"
+            app:layout_constraintBottom_toBottomOf="@+id/top_green_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.956"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:tint="@android:color/white" />
+        -->
         <TextView
             android:id="@+id/toolbar_title"
             style="@style/Toolbar.TitleText"

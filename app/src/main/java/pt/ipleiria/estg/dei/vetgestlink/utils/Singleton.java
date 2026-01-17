@@ -878,4 +878,30 @@ public class Singleton {
     }
 
     // endregion
+
+
+    // region Exemplo testes
+    public interface CountCallback {
+        void onSuccess(int count);
+        void onError(String message);
+    }
+
+    public void getMarcacoesCount(String accessToken, final CountCallback callback) {
+        String url = buildUrl("marcacao/count?access-token=" + accessToken);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        int count = response.getInt("count");
+                        if (callback != null) callback.onSuccess(count);
+                    } catch (JSONException e) {
+                        if (callback != null) callback.onError("Erro ao processar count: " + e.getMessage());
+                    }
+                },
+                error -> {
+                    if (callback != null) callback.onError("Erro na API");
+                }
+        );
+        addToRequestQueue(request, TAG_MARCACOES);
+    }
+    // endregion
 }

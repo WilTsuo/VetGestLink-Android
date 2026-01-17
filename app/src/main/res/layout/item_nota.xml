@@ -87,10 +87,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="18 Nov 2025"
+                android:text="@string/data_exemplo"
                 android:textColor="@color/icon_gray"
                 android:textSize="13sp"
                 android:fontFamily="sans-serif" />
+
+            <TextView
+                android:id="@+id/tv_autor"
+                android:paddingLeft="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/autor_exemplo"
+                android:textColor="@color/icon_gray"
+                android:textSize="13sp" />
 
         </LinearLayout>
 

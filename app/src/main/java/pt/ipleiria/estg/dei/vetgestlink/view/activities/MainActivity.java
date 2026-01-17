@@ -21,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.DefinicoesFragment;
+import pt.ipleiria.estg.dei.vetgestlink.view.fragments.ExemploFragment; //exemplo OG
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.LembretesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.MarcacoesFragment;
 import pt.ipleiria.estg.dei.vetgestlink.view.fragments.NotasFragment;
@@ -50,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar a barra de aviso
         warningBar = findViewById(R.id.warning_bar);
+
+        // Inicializar botão de exemplo
+        // migrar no futuro para uma bottomNavigationView so
+        // muda o lugar do botaao para o menu em baixo
+        /*
+        findViewById(R.id.btn_menu_exemplos).setOnClickListener(v -> {
+            setCurrentFragment(new ExemploFragment(), "Exemplos");
+        });
+        */
 
         // Inicializar Handler para verificações periódicas
         handler = new Handler(Looper.getMainLooper());

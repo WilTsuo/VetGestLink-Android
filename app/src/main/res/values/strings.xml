@@ -5,6 +5,7 @@
     <string name="fragment_name"> </string>
     <string name="logo_description">Logótipo VetGestLink</string>
     <string name="app_subtitle">Gestão Veterinária Completa</string>
+    <string name="menu_button">Botão de Menu</string>
 
     <!-- Login -->
     <string name="username_hint">Nome de utilizador</string>
@@ -40,6 +41,8 @@
     <string name="hint_titulo">Título</string>
     <string name="hint_descricao">Descrição</string>
     <string name="hint_selecionar_animal">Selecionar Animal</string>
+    <string name="data_exemplo">08 Nov 2001</string>
+    <string name="autor_exemplo">Autor: Exemplo</string>
 
     <!-- Marcações / Marcacões -->
     <string name="add_appointment">Nova Marcação</string>
@@ -80,6 +83,7 @@
     <string name="lbl_versao_app">VetGestLink Cliente v1.0.0</string>
     <string name="lbl_copyright">© 2025 VetGestLink</string>
     <string name="btn_logout">Terminar Sessão</string>
+
     <!-- secção de Suporte -->
     <string name="lbl_suporte">Suporte e Ajuda</string>
     <string name="btn_termos_condicoes">Termos e Condições</string>
@@ -146,7 +150,6 @@
     <string name="detalhes">Detalhes</string>
     <string name="label_cliente">Cliente:</string>
     <string name="label_nif">NIF:</string>
-    <!-- NOVAS STRINGS ADICIONADAS -->
     <string name="label_nome_paciente">Nome do Paciente</string>
     <string name="label_raca">Raça</string>
     <string name="label_diagnostico_notas">Diagnóstico / Notas</string>
