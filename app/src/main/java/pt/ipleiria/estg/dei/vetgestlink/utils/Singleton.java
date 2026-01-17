@@ -202,7 +202,12 @@ public class Singleton {
     }
 
     public String getMainUrl() { return mainUrl; }
-
+    public String getSignUpUrl() {
+        if (mainUrl != null && mainUrl.contains("/backend/web/api")) {
+            return mainUrl.replace("/backend/web/api", "/frontend/web/site/signup");
+        }
+        return mainUrl;
+    }
     public void setMainUrl(String url) {
         this.mainUrl = url;
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);

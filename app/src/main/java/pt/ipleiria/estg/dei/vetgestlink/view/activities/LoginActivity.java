@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvSignUp.setOnClickListener(v -> {
-            String url = Singleton.getInstance(getApplicationContext()).getMainUrl();
+            String url = Singleton.getInstance(getApplicationContext()).getSignUpUrl();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         });
