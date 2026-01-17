@@ -25,12 +25,19 @@ public class FaturasAdapter extends ArrayAdapter<Fatura> {
     private Context context;
     private ArrayList<Fatura> faturas;
     private OnPagarClickListener listener;
+    private boolean apiAvailable = true;
 
     public FaturasAdapter(Context context, ArrayList<Fatura> faturas, OnPagarClickListener listener){
         super(context, 0, faturas);
         this.context = context;
         this.faturas = faturas;
         this.listener = listener;
+    }
+
+    // setter pra atualizar disponibilidade da API em runtime
+    public void setApiAvailable(boolean apiAvailable) {
+        this.apiAvailable = apiAvailable;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -98,6 +105,10 @@ public class FaturasAdapter extends ArrayAdapter<Fatura> {
 
             tvMetodo.setVisibility(View.GONE);
             btnPagar.setVisibility(View.VISIBLE);
+
+            // aplica estado (enabled + alpha) conforme disponibilidade da API
+            btnPagar.setEnabled(apiAvailable);
+            btnPagar.setAlpha(apiAvailable ? 1f : 0.5f);
 
             btnPagar.setOnClickListener(v -> {
                 Log.d("PAGAR_CLICK", "Botão pagar clicado: " + fatura.getId());

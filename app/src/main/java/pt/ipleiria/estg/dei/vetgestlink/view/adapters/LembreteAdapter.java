@@ -44,6 +44,12 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
         this.listener = listener;
     }
 
+    // setter pra atualizar disponibilidade da API em runtime
+    public void setApiAvailable(boolean apiAvailable) {
+        // só notifica mudanças pra atualizar UI
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public LembreteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,8 +65,23 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
         holder.tvDescricao.setText(lembrete.getDescricao() != null ? lembrete.getDescricao() : "");
         holder.tvData.setText(lembrete.getCreatedAt() != null ? lembrete.getCreatedAt() : "");
 
-        holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), lembrete));
-        holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), lembrete));
+        // checa disponibilidade da API
+        boolean apiAvailable = Singleton.getInstance(holder.itemView.getContext()).getApiAvailable();
+        float alpha = apiAvailable ? 1f : 0.5f;
+
+        holder.btnEditar.setEnabled(apiAvailable);
+        holder.btnEditar.setAlpha(alpha);
+        holder.btnExcluir.setEnabled(apiAvailable);
+        holder.btnExcluir.setAlpha(alpha);
+
+        // listeners: se api tiver disponivel usa acoes normais, senao mostra toast
+        if (apiAvailable) {
+            holder.btnEditar.setOnClickListener(v -> showEditDialog(holder.itemView.getContext(), lembrete));
+            holder.btnExcluir.setOnClickListener(v -> showDeleteDialog(holder.itemView.getContext(), lembrete));
+        } else {
+            holder.btnEditar.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "API nao disponivel", Toast.LENGTH_SHORT).show());
+            holder.btnExcluir.setOnClickListener(v -> Toast.makeText(holder.itemView.getContext(), "API nao disponivel", Toast.LENGTH_SHORT).show());
+        }
     }
 
     @Override
@@ -69,6 +90,12 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
     }
 
     private void showEditDialog(Context context, Lembrete lembrete) {
+        // seguranca: se API nao disponivel nao abre dialogo
+        if (!Singleton.getInstance(context).getApiAvailable()) {
+            Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_nota, null);
 
@@ -114,6 +141,12 @@ public class LembreteAdapter extends RecyclerView.Adapter<LembreteAdapter.Lembre
     }
 
     private void showDeleteDialog(Context context, Lembrete lembrete) {
+        // seguranca: se API nao tiver disponivel nao abre dialogo
+        if (!Singleton.getInstance(context).getApiAvailable()) {
+            Toast.makeText(context, "API nao disponivel", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new AlertDialog.Builder(context)
                 .setTitle("Eliminar Lembrete")
                 .setMessage("Tem certeza que deseja eliminar este lembrete?")

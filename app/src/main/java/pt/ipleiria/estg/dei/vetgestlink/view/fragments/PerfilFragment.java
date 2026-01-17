@@ -1,6 +1,11 @@
 package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +33,14 @@ import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.activities.MainActivity;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.PerfilAnimalAdapter;
 
-public class PerfilFragment extends Fragment {
+public class PerfilFragment extends Fragment implements Singleton.ApiStateChangeListener {
 
     private RecyclerView recyclerAnimais;
     private PerfilAnimalAdapter perfilAdapter;
     private List<Animal> perfilAnimais = new ArrayList<>();
     private TextView tvAnimalCount;
+    private MaterialButton btnEditarPerfil;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     // TextViews do utilizador
     private TextView tvNomeCompleto;
@@ -85,8 +92,24 @@ public class PerfilFragment extends Fragment {
         });
 
         // Botão Editar Perfil
-        MaterialButton btnEditarPerfil = view.findViewById(R.id.btnEditarPerfil);
-        btnEditarPerfil.setOnClickListener(v -> abrirDialogEdicao());
+        btnEditarPerfil = view.findViewById(R.id.btnEditarPerfil);
+        btnEditarPerfil.setOnClickListener(v -> {
+            if (!Singleton.getInstance(requireContext()).getApiAvailable()){
+                Toast.makeText(requireContext(), "sem ligação a API, verifica a tua conexao a Internet", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            abrirDialogEdicao();
+        });
+
+        // registrar listener pro Singleton
+        Singleton.getInstance(requireContext()).addApiStateChangeListener(this);
+
+        // Setup do NetworkCallback pra reagir a mudancas de rede
+        setupNetworkCallback();
+
+        // ler o estado atual da API (nao chama http, so lê as preferencias)
+        boolean apiOk = Singleton.getInstance(requireContext()).getApiAvailable();
+        applyApiState(apiOk);
 
         // Carregar dados
         carregarDados();
@@ -313,5 +336,68 @@ public class PerfilFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    // Aplica o estado da api aos botoes
+    private void applyApiState(boolean ok) {
+        if (btnEditarPerfil != null) {
+            btnEditarPerfil.setEnabled(ok);
+            btnEditarPerfil.setAlpha(ok ? 1f : 0.5f);
+        }
+    }
+
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // qnd rede ficar disponivel, verifica a API rapidamnte
+                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> applyApiState(responding));
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // quando perder rede, desabilita imediatamente
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> applyApiState(false));
+                }
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        cm.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    @Override
+    public void onApiStateChanged(boolean available) {
+        // callback do singleton qnd o estado da api muda
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> applyApiState(available));
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // remove listener do Singleton
+        Singleton.getInstance(requireContext()).removeApiStateChangeListener(this);
+
+        // remove NetworkCallback
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                cm.unregisterNetworkCallback(networkCallback);
+            }
+        }
     }
 }

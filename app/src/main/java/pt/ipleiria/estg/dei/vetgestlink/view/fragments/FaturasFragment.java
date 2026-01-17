@@ -4,8 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -30,7 +35,7 @@ import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.FaturasAdapter;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.LinhasFaturaAdapter;
 
-public class FaturasFragment extends Fragment implements FaturasListener, OnPagarClickListener {
+public class FaturasFragment extends Fragment implements FaturasListener, OnPagarClickListener, Singleton.ApiStateChangeListener {
 
     private ListView lvFaturas;
     private Button btnTodos, btnPendente, btnPago;
@@ -39,6 +44,7 @@ public class FaturasFragment extends Fragment implements FaturasListener, OnPaga
     private ArrayList<Fatura> listaFaturas = new ArrayList<>();
     private ArrayList<Fatura> listaFiltrada = new ArrayList<>();
     private FaturasAdapter adapter;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     public FaturasFragment() {}
 
@@ -72,6 +78,16 @@ public class FaturasFragment extends Fragment implements FaturasListener, OnPaga
         // Singleton + listener
         Singleton singleton = Singleton.getInstance(requireContext());
         singleton.setFaturasListener(this);
+
+        // registar listener pro Singleton
+        singleton.addApiStateChangeListener(this);
+
+        // setup network monitoring
+        setupNetworkCallback();
+
+        // le o estado da api atual
+        boolean apiOk = singleton.getApiAvailable();
+        applyApiState(apiOk);
 
         // Token e Carregamento Inicial
         String token = getActivity()
@@ -194,6 +210,61 @@ public class FaturasFragment extends Fragment implements FaturasListener, OnPaga
     public void onDestroyView() {
         super.onDestroyView();
         Singleton.getInstance(requireContext()).setFaturasListener(null);
+
+        // remove listener do Singleton
+        Singleton.getInstance(requireContext()).removeApiStateChangeListener(this);
+
+        // remove NetworkCallback
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                cm.unregisterNetworkCallback(networkCallback);
+            }
+        }
+    }
+
+    // aplica o estado da api no adapter
+    private void applyApiState(boolean ok) {
+        if (adapter != null) adapter.setApiAvailable(ok);
+    }
+
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // qnd a rede fica disponivel, verificar API rapidamnte
+                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> applyApiState(responding));
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // qnd perder a rede, desabilita imediatamente
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> applyApiState(false));
+                }
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        cm.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    @Override
+    public void onApiStateChanged(boolean available) {
+        // callback do Singleton qnd o estado da API muda
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> applyApiState(available));
+        }
     }
 
     @Override

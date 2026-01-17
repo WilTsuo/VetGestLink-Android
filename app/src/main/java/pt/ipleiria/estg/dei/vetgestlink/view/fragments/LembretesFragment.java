@@ -2,6 +2,10 @@ package pt.ipleiria.estg.dei.vetgestlink.view.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +30,14 @@ import pt.ipleiria.estg.dei.vetgestlink.models.Lembrete;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.LembreteAdapter;
 
-public class LembretesFragment extends Fragment {
+public class LembretesFragment extends Fragment implements Singleton.ApiStateChangeListener {
 
     private RecyclerView rvLembretes;
     private LembreteAdapter adapter;
     private List<Lembrete> listaLembretes;
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private FloatingActionButton fabAdd;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Nullable
     @Override
@@ -53,7 +58,23 @@ public class LembretesFragment extends Fragment {
         adapter.setOnLembreteChangedListener(this::carregarLembretes);
         rvLembretes.setAdapter(adapter);
 
-        fabAdd.setOnClickListener(v -> mostrarDialogoCriar());
+        fabAdd.setOnClickListener(v -> {
+            if (!Singleton.getInstance(requireContext()).getApiAvailable()) {
+                Toast.makeText(requireContext(), "API indisponivel, verifica a conexao", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mostrarDialogoCriar();
+        });
+
+        // regista listener no Singleton
+        Singleton.getInstance(requireContext()).addApiStateChangeListener(this);
+
+        // setup network monitoring
+        setupNetworkCallback();
+
+        // le o estado da api atual
+        boolean apiOk = Singleton.getInstance(requireContext()).getApiAvailable();
+        applyApiState(apiOk);
 
         carregarLembretes();
 
@@ -121,5 +142,69 @@ public class LembretesFragment extends Fragment {
                 }
             });
         });
+    }
+
+    // aplica o estado da api no FAB
+    private void applyApiState(boolean ok) {
+        if (adapter != null) adapter.setApiAvailable(ok);
+        if (fabAdd != null) {
+            fabAdd.setEnabled(ok);
+            fabAdd.setAlpha(ok ? 1f : 0.5f);
+        }
+    }
+
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // qnd a rede fica disponivel, checa a API rapidamente
+                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> applyApiState(responding));
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // perde a rede, desabilita
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> applyApiState(false));
+                }
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        cm.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    @Override
+    public void onApiStateChanged(boolean available) {
+        // callback do singleton quando o estado da API muda
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> applyApiState(available));
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // remove listener do Singleton
+        Singleton.getInstance(requireContext()).removeApiStateChangeListener(this);
+
+        // remove o NetworkCallback
+        if (networkCallback != null) {
+            ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                cm.unregisterNetworkCallback(networkCallback);
+            }
+        }
     }
 }
