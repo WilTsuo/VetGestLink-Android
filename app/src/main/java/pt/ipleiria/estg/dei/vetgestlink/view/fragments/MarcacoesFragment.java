@@ -30,10 +30,12 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import pt.ipleiria.estg.dei.vetgestlink.R;
 import pt.ipleiria.estg.dei.vetgestlink.listeners.MarcacoesListener;
+import pt.ipleiria.estg.dei.vetgestlink.models.Animal;
 import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
 import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 import pt.ipleiria.estg.dei.vetgestlink.view.adapters.MarcacoesAdapter;
@@ -49,6 +51,9 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
 
     private String currentToken;
     private ArrayList<Marcacao> listaOriginal = new ArrayList<>();
+    // Lista separada para garantir que temos os nomes dos animais para o dropdown
+    private List<Animal> listaAnimais = new ArrayList<>();
+
     private String animalSelecionado = "Todos";
     private String estadoSelecionado = "Todas";
 
@@ -75,9 +80,8 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         rvMarcacoes.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new MarcacoesAdapter(getContext(), new ArrayList<>());
 
-        // Configurar o clique na lista
+        // Configurar o clique na lista para abrir detalhes via Singleton
         adapter.setOnItemClickListener(marcacao -> {
-            // Chama o Singleton para buscar os detalhes completos da API
             Singleton.getInstance(requireContext()).getMarcacaoDetalhesAPI(marcacao.getId(), requireContext());
         });
 
@@ -89,24 +93,102 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         configurarFiltrosEstado();
         configurarFiltroAnimal();
 
-        // Registrar listeners
+        // Registrar listeners no Singleton
         Singleton.getInstance(getContext()).setMarcacoesListener(this);
         Singleton.getInstance(requireContext()).addApiStateChangeListener(this);
 
-        // Setup NetworkCallback para reagir a mudanças de rede
         setupNetworkCallback();
 
-        // Carregar dados iniciais
+        // Carregar dados (Marcações e Animais) usando o Singleton
         loadMarcacoes();
+        loadAnimais();
 
         return view;
     }
 
-    // --- IMPLEMENTAÇÃO DO DIÁLOGO DE DETALHES ---
+    // --- CARREGAMENTO DE DADOS VIA SINGLETON ---
+
+    private void loadAnimais() {
+        if (currentToken == null || currentToken.isEmpty()) return;
+
+        // Busca animais da API (ou cache se offline, gerido pelo Singleton)
+        Singleton.getInstance(requireContext()).getAnimais(currentToken, new Singleton.AnimaisCallback() {
+            @Override
+            public void onSuccess(List<Animal> animais) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        listaAnimais = animais;
+                        atualizarDropdownAnimais();
+                    });
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("MarcacoesFragment", "Erro ao carregar animais: " + error);
+            }
+        });
+    }
+
+    private void loadMarcacoes() {
+        if (currentToken == null || currentToken.isEmpty()) {
+            carregarCache();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        // Pede ao Singleton as marcações
+        Singleton.getInstance(requireContext()).getMarcacoes(currentToken, new Singleton.MarcacoesCallback() {
+            @Override
+            public void onSuccess(ArrayList<Marcacao> marcacoes) {
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    listaOriginal = marcacoes;
+                    aplicarFiltros();
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    carregarCache();
+                    Toast.makeText(getContext(), "Modo Offline: " + error, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void carregarCache() {
+        if (!isAdded()) return;
+        requireActivity().runOnUiThread(() -> {
+            // Carrega Marcações da BD Local via Singleton
+            ArrayList<Marcacao> cachedMarcacoes = Singleton.getInstance(requireContext()).getMarcacoesBD();
+            listaOriginal.clear();
+            if (cachedMarcacoes != null) {
+                listaOriginal.addAll(cachedMarcacoes);
+            }
+
+            // Carrega Animais da BD Local via Singleton se a lista estiver vazia
+            if (listaAnimais.isEmpty()) {
+                listaAnimais = Singleton.getInstance(requireContext()).getAnimaisBD();
+                atualizarDropdownAnimais();
+            }
+
+            aplicarFiltros();
+            progressBar.setVisibility(View.GONE);
+            Log.d("VetGestLink-Marcacoes", "Carregou dados do cache local via Singleton");
+        });
+    }
+
+    // --- DIÁLOGO DE DETALHES ---
 
     @Override
     public void onMarcacaoDetalhesLoaded(Marcacao marcacaoDetalhada) {
-        // Este método é chamado pelo Singleton quando os dados chegam da API
+        // Callback do Listener do Singleton quando os detalhes chegam
         if (getContext() != null && isAdded()) {
             mostrarDialogDetalhes(marcacaoDetalhada);
         }
@@ -123,15 +205,15 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Referências UI do XML dialog_marcacao_detalhes.xml
+        // Referências UI
         TextView tvDataHora = dialogView.findViewById(R.id.tvDialogDataHora);
         TextView tvEstado = dialogView.findViewById(R.id.tvDialogEstado);
         TextView tvServico = dialogView.findViewById(R.id.tvDialogServico);
 
-        // ALTERAÇÃO: Referências para os novos campos separados do animal
         TextView tvAnimalNome = dialogView.findViewById(R.id.tvDialogAnimalNome);
         TextView tvAnimalEspecie = dialogView.findViewById(R.id.tvDialogAnimalEspecie);
         TextView tvAnimalRaca = dialogView.findViewById(R.id.tvDialogAnimalRaca);
+        TextView tvAnimalGenero = dialogView.findViewById(R.id.tvDialogAnimalGenero);
 
         TextView tvDiagnostico = dialogView.findViewById(R.id.tvDialogDiagnostico);
         Button btnClose = dialogView.findViewById(R.id.btnCloseDialog);
@@ -139,31 +221,26 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         // Preencher Dados
         tvDataHora.setText(m.getData() + " | " + m.getHoraInicio());
 
-        // Estado e Cor
         tvEstado.setText(m.getEstado());
         if ("realizada".equalsIgnoreCase(m.getEstado())) {
-            tvEstado.setTextColor(Color.parseColor("#2E7D32")); // Verde
+            tvEstado.setTextColor(Color.parseColor("#2E7D32"));
         } else if ("cancelada".equalsIgnoreCase(m.getEstado())) {
             tvEstado.setTextColor(Color.RED);
         } else {
-            tvEstado.setTextColor(Color.parseColor("#F59E0B")); // Laranja/Amarelo para pendente
+            tvEstado.setTextColor(Color.parseColor("#F59E0B"));
         }
 
-        // Serviço e Duração
         String servicoTxt = m.getServicoNome();
         if (m.getDuracaoMinutos() > 0) {
             servicoTxt += " (" + m.getDuracaoMinutos() + " min)";
         }
         tvServico.setText(servicoTxt);
 
-        // ALTERAÇÃO: Preenchimento dos campos separados
         tvAnimalNome.setText(m.getAnimalNome() != null ? m.getAnimalNome() : "-");
         tvAnimalEspecie.setText(m.getAnimalEspecie() != null ? m.getAnimalEspecie() : "-");
+        tvAnimalRaca.setText(m.getAnimalRaca() != null ? m.getAnimalRaca() : "-");
+        tvAnimalGenero.setText(m.getAnimalGenero() != null ? m.getAnimalGenero() : "-");
 
-        // Assumindo que o modelo Marcacao possui o método getAnimalEspecie()
-        tvAnimalRaca.setText(m.getAnimalEspecie() != null ? m.getAnimalEspecie() : "-");
-
-        // Diagnóstico
         String diag = m.getDiagnostico();
         if (diag == null || diag.isEmpty() || diag.equals("null")) {
             tvDiagnostico.setText("Sem notas registadas.");
@@ -175,89 +252,7 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         dialog.show();
     }
 
-    // --- FIM DA IMPLEMENTAÇÃO DO DIÁLOGO ---
-
-    private void loadMarcacoes() {
-        if (currentToken == null || currentToken.isEmpty()) {
-            carregarCache();
-            return;
-        }
-
-        progressBar.setVisibility(View.VISIBLE);
-
-        Singleton.getInstance(requireContext()).getMarcacoes(currentToken, new Singleton.MarcacoesCallback() {
-            @Override
-            public void onSuccess(ArrayList<Marcacao> marcacoes) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE);
-                    listaOriginal = marcacoes;
-                    atualizarDropdownAnimais();
-                    aplicarFiltros();
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE);
-                    // Se falhar a API, carrega do cache
-                    carregarCache();
-                    Toast.makeText(getContext(), "Modo Offline: " + error, Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
-    }
-
-    private void carregarCache() {
-        if (!isAdded()) return;
-        requireActivity().runOnUiThread(() -> {
-            ArrayList<Marcacao> cachedMarcacoes = Singleton.getInstance(requireContext()).getMarcacoesBD();
-
-            listaOriginal.clear();
-            if (cachedMarcacoes != null) {
-                listaOriginal.addAll(cachedMarcacoes);
-            }
-
-            atualizarDropdownAnimais();
-            aplicarFiltros();
-            progressBar.setVisibility(View.GONE);
-
-            Log.d("VetGestLink-Marcacoes", "Carregou dados do cache local");
-        });
-    }
-
-    private void setupNetworkCallback() {
-        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) return;
-
-        networkCallback = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onAvailable(@NonNull Network network) {
-                // Quando a rede ficar disponível, verificar a API e recarregar dados
-                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
-                    if (isAdded() && responding) {
-                        requireActivity().runOnUiThread(() -> loadMarcacoes());
-                    }
-                });
-            }
-
-            @Override
-            public void onLost(@NonNull Network network) {
-                // Quando perder a rede, garantir que mostramos o cache
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> carregarCache());
-                }
-            }
-        };
-
-        NetworkRequest networkRequest = new NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .build();
-
-        cm.registerNetworkCallback(networkRequest, networkCallback);
-    }
+    // --- FILTROS E DROPDOWN ---
 
     private void configurarFiltroAnimal() {
         autoCompleteAnimal.setOnItemClickListener((parent, view, position, id) -> {
@@ -269,51 +264,37 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
     private void atualizarDropdownAnimais() {
         Set<String> nomesAnimais = new HashSet<>();
         nomesAnimais.add("Todos");
-        for (Marcacao m : listaOriginal) {
-            if (m.getAnimalNome() != null) {
-                nomesAnimais.add(m.getAnimalNome());
+
+        // Usa a lista de ANIMAIS carregada via Singleton
+        if (listaAnimais != null) {
+            for (Animal a : listaAnimais) {
+                if (a.getNome() != null && !a.getNome().isEmpty()) {
+                    nomesAnimais.add(a.getNome());
+                }
             }
         }
+
         ArrayAdapter<String> adapterAnimais = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<>(nomesAnimais));
         autoCompleteAnimal.setAdapter(adapterAnimais);
 
-        // Se o animal selecionado anteriormente não existir mais na lista, volta para "Todos"
         if (!nomesAnimais.contains(animalSelecionado)) {
             animalSelecionado = "Todos";
         }
-
-        // Define o texto visível no campo para garantir que "Todos" (ou o atual) apareça selecionado
         autoCompleteAnimal.setText(animalSelecionado, false);
     }
 
     private void configurarFiltrosEstado() {
         View.OnClickListener statusClickListener = v -> {
-            // Lógica de Toggle: Se clicar no botão já selecionado, volta para "Todas"
             if (v.getId() == R.id.btnFiltrarPendente) {
-                if (estadoSelecionado.equals("pendente")) {
-                    estadoSelecionado = "Todas";
-                    atualizarBotoesUI(null);
-                } else {
-                    estadoSelecionado = "pendente";
-                    atualizarBotoesUI(btnFilterPendente);
-                }
+                estadoSelecionado = estadoSelecionado.equals("pendente") ? "Todas" : "pendente";
+                atualizarBotoesUI(estadoSelecionado.equals("pendente") ? btnFilterPendente : null);
             } else if (v.getId() == R.id.btnFiltrarCancelada) {
-                if (estadoSelecionado.equals("cancelada")) {
-                    estadoSelecionado = "Todas";
-                    atualizarBotoesUI(null);
-                } else {
-                    estadoSelecionado = "cancelada";
-                    atualizarBotoesUI(btnFilterCancelada);
-                }
+                estadoSelecionado = estadoSelecionado.equals("cancelada") ? "Todas" : "cancelada";
+                atualizarBotoesUI(estadoSelecionado.equals("cancelada") ? btnFilterCancelada : null);
             } else if (v.getId() == R.id.btnFiltrarRealizada) {
-                if (estadoSelecionado.equals("realizada")) {
-                    estadoSelecionado = "Todas";
-                    atualizarBotoesUI(null);
-                } else {
-                    estadoSelecionado = "realizada";
-                    atualizarBotoesUI(btnFilterRealizada);
-                }
+                estadoSelecionado = estadoSelecionado.equals("realizada") ? "Todas" : "realizada";
+                atualizarBotoesUI(estadoSelecionado.equals("realizada") ? btnFilterRealizada : null);
             }
             aplicarFiltros();
         };
@@ -327,9 +308,13 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         ArrayList<Marcacao> listaFiltrada = new ArrayList<>();
 
         for (Marcacao m : listaOriginal) {
-            boolean bateAnimal = animalSelecionado.equals("Todos") ||
-                    (m.getAnimalNome() != null && m.getAnimalNome().equalsIgnoreCase(animalSelecionado));
+            // Filtro de Animal: Verifica se é "Todos" OU se o nome coincide (ignorando maiúsculas/minúsculas e espaços)
+            boolean bateAnimal = animalSelecionado.equals("Todos");
+            if (!bateAnimal && m.getAnimalNome() != null) {
+                bateAnimal = m.getAnimalNome().trim().equalsIgnoreCase(animalSelecionado.trim());
+            }
 
+            // Filtro de Estado
             boolean bateEstado = estadoSelecionado.equals("Todas") ||
                     (m.getEstado() != null && m.getEstado().equalsIgnoreCase(estadoSelecionado));
 
@@ -354,21 +339,51 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
 
     private void atualizarBotoesUI(Button botaoSelecionado) {
         Button[] botoes = {btnFilterPendente, btnFilterCancelada, btnFilterRealizada};
-
         int corVerde = Color.parseColor("#2E7D32");
         int corBranca = Color.WHITE;
 
         for (Button btn : botoes) {
             if (btn == botaoSelecionado) {
-                // Botão Ativo: Fundo Verde, Texto Branco
                 btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(corVerde));
                 btn.setTextColor(corBranca);
             } else {
-                // Botão Inativo: Fundo Branco, Texto Verde
                 btn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(corBranca));
                 btn.setTextColor(corVerde);
             }
         }
+    }
+
+    // --- NETWORK & LISTENERS ---
+
+    private void setupNetworkCallback() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                Singleton.getInstance(requireContext()).quickCheckApiState(requireContext(), responding -> {
+                    if (isAdded() && responding) {
+                        requireActivity().runOnUiThread(() -> {
+                            loadMarcacoes();
+                            loadAnimais();
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> carregarCache());
+                }
+            }
+        };
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+        cm.registerNetworkCallback(networkRequest, networkCallback);
     }
 
     @Override
@@ -377,7 +392,6 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
         if (isAdded()) {
             requireActivity().runOnUiThread(() -> {
                 this.listaOriginal = listaMarcacoes;
-                atualizarDropdownAnimais();
                 aplicarFiltros();
             });
         }
@@ -385,9 +399,11 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
 
     @Override
     public void onApiStateChanged(boolean available) {
-        // Se a API ficar disponível e a lista estiver vazia ou desatualizada, podemos recarregar
         if (available && isAdded()) {
-            requireActivity().runOnUiThread(this::loadMarcacoes);
+            requireActivity().runOnUiThread(() -> {
+                loadMarcacoes();
+                loadAnimais();
+            });
         }
     }
 
@@ -395,7 +411,6 @@ public class MarcacoesFragment extends Fragment implements MarcacoesListener, Si
     public void onDestroyView() {
         super.onDestroyView();
         Singleton.getInstance(requireContext()).removeApiStateChangeListener(this);
-
         if (networkCallback != null) {
             ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             if (cm != null) {

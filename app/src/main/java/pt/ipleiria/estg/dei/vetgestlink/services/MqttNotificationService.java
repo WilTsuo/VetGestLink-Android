@@ -30,9 +30,9 @@ import pt.ipleiria.estg.dei.vetgestlink.utils.Singleton;
 
 public class MqttNotificationService extends Service {
 
-    private static final String TAG = "Vetgetlink-MqttDebug";
+    // Instância do handler MQTT com todas as funçõoes de conexão, subscrição e publicação
     private MqttHandler mqttHandler;
-
+    private static final String TAG = "Vetgetlink-MqttDebug";
     private static final String CLIENT_ID = "VetGestLink_Android";
     private static final String CHANNEL_ID = "vetgestlink_channel";
     private static final String FOREGROUND_CHANNEL_ID = "vetgestlink_foreground";

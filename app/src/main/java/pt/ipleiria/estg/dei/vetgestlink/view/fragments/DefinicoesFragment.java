@@ -36,7 +36,8 @@ public class DefinicoesFragment extends Fragment {
     private SwitchMaterial switchNotifications;
     private SharedPreferences sharedPreferences;
 
-    // Constantes removidas. Agora usamos o Singleton.getUrlFrontend()
+    // Constantes removidas. Agora usamos o Singleton.getUrlFrontend() para usar as imagens do glide,
+    // e as SharedPreferences do Singleton para guardar o URL.
 
     private static final String PREFS_NAME = "VetGestLinkPrefs";
     private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
@@ -174,6 +175,7 @@ public class DefinicoesFragment extends Fragment {
         }
     }
 
+    // Verifica permissão e inicia o serviço de notificações MQTT
     private void checkPermissionAndStartService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
@@ -236,6 +238,7 @@ public class DefinicoesFragment extends Fragment {
                             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                             // Efetuar logout após alteração de palavra-passe
+                            // Porque muda o token de acesso quando e mudado a palavra-passe
                             performLogout();
                         }
 
@@ -247,7 +250,6 @@ public class DefinicoesFragment extends Fragment {
                     }
             );
         });
-
         dialog.show();
     }
 }

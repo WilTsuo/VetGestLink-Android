@@ -35,7 +35,6 @@ public class FaturasFragment extends Fragment implements FaturasListener, OnPaga
     private ListView lvFaturas;
     private Button btnTodos, btnPendente, btnPago;
     private TextView tvQuantidadePendente, tvQuantidadePaga;
-
     private ArrayList<Fatura> listaFaturas = new ArrayList<>();
     private ArrayList<Fatura> listaFiltrada = new ArrayList<>();
     private FaturasAdapter adapter;

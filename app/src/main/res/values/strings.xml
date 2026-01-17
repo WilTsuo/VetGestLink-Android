@@ -146,6 +146,11 @@
     <string name="detalhes">Detalhes</string>
     <string name="label_cliente">Cliente:</string>
     <string name="label_nif">NIF:</string>
+    <!-- NOVAS STRINGS ADICIONADAS -->
+    <string name="label_nome_paciente">Nome do Paciente</string>
+    <string name="label_raca">Raça</string>
+    <string name="label_diagnostico_notas">Diagnóstico / Notas</string>
+    <string name="default_hifen">-</string>
 
     <!-- Item animal / perfil específico -->
     <string name="tv_species_label">Espécie</string>

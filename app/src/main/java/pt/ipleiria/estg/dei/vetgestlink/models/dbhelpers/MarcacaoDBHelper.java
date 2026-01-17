@@ -13,7 +13,7 @@ import pt.ipleiria.estg.dei.vetgestlink.models.Marcacao;
 public class MarcacaoDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "Marcacoes.db";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String TABLE_NAME = "marcacoes";
 
     // Colunas da Tabela
@@ -27,6 +27,9 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
     private static final String COL_SERVICO = "servicoNome";
     private static final String COL_ANIMAL_NOME = "animalNome";
     private static final String COL_ANIMAL_ESPECIE = "animalEspecie";
+    // 2. Novas Colunas
+    private static final String COL_ANIMAL_RACA = "animalRaca";
+    private static final String COL_ANIMAL_GENERO = "animalGenero";
 
     public MarcacaoDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -34,6 +37,7 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // 3. Adicionar as novas colunas ao comando CREATE TABLE
         String createTable = "CREATE TABLE " + TABLE_NAME + "(" +
                 COL_ID + " INTEGER PRIMARY KEY, " +
                 COL_DATA + " TEXT, " +
@@ -44,12 +48,15 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
                 COL_DIAGNOSTICO + " TEXT, " +
                 COL_SERVICO + " TEXT, " +
                 COL_ANIMAL_NOME + " TEXT, " +
-                COL_ANIMAL_ESPECIE + " TEXT);";
+                COL_ANIMAL_ESPECIE + " TEXT, " +
+                COL_ANIMAL_RACA + " TEXT, " +
+                COL_ANIMAL_GENERO + " TEXT);";
         db.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Simplesmente apaga e recria a tabela (cache)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
@@ -70,6 +77,9 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
             values.put(COL_SERVICO, m.getServicoNome());
             values.put(COL_ANIMAL_NOME, m.getAnimalNome());
             values.put(COL_ANIMAL_ESPECIE, m.getAnimalEspecie());
+            // 4. Guardar os novos valores
+            values.put(COL_ANIMAL_RACA, m.getAnimalRaca());
+            values.put(COL_ANIMAL_GENERO, m.getAnimalGenero());
 
             db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } finally {
@@ -87,6 +97,7 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
 
             if (cursor != null && cursor.moveToFirst()) {
                 do {
+                    // 5. Ler os novos valores e usar o construtor atualizado
                     lista.add(new Marcacao(
                             cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
                             cursor.getString(cursor.getColumnIndexOrThrow(COL_DATA)),
@@ -97,7 +108,9 @@ public class MarcacaoDBHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndexOrThrow(COL_DIAGNOSTICO)),
                             cursor.getString(cursor.getColumnIndexOrThrow(COL_SERVICO)),
                             cursor.getString(cursor.getColumnIndexOrThrow(COL_ANIMAL_NOME)),
-                            cursor.getString(cursor.getColumnIndexOrThrow(COL_ANIMAL_ESPECIE))
+                            cursor.getString(cursor.getColumnIndexOrThrow(COL_ANIMAL_ESPECIE)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(COL_ANIMAL_RACA)),   // Novo
+                            cursor.getString(cursor.getColumnIndexOrThrow(COL_ANIMAL_GENERO))  // Novo
                     ));
                 } while (cursor.moveToNext());
             }

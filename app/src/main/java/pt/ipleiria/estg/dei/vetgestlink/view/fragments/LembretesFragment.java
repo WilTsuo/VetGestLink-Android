@@ -107,7 +107,7 @@ public class LembretesFragment extends Fragment {
             SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             String token = prefs.getString("access_token", "");
 
-            Singleton.getInstance(requireContext()).criarLembrete(token, descricao, new Singleton.MessageCallback() {
+            Singleton.getInstance(requireContext()).criarLembrete(token, descricao, new Singleton.CriarLembreteCallback() {
                 @Override
                 public void onSuccess(String message) {
                     Toast.makeText(getContext(), "Lembrete criado", Toast.LENGTH_SHORT).show();

@@ -63,10 +63,11 @@
             android:background="@color/border_light"
             android:layout_marginBottom="16dp"/>
 
+        <!-- DADOS DO ANIMAL CORRIGIDOS -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nome do Paciente"
+            android:text="@string/label_nome_paciente"
             android:textSize="12sp"
             android:textColor="@color/text_tertiary"/>
 
@@ -74,19 +75,21 @@
             android:id="@+id/tvDialogAnimalNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nome do Paciente"
+            android:text="@string/label_nome_paciente"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp"/>
 
+        <!-- Linha 1: Espécie (Esq) e Raça (Dir) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:baselineAligned="false"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp">
 
+            <!-- Espécie -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -109,6 +112,7 @@
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
 
+            <!-- Raça -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -119,7 +123,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_gender_label"
+                    android:text="@string/label_raca"
                     android:textSize="12sp"
                     android:textColor="@color/text_tertiary"/>
 
@@ -127,16 +131,40 @@
                     android:id="@+id/tvDialogAnimalRaca"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_gender_label"
+                    android:text="@string/label_raca"
                     android:textSize="16sp"
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Linha 2: Género -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_gender_label"
+                android:textSize="12sp"
+                android:textColor="@color/text_tertiary"/>
+
+            <TextView
+                android:id="@+id/tvDialogAnimalGenero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_gender_label"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+
+        <!-- Diagnóstico e Botão -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Diagnóstico / Notas"
+            android:text="@string/label_diagnostico_notas"
             android:textSize="12sp"
             android:textColor="@color/text_tertiary"/>
 
@@ -144,7 +172,7 @@
             android:id="@+id/tvDialogDiagnostico"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/default_hifen"
             android:background="#F9FAFB"
             android:padding="12dp"
             android:textColor="@color/text_secondary"

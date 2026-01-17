@@ -148,7 +148,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
             }
 
             String token = getAccessToken(context);
-            Singleton.getInstance(context).atualizarNota(token, nota.getId(), descricao, new Singleton.MessageCallback() {
+            Singleton.getInstance(context).atualizarNota(token, nota.getId(), descricao, new Singleton.AtualizarNotaCallback() {
                 @Override
                 public void onSuccess(String message) {
                     Toast.makeText(context, message != null ? message : "Nota actualizada", Toast.LENGTH_SHORT).show();
@@ -176,7 +176,7 @@ public class NotasAdapter extends RecyclerView.Adapter<NotasAdapter.NotaViewHold
                 .setMessage("Tem certeza que deseja eliminar esta nota?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     String token = getAccessToken(context);
-                    Singleton.getInstance(context).deletarNota(token, nota.getId(), new Singleton.MessageCallback() {
+                    Singleton.getInstance(context).deletarNota(token, nota.getId(), new Singleton.EliminarNotaCallback() {
                         @Override
                         public void onSuccess(String message) {
                             Toast.makeText(context, "Nota eliminada", Toast.LENGTH_SHORT).show();

@@ -128,6 +128,12 @@ public class Singleton {
     public interface MarcacoesCallback { void onSuccess(ArrayList<Marcacao> marcacoes); void onError(String error); }
     public interface LembretesCallback { void onSuccess(List<Lembrete> lembretes); void onError(String error); }
     public interface MessageCallback { void onSuccess(String message); void onError(String error); }
+    public interface AtualizarLembreteCallback { void onSuccess(String message); void onError(String error); }
+    public interface CriarLembreteCallback { void onSuccess(String message); void onError(String error); }
+    public interface EliminarLembreteCallback { void onSuccess(String message); void onError(String error); }
+    public interface CriarNotaCallback { void onSuccess(String message); void onError(String error); }
+    public interface AtualizarNotaCallback { void onSuccess(String message); void onError(String error); }
+    public interface EliminarNotaCallback { void onSuccess(String message); void onError(String error); }
     public interface FaturasCallback { void onSuccess(ArrayList<Fatura> faturas); void onError(String error); }
     public interface MetodosPagamentoCallback { void onSuccess(ArrayList<MetodoPagamento> metodos); void onError(String error); }
     public interface LoginCallback { void onSuccess(String token, UserProfile userProfile); void onError(String error); }
@@ -256,7 +262,7 @@ public class Singleton {
 
     // endregion
 
-    // region Autenticação (Login)
+    // region Autenticação (LoginActivity)
     public void login(String username, String password, LoginCallback callback) {
         String url = buildUrl("auth/login");
         JSONObject jsonBody = new JSONObject();
@@ -293,7 +299,7 @@ public class Singleton {
     }
     // endregion
 
-    // region Esqueceu a Palavra-Passe(Login)
+    // region Esqueceu a Palavra-Passe(EsqueceuPalavraPassActivity)
     public void recuperarPalavraPasse(String email, final EsqueceuPassCallback callback) {
         String url = buildUrl("auth/forgot");
 
@@ -377,7 +383,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    public void criarNota(String accessToken, int animalId, String nota, MessageCallback callback) {
+    public void criarNota(String accessToken, int animalId, String nota, CriarNotaCallback callback) {
         String url = buildUrl("nota/create?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
         try {
@@ -400,7 +406,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    public void atualizarNota(String accessToken, int notaId, String nota, MessageCallback callback) {
+    public void atualizarNota(String accessToken, int notaId, String nota, AtualizarNotaCallback callback) {
         String url = buildUrl("nota/" + notaId + "?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
         try {
@@ -419,7 +425,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_NOTAS);
     }
 
-    public void deletarNota(String accessToken, int notaId, MessageCallback callback) {
+    public void deletarNota(String accessToken, int notaId, EliminarNotaCallback callback) {
         String url = buildUrl("nota/" + notaId + "?access-token=" + accessToken);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 response -> {
@@ -637,7 +643,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_LEMBRETES);
     }
 
-    public void criarLembrete(String accessToken, String descricao, MessageCallback callback) {
+    public void criarLembrete(String accessToken, String descricao, CriarLembreteCallback callback) {
         String url = buildUrl("lembrete/create?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
         try { jsonBody.put("descricao", descricao); } catch (JSONException e) { return; }
@@ -653,7 +659,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_LEMBRETES);
     }
 
-    public void atualizarLembrete(String accessToken, int id, String descricao, MessageCallback callback) {
+    public void atualizarLembrete(String accessToken, int id, String descricao, CriarLembreteCallback callback) {
         String url = buildUrl("lembrete/update/" + id + "?access-token=" + accessToken);
         JSONObject jsonBody = new JSONObject();
         try { jsonBody.put("descricao", descricao); } catch (JSONException e) { return; }
@@ -669,7 +675,7 @@ public class Singleton {
         addToRequestQueue(request, TAG_LEMBRETES);
     }
 
-    public void deletarLembrete(String accessToken, int id, MessageCallback callback) {
+    public void deletarLembrete(String accessToken, int id, EliminarLembreteCallback callback) {
         String url = buildUrl("lembrete/delete/" + id + "?access-token=" + accessToken);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 response -> {
