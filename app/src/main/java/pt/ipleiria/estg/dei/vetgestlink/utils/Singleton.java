@@ -261,7 +261,6 @@ public class Singleton {
     // endregion
 
     // region Autenticação (Login)
-
     public void login(String username, String password, LoginCallback callback) {
         String url = buildUrl("auth/login");
         JSONObject jsonBody = new JSONObject();
@@ -294,7 +293,7 @@ public class Singleton {
                     callback.onError(err);
                 }
         );
-        getRequestQueue().add(request);
+        addToRequestQueue(request,TAG_LOGIN);
     }
 
     // endregion
